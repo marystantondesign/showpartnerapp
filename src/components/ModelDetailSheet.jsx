@@ -3,18 +3,69 @@ import BottomSheet from './BottomSheet'
 import StatusChip from './StatusChip'
 import { STATUS_META, STATUS_ORDER, cycleStatus } from '../data/mockData'
 
-export default function ModelDetailSheet({ model, onClose, onStatusChange, onNote }) {
+export default function ModelDetailSheet({ model, onClose, onStatusChange, onNote, currentProfile }) {
   const [note, setNote] = useState(model?.notes || '')
+  const [photos, setPhotos] = useState(model?.photos || [])
+  const [expandedPhoto, setExpandedPhoto] = useState(null)
 
   if (!model) return null
 
   const allStatuses = STATUS_ORDER
 
+  function handleUpload() {
+    const newPhoto = {
+      id: `ph-${Date.now()}`,
+      url: `https://i.pravatar.cc/300?img=${Math.floor(Math.random() * 70)}`,
+      uploadedBy: currentProfile?.name || 'You',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      label: 'Today',
+    }
+    setPhotos(prev => [...prev, newPhoto])
+  }
+
+  function getInitials(name) {
+    if (!name) return '?'
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
   return (
     <BottomSheet open onClose={onClose} height="88%" noPadding>
+      {/* Expanded photo overlay */}
+      {expandedPhoto && (
+        <div
+          className="absolute inset-0 z-50 flex flex-col bg-black"
+          style={{ borderRadius: 'inherit' }}
+        >
+          <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
+            <span className="text-[10px] tracking-widest uppercase font-sans text-white/60">
+              {expandedPhoto.label} · {expandedPhoto.timestamp}
+            </span>
+            <button
+              onClick={() => setExpandedPhoto(null)}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 outline-none"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round">
+                <line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/>
+              </svg>
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center px-4 pb-8">
+            <img
+              src={expandedPhoto.url}
+              alt={expandedPhoto.label}
+              className="w-full rounded-lg object-contain"
+              style={{ maxHeight: '70vh' }}
+            />
+          </div>
+          <div className="px-4 pb-6 flex-shrink-0">
+            <p className="text-[11px] font-sans text-white/50">by {expandedPhoto.uploadedBy}</p>
+          </div>
+        </div>
+      )}
+
       {/* Photo header */}
-      <div className="relative w-full h-48 flex-shrink-0">
-        <img src={model.avatar} alt={model.name} className="w-full h-full object-cover" />
+      <div className="relative w-full flex-shrink-0" style={{ height: 224 }}>
+        <img src={model.avatar} alt={model.name} className="w-full h-full object-cover object-top" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-3 left-4">
           <h2 className="font-serif text-2xl text-white leading-tight">{model.name}</h2>
@@ -34,6 +85,39 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
         <div className="mb-5">
           <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">ARTISTS</p>
           <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{model.assignedArtists.join(', ')}</p>
+        </div>
+
+        {/* Photos */}
+        <div className="mb-5">
+          <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">PHOTOS</p>
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+            {photos.map(photo => (
+              <button
+                key={photo.id}
+                onClick={() => setExpandedPhoto(photo)}
+                className="flex-shrink-0 flex flex-col gap-1 outline-none"
+              >
+                <img
+                  src={photo.url}
+                  alt={photo.label}
+                  className="rounded-lg object-cover"
+                  style={{ width: 80, height: 80 }}
+                />
+                <span className="text-[9px] font-sans text-[#888580] text-center w-20 truncate">{photo.label} · {photo.timestamp}</span>
+              </button>
+            ))}
+            {/* Upload button */}
+            <button
+              onClick={handleUpload}
+              className="flex-shrink-0 flex flex-col items-center justify-center rounded-lg border border-dashed border-[#C8C4BF] dark:border-[#3A3632] outline-none gap-1"
+              style={{ width: 80, height: 80 }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-[#888580]">
+                <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
+              </svg>
+              <span className="text-[8px] tracking-widest uppercase font-sans text-[#888580]">UPLOAD</span>
+            </button>
+          </div>
         </div>
 
         <div className="h-px bg-[#E0DDD8] dark:bg-[#2E2B28] mb-5" />

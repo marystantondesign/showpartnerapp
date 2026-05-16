@@ -10,7 +10,7 @@ const STATUS_BORDER = {
   done: '#7A9E7E',
 }
 
-export default function LineupView({ models, onStatusChange, onNote }) {
+export default function LineupView({ models, currentProfile, onStatusChange, onNote }) {
   const [selectedModel, setSelectedModel] = useState(null)
 
   return (
@@ -70,6 +70,7 @@ export default function LineupView({ models, onStatusChange, onNote }) {
           onClose={() => setSelectedModel(null)}
           onStatusChange={onStatusChange}
           onNote={onNote}
+          currentProfile={currentProfile}
         />
       )}
     </div>

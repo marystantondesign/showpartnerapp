@@ -30,6 +30,11 @@ export const models = [
     assignedArtists: ['Aria Chen'],
     status: 'needs_revisit',
     notes: 'Allergic to latex gloves.',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=44', uploadedBy: 'Aria Chen', timestamp: '5:12 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=48', uploadedBy: 'Aria Chen', timestamp: '5:34 AM', label: 'After' },
+      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=56', uploadedBy: 'Aria Chen', timestamp: '5:40 AM', label: 'Revisit' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Aria Chen' },
       { status: 'needs_revisit', timestamp: '5:35 AM', updatedBy: 'Aria Chen' },
@@ -41,6 +46,10 @@ export const models = [
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: '',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=25', uploadedBy: 'Marcus Lee', timestamp: '2:10 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=60', uploadedBy: 'Marcus Lee', timestamp: '2:46 AM', label: 'Done' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:47 AM', updatedBy: 'Marcus Lee' },
@@ -52,6 +61,10 @@ export const models = [
     assignedArtists: ['Aria Chen', 'Zoe Park'],
     status: 'paused',
     notes: 'Requested minimal coverage.',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=29', uploadedBy: 'Zoe Park', timestamp: '2:49 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=53', uploadedBy: 'Aria Chen', timestamp: '3:05 AM', label: 'Paused' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:49 AM', updatedBy: 'Zoe Park' },
       { status: 'paused', timestamp: '3:06 AM', updatedBy: 'Aria Chen' },
@@ -63,6 +76,9 @@ export const models = [
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: '',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=15', uploadedBy: 'Marcus Lee', timestamp: '1:55 AM', label: 'Before' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '1:55 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:29 AM', updatedBy: 'Marcus Lee' },
@@ -74,6 +90,7 @@ export const models = [
     assignedArtists: ['Sophia Rivera'],
     status: 'done',
     notes: '',
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:00 AM', updatedBy: 'Sophia Rivera' },
       { status: 'done', timestamp: '2:34 AM', updatedBy: 'Sophia Rivera' },
@@ -85,6 +102,9 @@ export const models = [
     assignedArtists: ['Zoe Park'],
     status: 'needs_revisit',
     notes: 'Touch up left brow.',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=39', uploadedBy: 'Zoe Park', timestamp: '2:30 AM', label: 'Before' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:30 AM', updatedBy: 'Zoe Park' },
       { status: 'needs_revisit', timestamp: '3:08 AM', updatedBy: 'Zoe Park' },
@@ -96,6 +116,7 @@ export const models = [
     assignedArtists: ['Aria Chen'],
     status: 'done',
     notes: '',
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Aria Chen' },
       { status: 'done', timestamp: '2:24 AM', updatedBy: 'Aria Chen' },
@@ -107,6 +128,10 @@ export const models = [
     assignedArtists: ['Sophia Rivera', 'Marcus Lee'],
     status: 'in_progress',
     notes: '',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=43', uploadedBy: 'Marcus Lee', timestamp: '3:15 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=62', uploadedBy: 'Sophia Rivera', timestamp: '3:40 AM', label: 'In Progress' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '3:15 AM', updatedBy: 'Marcus Lee' },
     ],
@@ -117,6 +142,9 @@ export const models = [
     assignedArtists: ['Zoe Park'],
     status: 'done',
     notes: '',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=23', uploadedBy: 'Zoe Park', timestamp: '2:45 AM', label: 'Before' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:45 AM', updatedBy: 'Zoe Park' },
       { status: 'done', timestamp: '3:20 AM', updatedBy: 'Zoe Park' },
@@ -128,6 +156,7 @@ export const models = [
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: '',
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '3:30 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '4:05 AM', updatedBy: 'Marcus Lee' },
@@ -139,6 +168,11 @@ export const models = [
     assignedArtists: ['Aria Chen'],
     status: 'in_progress',
     notes: '',
+    photos: [
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=36', uploadedBy: 'Aria Chen', timestamp: '4:40 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=65', uploadedBy: 'Aria Chen', timestamp: '5:02 AM', label: 'In Progress' },
+      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=67', uploadedBy: 'Aria Chen', timestamp: '5:18 AM', label: 'Detail' },
+    ],
     statusLog: [
       { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Aria Chen' },
     ],
@@ -149,6 +183,7 @@ export const models = [
     assignedArtists: ['Sophia Rivera'],
     status: 'not_started',
     notes: '',
+    photos: [],
     statusLog: [],
   },
 ]

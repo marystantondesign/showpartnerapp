@@ -37,35 +37,37 @@ export default function ListView({ models, currentProfile, onStatusChange, onNot
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Filter chips + toggle */}
-      <div className="flex items-center px-4 py-2.5 border-b border-[#E0DDD8] dark:border-[#2E2B28] gap-2 overflow-x-auto flex-shrink-0">
-        <div className="flex items-center gap-1.5 flex-1 overflow-x-auto">
-          {activeCounts.map(s => (
-            <button
-              key={s}
-              onClick={() => setFilterStatus(f => f === s ? null : s)}
-              style={{
-                backgroundColor: STATUS_META[s].color,
-                outline: filterStatus === s ? '2px solid #111' : 'none',
-                outlineOffset: 1,
-              }}
-              className="text-[9px] font-sans font-semibold tracking-widest uppercase px-2 py-[4px] rounded-full text-[#111] whitespace-nowrap flex-shrink-0"
-            >
-              {counts[s]} {SHORT_LABEL[s]}
+      <div className="px-4 py-2.5 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
+        <div className="flex items-start gap-2">
+          <div className="flex flex-wrap gap-1.5 flex-1">
+            {activeCounts.map(s => (
+              <button
+                key={s}
+                onClick={() => setFilterStatus(f => f === s ? null : s)}
+                style={{
+                  backgroundColor: STATUS_META[s].color,
+                  outline: filterStatus === s ? '2px solid #111' : 'none',
+                  outlineOffset: 1,
+                }}
+                className="text-[9px] font-sans font-semibold tracking-widest uppercase px-2 py-[4px] rounded-full text-[#111] whitespace-nowrap flex-shrink-0"
+              >
+                {counts[s]} {SHORT_LABEL[s]}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
+            <button onClick={() => setGridView(false)} className={`outline-none ${!gridView ? 'text-[#111] dark:text-[#F0EDE8]' : 'text-[#B0ACA7]'}`}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/>
+              </svg>
             </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-          <button onClick={() => setGridView(false)} className={`outline-none ${!gridView ? 'text-[#111] dark:text-[#F0EDE8]' : 'text-[#B0ACA7]'}`}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-              <line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/>
-            </svg>
-          </button>
-          <button onClick={() => setGridView(true)} className={`outline-none ${gridView ? 'text-[#111] dark:text-[#F0EDE8]' : 'text-[#B0ACA7]'}`}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-              <rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/>
-              <rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/>
-            </svg>
-          </button>
+            <button onClick={() => setGridView(true)} className={`outline-none ${gridView ? 'text-[#111] dark:text-[#F0EDE8]' : 'text-[#B0ACA7]'}`}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/>
+                <rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -129,6 +131,7 @@ export default function ListView({ models, currentProfile, onStatusChange, onNot
           onClose={() => setSelectedModel(null)}
           onStatusChange={onStatusChange}
           onNote={onNote}
+          currentProfile={currentProfile}
         />
       )}
     </div>

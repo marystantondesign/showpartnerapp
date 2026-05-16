@@ -58,7 +58,7 @@ export default function App() {
         <div className="flex-1 overflow-hidden flex flex-col">
           {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} />}
           {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
-          {tab === 'lineup'    && <LineupView models={models} onStatusChange={handleStatusChange} onNote={handleNote} />}
+          {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'dashboard' && <DashboardView models={models} team={profiles} notifications={notifications} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} />}
         </div>

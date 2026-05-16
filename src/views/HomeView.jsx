@@ -61,7 +61,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation }
   }
 
   return (
-    <div className="relative w-full" style={{ height: 260 }} onClick={() => setTooltip(null)}>
+    <div className="relative w-full" style={{ height: 260, overflow: 'hidden', backgroundColor: '#2B2F38' }} onClick={() => setTooltip(null)}>
       <style>{`
         @keyframes pulse-ring {
           0%   { transform: scale(1);   opacity: 0.6; }
@@ -110,7 +110,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation }
       </svg>
 
       {/* Floor plan overlay at 30% opacity */}
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.28, padding: '8px 10px' }}>
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.28, padding: 0 }}>
         <FloorPlanSVG dark={false} />
       </div>
 
