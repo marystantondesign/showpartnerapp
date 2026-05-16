@@ -36,6 +36,8 @@ Thumbs.db
 *.mov
 *.m4a
 *.pdf
-*.png
 *.jpg
 *.jpeg
+# Allow app icon PNG in public/
+*.png
+!public/*.png
