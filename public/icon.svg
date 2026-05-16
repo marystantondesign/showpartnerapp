@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#F5F2EE"/>
+
+  <!-- SHOW -->
+  <text x="256" y="210" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="96" font-weight="400" letter-spacing="12"
+    fill="#111111">SHOW</text>
+
+  <!-- PARTNER -->
+  <text x="256" y="310" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="96" font-weight="400" letter-spacing="12"
+    fill="#111111">PARTNER</text>
+
+  <!-- Divider line -->
+  <line x1="96" y1="345" x2="416" y2="345" stroke="#C8C4BF" stroke-width="1.5"/>
+
+  <!-- Status dots -->
+  <circle cx="160" cy="390" r="18" fill="#7A9E7E"/>
+  <circle cx="216" cy="390" r="18" fill="#8A9BB0"/>
+  <circle cx="272" cy="390" r="18" fill="#D4A853"/>
+  <circle cx="328" cy="390" r="18" fill="#C4614A"/>
+</svg>
