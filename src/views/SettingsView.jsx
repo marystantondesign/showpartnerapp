@@ -111,27 +111,38 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange 
 
           {/* Floor plan row — shown once a pin is set */}
           {venue.pin && (
-            <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-              <div style={{ flex: 1, paddingRight: 12 }}>
-                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Floor plan</p>
-                <p className="text-[11px] font-sans text-[#888580] mt-0.5">
-                  {venue.area
-                    ? (venue.area.name && venue.area.name !== 'Custom area' ? venue.area.name : 'Building footprint') + ' selected'
-                    : venue.floorPlanImage
-                    ? 'Image uploaded'
-                    : 'None — select a building or upload an image'}
-                </p>
+            <div className="py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              <div className="flex items-center justify-between">
+                <div style={{ flex: 1, paddingRight: 12 }}>
+                  <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Floor plan</p>
+                  <p className="text-[11px] font-sans text-[#888580] mt-0.5">
+                    {venue.area
+                      ? (venue.area.name && venue.area.name !== 'Custom area' ? venue.area.name : 'Building footprint') + ' selected'
+                      : venue.floorPlanImage
+                      ? 'Image uploaded'
+                      : 'Select a building or upload an image'}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  {/* Select building — reopens the map */}
+                  <button
+                    onClick={() => setShowVenueMap(true)}
+                    className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8]"
+                  >
+                    SELECT
+                  </button>
+                  {/* Upload image */}
+                  <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer">
+                    UPLOAD
+                    <input ref={floorPlanUploadRef} type="file" accept="image/*" className="hidden" onChange={handleFloorPlanUpload} />
+                  </label>
+                </div>
               </div>
-              {/* Upload image as secondary path */}
-              <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer flex-shrink-0">
-                UPLOAD
-                <input ref={floorPlanUploadRef} type="file" accept="image/*" className="hidden" onChange={handleFloorPlanUpload} />
-              </label>
             </div>
           )}
 
-          {/* Zones row — shown once there's a floor plan base or we have zones */}
-          {(hasFloorPlan || zoneCount > 0) && (
+          {/* Zones row — always visible once a pin is set */}
+          {venue.pin && (
             <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
               <div style={{ flex: 1, paddingRight: 12 }}>
                 <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Zones & stations</p>
