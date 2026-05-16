@@ -592,24 +592,23 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
               </svg>
             </button>
             {expandedSections[sec.key] && (
-              <div className="grid grid-cols-2 gap-2 pt-1 pb-3">
+              <div className="grid grid-cols-3 gap-1.5 pt-1 pb-2">
                 {sec.people.map(p => (
                   <button
                     key={p.id}
                     onClick={() => setContactPerson(p)}
-                    className="flex flex-col items-center gap-1.5 bg-white/50 dark:bg-white/5 rounded-xl px-3 py-3 outline-none text-center"
+                    className="flex flex-col items-center gap-1 bg-white/50 dark:bg-white/5 rounded-lg px-2 py-2 outline-none text-center"
                   >
                     <div className="relative">
-                      <img src={p.avatar} alt={p.name} className="w-11 h-11 rounded-full object-cover" />
+                      <img src={p.avatar} alt={p.name} className="w-8 h-8 rounded-full object-cover" />
                       {(p.role === 'lead' || p.role === 'assistant') && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#F5F2EE] dark:border-[#1A1816] bg-[#7A9E7E]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#7A9E7E]" />
                       )}
                       {p.role === 'artist' && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />
                       )}
                     </div>
-                    <p className="text-[12px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight">{p.name}</p>
-                    <p className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">{p.role}</p>
+                    <p className="text-[10px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight w-full truncate">{p.name}</p>
                   </button>
                 ))}
               </div>
