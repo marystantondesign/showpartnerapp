@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
-// Fix default marker icon broken by bundlers
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -14,14 +13,19 @@ const DEFAULT_LAT = 48.8648
 const DEFAULT_LNG = 2.3490
 const DEFAULT_ZOOM = 17
 
-export default function VenuePinMap({ initialPin, onSave, onClose }) {
+export default function VenuePinMap({ initialPin, onSave, onClose, onCapture }) {
   const mapRef = useRef(null)
   const leafletMap = useRef(null)
+  const polygonLayer = useRef(null)
   const markerRef = useRef(null)
+
   const [pin, setPin] = useState(initialPin || { lat: DEFAULT_LAT, lng: DEFAULT_LNG })
   const [address, setAddress] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [searching, setSearching] = useState(false)
+  const [selectedBuilding, setSelectedBuilding] = useState(null) // { geometry: [{lat,lon}] }
+  const [loadingBuilding, setLoadingBuilding] = useState(false)
+  const [mode, setMode] = useState('pin') // 'pin' | 'building'
 
   useEffect(() => {
     if (leafletMap.current) return
@@ -44,8 +48,14 @@ export default function VenuePinMap({ initialPin, onSave, onClose }) {
       reverseGeocode(lat, lng)
     })
 
-    map.on('click', (e) => {
+    map.on('click', async (e) => {
       const { lat, lng } = e.latlng
+
+      if (mode === 'building' || true) {
+        // Always try to find a building first
+        await fetchBuilding(lat, lng, map)
+      }
+
       marker.setLatLng([lat, lng])
       setPin({ lat, lng })
       reverseGeocode(lat, lng)
@@ -53,13 +63,7 @@ export default function VenuePinMap({ initialPin, onSave, onClose }) {
 
     markerRef.current = marker
     leafletMap.current = map
-
     reverseGeocode(pin.lat, pin.lng)
-
-    return () => {
-      map.remove()
-      leafletMap.current = null
-    }
   }, [])
 
   async function reverseGeocode(lat, lng) {
@@ -73,6 +77,45 @@ export default function VenuePinMap({ initialPin, onSave, onClose }) {
     } catch {
       setAddress(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
     }
+  }
+
+  async function fetchBuilding(lat, lng, map) {
+    setLoadingBuilding(true)
+    setSelectedBuilding(null)
+    try {
+      const query = `[out:json][timeout:10];(way["building"](around:30,${lat},${lng});relation["building"](around:30,${lat},${lng}););out geom;`
+      const res = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query,
+      })
+      const data = await res.json()
+
+      if (data.elements?.length > 0) {
+        const building = data.elements[0]
+        const coords = building.geometry || []
+
+        if (coords.length > 0) {
+          // Remove old polygon
+          if (polygonLayer.current) polygonLayer.current.remove()
+
+          const latLngs = coords.map(p => [p.lat, p.lon])
+          polygonLayer.current = L.polygon(latLngs, {
+            color: '#C4614A',
+            weight: 2.5,
+            fillColor: '#C4614A',
+            fillOpacity: 0.15,
+          }).addTo(map || leafletMap.current)
+
+          setSelectedBuilding({ geometry: coords, name: building.tags?.name })
+        }
+      } else {
+        if (polygonLayer.current) { polygonLayer.current.remove(); polygonLayer.current = null }
+        setSelectedBuilding(null)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    setLoadingBuilding(false)
   }
 
   async function handleSearch(e) {
@@ -92,9 +135,44 @@ export default function VenuePinMap({ initialPin, onSave, onClose }) {
         markerRef.current.setLatLng([lat, lng])
         setPin({ lat, lng })
         setAddress(data[0].display_name)
+        await fetchBuilding(lat, lng)
       }
     } catch {}
     setSearching(false)
+  }
+
+  function buildingToSVG(geometry) {
+    const lats = geometry.map(p => p.lat)
+    const lons = geometry.map(p => p.lon)
+    const minLat = Math.min(...lats), maxLat = Math.max(...lats)
+    const minLon = Math.min(...lons), maxLon = Math.max(...lons)
+    const W = 800, H = 800
+    const PAD = 80
+
+    const scaleX = (lon) => PAD + ((lon - minLon) / (maxLon - minLon || 1)) * (W - PAD * 2)
+    // Lat is inverted in SVG (y increases downward)
+    const scaleY = (lat) => PAD + ((maxLat - lat) / (maxLat - minLat || 1)) * (H - PAD * 2)
+
+    const points = geometry.map(p => `${scaleX(p.lon)},${scaleY(p.lat)}`).join(' ')
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+  <rect width="${W}" height="${H}" fill="#F5F2EE"/>
+  <!-- Grid lines for context -->
+  <line x1="${PAD}" y1="${H / 2}" x2="${W - PAD}" y2="${H / 2}" stroke="#E0DDD8" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="${W / 2}" y1="${PAD}" x2="${W / 2}" y2="${H - PAD}" stroke="#E0DDD8" stroke-width="1" stroke-dasharray="4 4"/>
+  <!-- Building footprint -->
+  <polygon points="${points}" fill="#EDE9E4" stroke="#111111" stroke-width="3" stroke-linejoin="round"/>
+  <!-- North indicator -->
+  <text x="${W - PAD + 10}" y="${PAD}" font-family="Inter,system-ui,sans-serif" font-size="18" fill="#888580">N↑</text>
+</svg>`
+  }
+
+  function handleUseAsFloorPlan() {
+    if (!selectedBuilding) return
+    const svg = buildingToSVG(selectedBuilding.geometry)
+    const blob = new Blob([svg], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    onCapture(url, { ...pin, address })
   }
 
   return (
@@ -103,61 +181,77 @@ export default function VenuePinMap({ initialPin, onSave, onClose }) {
       <div style={{ padding: '12px 16px', borderBottom: '1px solid #2E2B28', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <p style={{ margin: 0, fontSize: 10, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580' }}>
-            DROP A PIN — VENUE LOCATION
+            {selectedBuilding ? '✓ Building selected — tap to change' : 'Tap a building to select it'}
           </p>
-          <button
-            onClick={onClose}
-            style={{ fontSize: 9, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580', border: 'none', background: 'none', cursor: 'pointer' }}
-          >
+          <button onClick={onClose} style={{ fontSize: 9, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580', border: 'none', background: 'none', cursor: 'pointer' }}>
             CANCEL
           </button>
         </div>
 
-        {/* Search */}
         <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
           <input
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search address..."
+            placeholder="Search address or venue name..."
             style={{
               flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid #3A3632',
               borderRadius: 6, padding: '8px 10px', fontSize: 13,
               fontFamily: 'Inter, system-ui', color: '#F0EDE8', outline: 'none',
             }}
           />
-          <button
-            type="submit"
-            style={{
-              fontSize: 9, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: '#F0EDE8', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6,
-              padding: '0 12px', background: 'none', cursor: 'pointer', flexShrink: 0,
-            }}
-          >
+          <button type="submit" style={{
+            fontSize: 9, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: '#F0EDE8', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6,
+            padding: '0 12px', background: 'none', cursor: 'pointer', flexShrink: 0,
+          }}>
             {searching ? '...' : 'GO'}
           </button>
         </form>
       </div>
 
+      {/* Loading indicator */}
+      {loadingBuilding && (
+        <div style={{ position: 'absolute', top: 120, left: '50%', transform: 'translateX(-50%)', zIndex: 200, background: 'rgba(26,24,22,0.9)', border: '1px solid #3A3632', borderRadius: 6, padding: '8px 14px' }}>
+          <p style={{ margin: 0, fontSize: 10, fontFamily: 'Inter, system-ui', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580' }}>Finding building…</p>
+        </div>
+      )}
+
       {/* Map */}
       <div ref={mapRef} style={{ flex: 1 }} />
 
-      {/* Footer — address + save */}
+      {/* Footer */}
       <div style={{ padding: '12px 16px', borderTop: '1px solid #2E2B28', flexShrink: 0 }}>
-        {address ? (
+        {address && (
           <p style={{ margin: '0 0 10px', fontSize: 11, fontFamily: 'Inter, system-ui', color: '#888580', lineHeight: 1.4 }}>
-            {address}
+            {address.split(',').slice(0, 2).join(',')}
           </p>
-        ) : null}
-        <button
-          onClick={() => onSave({ ...pin, address })}
-          style={{
-            width: '100%', padding: '12px', fontSize: 10, fontFamily: 'Inter, system-ui',
-            letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F0EDE8',
-            border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'none', cursor: 'pointer',
-          }}
-        >
-          Save Pin
-        </button>
+        )}
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => onSave({ ...pin, address })}
+            style={{
+              flex: 1, padding: '12px', fontSize: 10, fontFamily: 'Inter, system-ui',
+              letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F0EDE8',
+              border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'none', cursor: 'pointer',
+            }}
+          >
+            Save Pin Only
+          </button>
+
+          {selectedBuilding && (
+            <button
+              onClick={handleUseAsFloorPlan}
+              style={{
+                flex: 1, padding: '12px', fontSize: 10, fontFamily: 'Inter, system-ui',
+                letterSpacing: '0.12em', textTransform: 'uppercase', color: '#111',
+                border: 'none', borderRadius: 8, background: '#D4A853', cursor: 'pointer', fontWeight: 600,
+              }}
+            >
+              Use as Floor Plan →
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

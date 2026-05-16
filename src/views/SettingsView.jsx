@@ -187,6 +187,13 @@ export default function SettingsView({ dark, onToggleDark }) {
           initialPin={venuePin}
           onSave={(pin) => { setVenuePin(pin); setShowPinMap(false) }}
           onClose={() => setShowPinMap(false)}
+          onCapture={(svgUrl, pinData) => {
+            setVenuePin(pinData)
+            setShowPinMap(false)
+            setFloorPlanImage(svgUrl)
+            setAnnotatedImage(null)
+            setShowAnnotator(true)
+          }}
         />
       )}
     </>
