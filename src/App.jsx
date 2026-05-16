@@ -18,6 +18,7 @@ export default function App() {
   const [notifications, setNotifications] = useState(initNotifs)
   const [toast, setToast] = useState(null)
   const [bellOpen, setBellOpen] = useState(false)
+  const [venue, setVenue] = useState({ pin: null, area: null, floorPlanImage: null, zones: [], stationPins: [] })
 
   function toggleDark() {
     setDark(d => {
@@ -56,11 +57,11 @@ export default function App() {
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
-          {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} />}
+          {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} />}
           {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'dashboard' && <DashboardView models={models} team={profiles} notifications={notifications} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
-          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} />}
+          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} />}
         </div>
 
         <BottomNav active={tab} onSelect={setTab} />

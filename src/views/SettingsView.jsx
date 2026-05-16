@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import FloorPlanAnnotator from '../components/FloorPlanAnnotator'
+import { useState, useRef } from 'react'
 import VenuePinMap from '../components/VenuePinMap'
+import VenueZonePlacer from '../components/VenueZonePlacer'
 
 function Toggle({ value, onChange }) {
   return (
@@ -32,7 +32,7 @@ function UploadRow({ label, value, onChange }) {
         <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{label}</p>
         <p className="text-[11px] font-sans text-[#888580] mt-0.5">{value || 'No file uploaded'}</p>
       </div>
-      <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer">
+      <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer flex-shrink-0">
         UPLOAD
         <input type="file" className="hidden" onChange={e => onChange(e.target.files[0]?.name)} />
       </label>
@@ -40,19 +40,15 @@ function UploadRow({ label, value, onChange }) {
   )
 }
 
-export default function SettingsView({ dark, onToggleDark }) {
+export default function SettingsView({ dark, onToggleDark, venue, onVenueChange }) {
   const [files, setFiles] = useState({ callSheet: null, runningOrder: null, faceCharts: null })
   const [pings, setPings] = useState(true)
   const [statusAlerts, setStatusAlerts] = useState(true)
 
-  // Floor plan state
-  const [floorPlanImage, setFloorPlanImage] = useState(null)   // raw data URL of uploaded image
-  const [annotatedImage, setAnnotatedImage] = useState(null)   // canvas output after annotation
-  const [showAnnotator, setShowAnnotator] = useState(false)
-
-  // Venue pin state
-  const [venuePin, setVenuePin] = useState(null)  // { lat, lng, address }
-  const [showPinMap, setShowPinMap] = useState(false)
+  // Venue setup overlay states
+  const [showVenueMap, setShowVenueMap] = useState(false)
+  const [showZonePlacer, setShowZonePlacer] = useState(false)
+  const floorPlanUploadRef = useRef(null)
 
   function setFile(key, name) {
     setFiles(s => ({ ...s, [key]: name }))
@@ -62,82 +58,97 @@ export default function SettingsView({ dark, onToggleDark }) {
     const file = e.target.files[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (PNG, JPG, etc). For PDFs, take a screenshot first.')
+      alert('Please upload an image file (PNG, JPG, etc).')
       return
     }
     const reader = new FileReader()
     reader.onload = ev => {
-      setFloorPlanImage(ev.target.result)
-      setAnnotatedImage(null)
-      setShowAnnotator(true)
+      onVenueChange(v => ({ ...v, floorPlanImage: ev.target.result }))
+      setShowZonePlacer(true)
     }
     reader.readAsDataURL(file)
   }
 
-  const displayImage = annotatedImage || floorPlanImage
+  const shortAddress = venue.pin?.address
+    ? venue.pin.address.split(',').slice(0, 2).join(',')
+    : null
+
+  const zoneCount = venue.zones.length
+  const stationCount = venue.stationPins.length
+  const hasFloorPlan = !!(venue.floorPlanImage || venue.area)
 
   return (
     <>
       <div className="flex-1 overflow-y-auto px-4 py-4">
+
         {/* Show setup */}
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">SHOW SETUP</p>
         <div className="mb-6">
           <UploadRow label="Call Sheet"    value={files.callSheet}    onChange={n => setFile('callSheet', n)} />
           <UploadRow label="Running Order" value={files.runningOrder} onChange={n => setFile('runningOrder', n)} />
           <UploadRow label="Face Charts"   value={files.faceCharts}   onChange={n => setFile('faceCharts', n)} />
-
-          {/* Floor Plan — custom uploader */}
-          <div className="py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Floor Plan</p>
-                <p className="text-[11px] font-sans text-[#888580] mt-0.5">
-                  {displayImage ? 'Image uploaded · tap to annotate' : 'Upload an image to annotate'}
-                </p>
-              </div>
-              <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer flex-shrink-0">
-                UPLOAD
-                <input type="file" accept="image/*" className="hidden" onChange={handleFloorPlanUpload} />
-              </label>
-            </div>
-
-            {/* Preview + annotate button */}
-            {displayImage && (
-              <div className="relative mt-2 rounded overflow-hidden" style={{ height: 120 }}>
-                <img src={displayImage} alt="Floor plan" className="w-full h-full object-cover" />
-                <button
-                  onClick={() => setShowAnnotator(true)}
-                  style={{
-                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.35)', fontSize: 9, fontFamily: 'Inter, system-ui',
-                    letterSpacing: '0.12em', textTransform: 'uppercase', color: 'white',
-                    border: 'none', cursor: 'pointer',
-                  }}
-                >
-                  ✏ ANNOTATE
-                </button>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Venue pin */}
-        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">VENUE LOCATION</p>
+        {/* Venue setup */}
+        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">VENUE SETUP</p>
         <div className="mb-6">
+
+          {/* Venue row */}
           <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-            <div>
-              <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Drop a pin</p>
-              <p className="text-[11px] font-sans text-[#888580] mt-0.5 pr-4" style={{ maxWidth: 230 }}>
-                {venuePin ? venuePin.address.split(',').slice(0, 2).join(',') : 'No pin set'}
+            <div style={{ flex: 1, paddingRight: 12 }}>
+              <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Venue</p>
+              <p className="text-[11px] font-sans text-[#888580] mt-0.5">
+                {shortAddress || 'Find your venue and set up your backstage map'}
               </p>
             </div>
             <button
-              onClick={() => setShowPinMap(true)}
+              onClick={() => setShowVenueMap(true)}
               className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0"
             >
-              {venuePin ? 'EDIT' : 'SET PIN'}
+              {venue.pin ? 'EDIT' : 'SET UP'}
             </button>
           </div>
+
+          {/* Floor plan row — shown once a pin is set */}
+          {venue.pin && (
+            <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              <div style={{ flex: 1, paddingRight: 12 }}>
+                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Floor plan</p>
+                <p className="text-[11px] font-sans text-[#888580] mt-0.5">
+                  {venue.area
+                    ? (venue.area.name && venue.area.name !== 'Custom area' ? venue.area.name : 'Building footprint') + ' selected'
+                    : venue.floorPlanImage
+                    ? 'Image uploaded'
+                    : 'None — select a building or upload an image'}
+                </p>
+              </div>
+              {/* Upload image as secondary path */}
+              <label className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] cursor-pointer flex-shrink-0">
+                UPLOAD
+                <input ref={floorPlanUploadRef} type="file" accept="image/*" className="hidden" onChange={handleFloorPlanUpload} />
+              </label>
+            </div>
+          )}
+
+          {/* Zones row — shown once there's a floor plan base or we have zones */}
+          {(hasFloorPlan || zoneCount > 0) && (
+            <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              <div style={{ flex: 1, paddingRight: 12 }}>
+                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Zones & stations</p>
+                <p className="text-[11px] font-sans text-[#888580] mt-0.5">
+                  {zoneCount + stationCount === 0
+                    ? 'Tap to place zones on your floor plan'
+                    : `${zoneCount} zone${zoneCount !== 1 ? 's' : ''}${stationCount ? ` · ${stationCount} station${stationCount !== 1 ? 's' : ''}` : ''}`}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowZonePlacer(true)}
+                className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0"
+              >
+                {zoneCount + stationCount > 0 ? 'EDIT' : 'ADD ZONES'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* App preferences */}
@@ -170,30 +181,34 @@ export default function SettingsView({ dark, onToggleDark }) {
         </div>
       </div>
 
-      {/* Floor plan annotator overlay */}
-      {showAnnotator && floorPlanImage && (
-        <FloorPlanAnnotator
-          imageUrl={floorPlanImage}
-          onClose={(saved) => {
-            if (saved) setAnnotatedImage(saved)
-            setShowAnnotator(false)
+      {/* Venue map overlay */}
+      {showVenueMap && (
+        <VenuePinMap
+          initialPin={venue.pin}
+          onSave={(pin) => {
+            onVenueChange(v => ({ ...v, pin }))
+            setShowVenueMap(false)
           }}
+          onCapture={(svgUrl, pinData) => {
+            onVenueChange(v => ({ ...v, pin: pinData, floorPlanImage: svgUrl, area: pinData.area || v.area }))
+            setShowVenueMap(false)
+            setShowZonePlacer(true)
+          }}
+          onClose={() => setShowVenueMap(false)}
         />
       )}
 
-      {/* Venue pin map overlay */}
-      {showPinMap && (
-        <VenuePinMap
-          initialPin={venuePin}
-          onSave={(pin) => { setVenuePin(pin); setShowPinMap(false) }}
-          onClose={() => setShowPinMap(false)}
-          onCapture={(svgUrl, pinData) => {
-            setVenuePin(pinData)
-            setShowPinMap(false)
-            setFloorPlanImage(svgUrl)
-            setAnnotatedImage(null)
-            setShowAnnotator(true)
+      {/* Zone placer overlay */}
+      {showZonePlacer && (
+        <VenueZonePlacer
+          baseImage={venue.floorPlanImage}
+          initialZones={venue.zones}
+          initialStations={venue.stationPins}
+          onSave={(zones, stationPins) => {
+            onVenueChange(v => ({ ...v, zones, stationPins }))
+            setShowZonePlacer(false)
           }}
+          onClose={() => setShowZonePlacer(false)}
         />
       )}
     </>

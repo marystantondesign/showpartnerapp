@@ -33,7 +33,7 @@ function paceSnippet(nowMins) {
 }
 
 // Satellite-style venue map
-function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation }) {
+function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, venue }) {
   const [tooltip, setTooltip] = useState(null)
 
   // Artist station pins — hair near HAIR zone, makeup near MAKEUP zone
@@ -253,6 +253,58 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation }
         )
       })()}
 
+      {/* Venue zones */}
+      {venue?.zones?.map(z => (
+        <div
+          key={z.id}
+          style={{
+            position: 'absolute',
+            left: `${z.xPct}%`,
+            top: `${z.yPct}%`,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 4,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            backgroundColor: z.color + '28',
+            border: `1px solid ${z.color}88`,
+            borderRadius: 3,
+            padding: '2px 5px',
+          }}>
+            <span style={{ fontSize: 7, fontFamily: 'Inter, system-ui', letterSpacing: '0.08em', textTransform: 'uppercase', color: z.color, whiteSpace: 'nowrap' }}>
+              {z.label}
+            </span>
+          </div>
+        </div>
+      ))}
+
+      {/* Venue station pins */}
+      {venue?.stationPins?.map(s => (
+        <div
+          key={s.id}
+          style={{
+            position: 'absolute',
+            left: `${s.xPct}%`,
+            top: `${s.yPct}%`,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 5,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <div style={{
+              width: 8, height: 8, borderRadius: '50%',
+              backgroundColor: s.color,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.6)',
+            }} />
+            <span style={{ fontSize: 6, fontFamily: 'Inter, system-ui', color: s.color, whiteSpace: 'nowrap', textShadow: '0 1px 2px rgba(0,0,0,0.9)', letterSpacing: '0.04em' }}>
+              {s.label}
+            </span>
+          </div>
+        </div>
+      ))}
+
       {/* Pin tooltip */}
       {tooltip && tooltip.person && (() => {
         const p = tooltip.person
@@ -307,7 +359,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation }
   )
 }
 
-export default function HomeView({ dark, currentProfile, onToast, models: modelsProp }) {
+export default function HomeView({ dark, currentProfile, onToast, models: modelsProp, venue }) {
   const [now, setNow] = useState(new Date())
   const [checked, setChecked] = useState(() => {
     const cur = currentMinutes(new Date())
@@ -466,6 +518,7 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             models={liveModels}
             onToast={onToast}
             trackLocation={trackLocation}
+            venue={venue}
           />
           {/* Pin legend */}
           <div className="px-3 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-white/5">
