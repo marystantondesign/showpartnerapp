@@ -592,15 +592,15 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
               </svg>
             </button>
             {expandedSections[sec.key] && (
-              <div className="grid grid-cols-2 gap-1.5 pt-1 pb-2">
+              <div className="grid grid-cols-3 gap-1.5 pt-1 pb-2">
                 {sec.people.map(p => (
                   <button
                     key={p.id}
                     onClick={() => setContactPerson(p)}
-                    className="flex items-center gap-2 bg-white/50 dark:bg-white/5 rounded-lg px-2.5 py-2 outline-none"
+                    className="flex flex-col items-center gap-1 bg-white/50 dark:bg-white/5 rounded-lg px-2 py-2 outline-none text-center"
                   >
-                    <div className="relative flex-shrink-0">
-                      <img src={p.avatar} alt={p.name} className="w-7 h-7 rounded-full object-cover" />
+                    <div className="relative">
+                      <img src={p.avatar} alt={p.name} className="w-8 h-8 rounded-full object-cover" />
                       {(p.role === 'lead' || p.role === 'assistant') && (
                         <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#7A9E7E]" />
                       )}
@@ -608,7 +608,7 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
                         <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />
                       )}
                     </div>
-                    <p className="text-[11px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight truncate">{p.name}</p>
+                    <p className="text-[10px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight w-full truncate">{p.name}</p>
                   </button>
                 ))}
               </div>
