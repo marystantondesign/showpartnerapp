@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  position: relative;
+  margin: 0 auto;
+  background: #F5F2EE;
+}
+
+.dark #root {
+  background: #1A1816;
+}
+
+.font-serif {
+  font-family: Georgia, serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 0; }
+
+/* Status chip text */
+.chip-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Bottom sheet animation */
+.sheet-enter {
+  transform: translateY(100%);
+}
+.sheet-visible {
+  transform: translateY(0);
+  transition: transform 200ms ease;
+}
+
+/* Transition default */
+* {
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+input, textarea, select, button {
+  transition-property: background-color, border-color, color, opacity;
+}
