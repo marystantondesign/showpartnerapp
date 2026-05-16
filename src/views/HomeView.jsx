@@ -591,30 +591,29 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
                 <polyline points="2 4 6 8 10 4"/>
               </svg>
             </button>
-            {expandedSections[sec.key] && sec.people.map(p => (
-              <button
-                key={p.id}
-                onClick={() => setContactPerson(p)}
-                className="flex items-center gap-3 w-full py-2.5 border-t border-[#E0DDD8] dark:border-[#2E2B28] outline-none"
-              >
-                <div className="relative flex-shrink-0">
-                  <img src={p.avatar} alt={p.name} className="w-9 h-9 rounded-full object-cover" />
-                  {(p.role === 'lead' || p.role === 'assistant') && (
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white dark:border-[#1A1816] bg-[#7A9E7E]" />
-                  )}
-                  {p.role === 'artist' && (
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-white dark:border-[#1A1816] bg-[#D0CCC7]" />
-                  )}
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{p.name}</p>
-                  <p className="text-[10px] tracking-wide uppercase font-sans text-[#888580]">{p.role}</p>
-                </div>
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.2" className="text-[#B0ACA7]">
-                  <polyline points="2 1 6 4 2 7"/>
-                </svg>
-              </button>
-            ))}
+            {expandedSections[sec.key] && (
+              <div className="grid grid-cols-2 gap-2 pt-1 pb-3">
+                {sec.people.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setContactPerson(p)}
+                    className="flex flex-col items-center gap-1.5 bg-white/50 dark:bg-white/5 rounded-xl px-3 py-3 outline-none text-center"
+                  >
+                    <div className="relative">
+                      <img src={p.avatar} alt={p.name} className="w-11 h-11 rounded-full object-cover" />
+                      {(p.role === 'lead' || p.role === 'assistant') && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#F5F2EE] dark:border-[#1A1816] bg-[#7A9E7E]" />
+                      )}
+                      {p.role === 'artist' && (
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />
+                      )}
+                    </div>
+                    <p className="text-[12px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight">{p.name}</p>
+                    <p className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">{p.role}</p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -662,6 +661,7 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             onClose={() => setContactPerson(null)}
             onToast={onToast}
             models={liveModels}
+            isMe={contactPerson?.id === currentProfile?.id}
           />
         )}
       </BottomSheet>
