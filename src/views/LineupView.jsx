@@ -43,7 +43,8 @@ export default function LineupView({ models, currentProfile, onStatusChange, onN
               className="flex flex-col items-center outline-none"
             >
               <div className="relative w-full">
-                <span className="absolute top-1 left-1 z-10 text-[9px] font-sans font-semibold text-white leading-none drop-shadow-sm">
+                {/* Running order number — white bg for readability */}
+                <span className="absolute top-1 left-1 z-10 font-sans font-medium leading-none" style={{ fontSize: 12, color: '#111', backgroundColor: 'white', padding: '1px 4px', borderRadius: 2 }}>
                   {model.lookNumber}
                 </span>
                 <img

@@ -51,12 +51,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=44',
     assignedArtists: ['Jen Z'],
     status: 'needs_revisit',
-    notes: 'Allergic to latex gloves.',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=44', uploadedBy: 'Jen Z', timestamp: '5:12 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=48', uploadedBy: 'Jen Z', timestamp: '5:34 AM', label: 'After' },
-      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=56', uploadedBy: 'Jen Z', timestamp: '5:40 AM', label: 'Revisit' },
-    ],
+    notes: [{ id: 'note-m1-1', text: 'Allergic to latex gloves.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:35:00' }],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Jen Z' },
       { status: 'needs_revisit', timestamp: '5:35 AM', updatedBy: 'Jen Z' },
@@ -67,11 +63,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=25',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
-    notes: '',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=25', uploadedBy: 'Marcus Lee', timestamp: '2:10 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=60', uploadedBy: 'Marcus Lee', timestamp: '2:46 AM', label: 'Done' },
-    ],
+    notes: [],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:47 AM', updatedBy: 'Marcus Lee' },
@@ -82,11 +75,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=29',
     assignedArtists: ['Jen Z', 'Zoe Park'],
     status: 'paused',
-    notes: 'Requested minimal coverage.',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=29', uploadedBy: 'Zoe Park', timestamp: '2:49 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=53', uploadedBy: 'Jen Z', timestamp: '3:05 AM', label: 'Paused' },
-    ],
+    notes: [{ id: 'note-m3-1', text: 'Requested minimal coverage.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:06:00' }],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:49 AM', updatedBy: 'Zoe Park' },
       { status: 'paused', timestamp: '3:06 AM', updatedBy: 'Jen Z' },
@@ -97,10 +87,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=15',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
-    notes: '',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=15', uploadedBy: 'Marcus Lee', timestamp: '1:55 AM', label: 'Before' },
-    ],
+    notes: [],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '1:55 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:29 AM', updatedBy: 'Marcus Lee' },
@@ -111,7 +99,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=32',
     assignedArtists: ['Sophia Rivera'],
     status: 'done',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:00 AM', updatedBy: 'Sophia Rivera' },
@@ -123,10 +111,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=39',
     assignedArtists: ['Zoe Park'],
     status: 'needs_revisit',
-    notes: 'Touch up left brow.',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=39', uploadedBy: 'Zoe Park', timestamp: '2:30 AM', label: 'Before' },
-    ],
+    notes: [{ id: 'note-m6-1', text: 'Touch up left brow.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:08:00' }],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:30 AM', updatedBy: 'Zoe Park' },
       { status: 'needs_revisit', timestamp: '3:08 AM', updatedBy: 'Zoe Park' },
@@ -137,7 +123,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=16',
     assignedArtists: ['Jen Z'],
     status: 'done',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Jen Z' },
@@ -149,11 +135,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=43',
     assignedArtists: ['Sophia Rivera', 'Marcus Lee'],
     status: 'in_progress',
-    notes: '',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=43', uploadedBy: 'Marcus Lee', timestamp: '3:15 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=62', uploadedBy: 'Sophia Rivera', timestamp: '3:40 AM', label: 'In Progress' },
-    ],
+    notes: [],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '3:15 AM', updatedBy: 'Marcus Lee' },
     ],
@@ -163,10 +146,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=23',
     assignedArtists: ['Zoe Park'],
     status: 'done',
-    notes: '',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=23', uploadedBy: 'Zoe Park', timestamp: '2:45 AM', label: 'Before' },
-    ],
+    notes: [],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '2:45 AM', updatedBy: 'Zoe Park' },
       { status: 'done', timestamp: '3:20 AM', updatedBy: 'Zoe Park' },
@@ -177,7 +158,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=49',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '3:30 AM', updatedBy: 'Marcus Lee' },
@@ -189,12 +170,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=36',
     assignedArtists: ['Jen Z'],
     status: 'in_progress',
-    notes: '',
-    photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=36', uploadedBy: 'Jen Z', timestamp: '4:40 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=65', uploadedBy: 'Jen Z', timestamp: '5:02 AM', label: 'In Progress' },
-      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=67', uploadedBy: 'Jen Z', timestamp: '5:18 AM', label: 'Detail' },
-    ],
+    notes: [],
+    photos: [],
     statusLog: [
       { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Jen Z' },
     ],
@@ -204,7 +181,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=21',
     assignedArtists: ['Sophia Rivera'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
@@ -214,9 +191,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=40',
     assignedArtists: ['Kenji Watanabe'],
     status: 'done',
-    notes: '',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=40', uploadedBy: 'Kenji Watanabe', timestamp: '3:00 AM', label: 'Before' },
-              { id: 'ph2', url: 'https://i.pravatar.cc/300?img=41', uploadedBy: 'Kenji Watanabe', timestamp: '3:45 AM', label: 'Done' }],
+    notes: [],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '3:00 AM', updatedBy: 'Kenji Watanabe' }, { status: 'done', timestamp: '3:46 AM', updatedBy: 'Kenji Watanabe' }],
   },
   {
@@ -224,8 +200,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=42',
     assignedArtists: ['Aisha Johnson'],
     status: 'in_progress',
-    notes: '',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=42', uploadedBy: 'Aisha Johnson', timestamp: '4:10 AM', label: 'Before' }],
+    notes: [],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '4:10 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
@@ -233,7 +209,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=45',
     assignedArtists: ['Kenji Watanabe'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
@@ -242,8 +218,8 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=46',
     assignedArtists: ['Lena Schmidt', 'Aisha Johnson'],
     status: 'done',
-    notes: '',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=46', uploadedBy: 'Lena Schmidt', timestamp: '2:20 AM', label: 'Before' }],
+    notes: [],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '2:20 AM', updatedBy: 'Lena Schmidt' }, { status: 'done', timestamp: '3:05 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
@@ -251,7 +227,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=50',
     assignedArtists: ['Sofia Reyes', 'Zoe Park'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
@@ -260,26 +236,26 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=51',
     assignedArtists: ['Lena Schmidt'],
     status: 'in_progress',
-    notes: '',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=51', uploadedBy: 'Lena Schmidt', timestamp: '4:30 AM', label: 'Before' }],
+    notes: [],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '4:30 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
-    id: 'm19', name: 'Amara Okafor', lookNumber: '19',
+    id: 'm19', name: 'Abdullah Ali', lookNumber: '19',
     avatar: 'https://i.pravatar.cc/300?img=54',
     assignedArtists: ['Mira Patel', 'Marcus Lee'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
   {
-    id: 'm20', name: 'Bianca Reuter', lookNumber: '20',
+    id: 'm20', name: 'Justin Mitchell', lookNumber: '20',
     avatar: 'https://i.pravatar.cc/300?img=55',
     assignedArtists: ['Kenji Watanabe', 'Luna Torres'],
     status: 'paused',
-    notes: 'Waiting on stylist.',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=55', uploadedBy: 'Luna Torres', timestamp: '4:50 AM', label: 'In Progress' }],
+    notes: [{ id: 'note-m20-1', text: 'Waiting on stylist.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:10:00' }],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '4:50 AM', updatedBy: 'Luna Torres' }, { status: 'paused', timestamp: '5:10 AM', updatedBy: 'Luna Torres' }],
   },
   {
@@ -287,7 +263,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=59',
     assignedArtists: ['Aisha Johnson'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
@@ -296,17 +272,17 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=61',
     assignedArtists: ['Mira Patel', 'Priya Osei'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
   {
-    id: 'm23', name: 'Rina Yamamoto', lookNumber: '23',
+    id: 'm23', name: 'Rio Yamamoto', lookNumber: '23',
     avatar: 'https://i.pravatar.cc/300?img=63',
     assignedArtists: ['Lena Schmidt'],
     status: 'needs_revisit',
-    notes: 'Root touchup needed.',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=63', uploadedBy: 'Lena Schmidt', timestamp: '5:00 AM', label: 'Before' }],
+    notes: [{ id: 'note-m23-1', text: 'Root touchup needed.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:25:00' }],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '5:00 AM', updatedBy: 'Lena Schmidt' }, { status: 'needs_revisit', timestamp: '5:25 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
@@ -314,7 +290,7 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=69',
     assignedArtists: ['Sofia Reyes', 'David Kim'],
     status: 'not_started',
-    notes: '',
+    notes: [],
     photos: [],
     statusLog: [],
   },
@@ -323,12 +299,37 @@ export const models = [
     avatar: 'https://i.pravatar.cc/300?img=41',
     assignedArtists: ['Aisha Johnson', 'Mira Patel'],
     status: 'done',
-    notes: '',
-    photos: [{ id: 'ph1', url: 'https://i.pravatar.cc/300?img=41', uploadedBy: 'Aisha Johnson', timestamp: '2:10 AM', label: 'Before' },
-              { id: 'ph2', url: 'https://i.pravatar.cc/300?img=40', uploadedBy: 'Mira Patel', timestamp: '2:55 AM', label: 'Done' }],
+    notes: [],
+    photos: [],
     statusLog: [{ status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Aisha Johnson' }, { status: 'done', timestamp: '2:56 AM', updatedBy: 'Mira Patel' }],
   },
 ]
+
+// Per-model show history (past shows this model worked with the team)
+export const modelHistory = {
+  'm1': [
+    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Marcus Lee', 'Zoe Park'], assistants: ['Sophia Rivera'], notes: 'Strong look. No issues.', incidents: [] },
+    { showName: 'Valentino SS25', date: 'March 2025', city: 'Paris', artists: ['Marcus Lee'], assistants: [], notes: '', incidents: [] },
+  ],
+  'm2': [
+    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Marcus Lee'], assistants: ['Sophia Rivera'], notes: '', incidents: [] },
+    { showName: 'Valentino FW24', date: 'October 2024', city: 'New York', artists: ['Zoe Park'], assistants: [], notes: 'Easy to work with.', incidents: [] },
+  ],
+  'm3': [
+    { showName: 'Valentino SS25', date: 'March 2025', city: 'Paris', artists: ['Zoe Park'], assistants: ['James Kim'], notes: 'Minimal coverage requested, honour it.', incidents: [] },
+  ],
+  'm6': [
+    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Zoe Park', 'David Kim'], assistants: [], notes: 'Left brow is always tricky — note for future.', incidents: [] },
+    { showName: 'Valentino FW24', date: 'October 2024', city: 'New York', artists: ['Priya Osei'], assistants: [], notes: '', incidents: [] },
+  ],
+  'm9': [
+    { showName: 'Valentino SS25', date: 'March 2025', city: 'Paris', artists: ['Zoe Park'], assistants: ['Cleo Marsh'], notes: 'Excellent. Fast in chair.', incidents: [] },
+  ],
+  'm11': [
+    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Jen Z', 'Marcus Lee'], assistants: ['Ben Adeyemi'], notes: '', incidents: [] },
+    { showName: 'Valentino FW24', date: 'October 2024', city: 'New York', artists: ['Jen Z'], assistants: [], notes: '', incidents: [] },
+  ],
+}
 
 export const showHistory = [
   {

@@ -61,8 +61,9 @@ export default function App() {
     }))
   }
 
-  function handleNote(modelId, note) {
-    setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: note } : m))
+  // notes is now an array; ModelDetailSheet passes the full updated array
+  function handleNote(modelId, newNotesArray) {
+    setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: newNotesArray } : m))
   }
 
   function handleAssignArtists(modelId, { hair, makeup }) {
