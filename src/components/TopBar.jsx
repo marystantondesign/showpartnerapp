@@ -2,14 +2,24 @@ import { useState, useRef, useEffect } from 'react'
 import { profiles } from '../data/mockData'
 import BottomSheet from './BottomSheet'
 
-export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchProfile, notifications, onBell }) {
+export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchProfile, notifications, onBell, onSwitchRole }) {
   const [profileOpen, setProfileOpen] = useState(false)
   const unread = notifications.filter(n => !n.read).length
 
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] bg-greige dark:bg-greige-dark flex-shrink-0">
-      {/* Show name */}
-      <span className="font-serif text-lg text-[#111] dark:text-[#F0EDE8] leading-none">Valentino SS26</span>
+      {/* Show name + switch role */}
+      <div className="flex flex-col gap-0.5">
+        <span className="font-serif text-lg text-[#111] dark:text-[#F0EDE8] leading-none">Valentino SS26</span>
+        {onSwitchRole && (
+          <button
+            onClick={onSwitchRole}
+            style={{ fontFamily: 'Inter, system-ui', fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580', background: 'none', border: 'none', cursor: 'pointer', outline: 'none', padding: 0, textAlign: 'left' }}
+          >
+            Switch role
+          </button>
+        )}
+      </div>
 
       {/* Right controls */}
       <div className="flex items-center gap-3">
