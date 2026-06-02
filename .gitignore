@@ -41,6 +41,11 @@ Thumbs.db
 # Allow app icon PNG in public/
 *.png
 !public/*.png
+# Allow model photos in public/models/
+!public/models/*.jpg
+!public/models/*.jpeg
+!public/models/*.png
+!public/models/*.webp
 .vercel
 bts.html
 bts_files/
