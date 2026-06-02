@@ -10,37 +10,37 @@ export const show = {
 
 export const profiles = [
   // Lead
-  { id: 'p1',  name: 'Jen Z',       role: 'lead',      specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=47',
+  { id: 'p1',  name: 'Jen Z',       role: 'lead',      specialty: 'hair',   avatar: '/lead/Jen-Z.png',
     tags: ['Show direction', 'Team coordination', 'Hair + Beauty'] },
 
   // Artists (10 total)
-  { id: 'p2',  name: 'Marcus Lee',      role: 'artist',    specialty: 'makeup', avatar: 'https://i.pravatar.cc/150?img=12',
+  { id: 'p2',  name: 'Marcus Lee',      role: 'artist',    specialty: 'makeup', avatar: '/artists/Marcus-Lee.png',
     tags: ['Editorial makeup', 'Special effects', 'Contouring', 'Avant-garde color', 'Skin prep'] },
-  { id: 'p3',  name: 'Zoe Park',        role: 'artist',    specialty: 'makeup', avatar: 'https://i.pravatar.cc/150?img=5',
+  { id: 'p3',  name: 'Zoe Park',        role: 'artist',    specialty: 'makeup', avatar: '/artists/Zoe-Parker.png',
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
-  { id: 'p6',  name: 'David Kim',       role: 'artist',    specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=33',
+  { id: 'p6',  name: 'David Kim',       role: 'artist',    specialty: 'hair',   avatar: '/artists/David-Kim.png',
     tags: ['Hair extensions', 'Avant-garde styling', 'Braiding', 'Color work', 'Keratin'] },
-  { id: 'p7',  name: 'Priya Osei',      role: 'artist',    specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=20',
+  { id: 'p7',  name: 'Priya Osei',      role: 'artist',    specialty: 'hair',   avatar: '/artists/Priya-Osei.png',
     tags: ['Natural textures', 'Protective styles', 'Color correction', 'Precision cuts', 'Blowouts'] },
-  { id: 'p8',  name: 'Luna Torres',     role: 'artist',    specialty: 'makeup', avatar: 'https://i.pravatar.cc/150?img=38',
+  { id: 'p8',  name: 'Luna Torres',     role: 'artist',    specialty: 'makeup', avatar: '/artists/Luna-Tores.png',
     tags: ['Eyebrow bleaching', 'Editorial makeup', 'Avant-garde color', 'Fantasy looks', 'Runway'] },
-  { id: 'p11', name: 'Kenji Watanabe',  role: 'artist',    specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=66',
+  { id: 'p11', name: 'Kenji Watanabe',  role: 'artist',    specialty: 'hair',   avatar: '/artists/Kenji-Watanabe.png',
     tags: ['Avant-garde cuts', 'Keratin treatments', 'Natural textures', 'Braiding', 'Ombré'] },
-  { id: 'p12', name: 'Sofia Reyes',     role: 'artist',    specialty: 'nails',  avatar: 'https://i.pravatar.cc/150?img=68',
+  { id: 'p12', name: 'Sofia Reyes',     role: 'artist',    specialty: 'nails',  avatar: '/artists/Sofia-Reyes.png',
     tags: ['Nail art', 'Gel extensions', 'Chrome powder', 'Hand painting', '3D nail art'] },
-  { id: 'p13', name: 'Aisha Johnson',   role: 'artist',    specialty: 'makeup', avatar: 'https://i.pravatar.cc/150?img=58',
+  { id: 'p13', name: 'Aisha Johnson',   role: 'artist',    specialty: 'makeup', avatar: '/artists/Aisha-Johnson.png',
     tags: ['Skin prep', 'Airbrush', 'Contouring', 'Lash application', 'Film & TV'] },
-  { id: 'p14', name: 'Lena Schmidt',    role: 'artist',    specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=26',
+  { id: 'p14', name: 'Lena Schmidt',    role: 'artist',    specialty: 'hair',   avatar: '/artists/Lena-Schmidt.png',
     tags: ['Updos', 'Vintage styles', 'Extensions', 'Color correction', 'Scalp care'] },
-  { id: 'p15', name: 'Mira Patel',      role: 'artist',    specialty: 'nails',  avatar: 'https://i.pravatar.cc/150?img=37',
+  { id: 'p15', name: 'Mira Patel',      role: 'artist',    specialty: 'nails',  avatar: '/artists/Mira-Patel.png',
     tags: ['Nail extensions', 'Acrylic overlays', 'Chrome effects', 'Minimalist design', 'Nail repair'] },
 
   // Assistants (5 total)
-  { id: 'p4',  name: 'Sophia Rivera',   role: 'assistant', trackingState: 'active',                  avatar: 'https://i.pravatar.cc/150?img=9'  },
-  { id: 'p5',  name: 'James Kim',       role: 'assistant', trackingState: 'lost', lastSeenMins: 12,  avatar: 'https://i.pravatar.cc/150?img=52' },
-  { id: 'p9',  name: 'Cleo Marsh',      role: 'assistant', trackingState: 'active',                  avatar: 'https://i.pravatar.cc/150?img=14' },
-  { id: 'p10', name: 'Ben Adeyemi',     role: 'assistant', trackingState: 'lost', lastSeenMins: 8,   avatar: 'https://i.pravatar.cc/150?img=57' },
-  { id: 'p16', name: 'Nadia Faris',     role: 'assistant', trackingState: 'active',                  avatar: 'https://i.pravatar.cc/150?img=64' },
+  { id: 'p4',  name: 'Sophia Rivera',   role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Sophia-Rivera.png'  },
+  { id: 'p5',  name: 'James Kim',       role: 'assistant', trackingState: 'lost', lastSeenMins: 12,  avatar: '/assistants/James-Kim.png' },
+  { id: 'p9',  name: 'Cleo Marsh',      role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Cleo-Marsh.png' },
+  { id: 'p10', name: 'Benji Adams',     role: 'assistant', trackingState: 'lost', lastSeenMins: 8,   avatar: '/assistants/Benji-Adams.png' },
+  { id: 'p16', name: 'Nadia Faris',     role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Nadia-Faris.png' },
 ]
 
 export const team = profiles
@@ -239,12 +239,14 @@ export const models = [
   // New models 13–25
   {
     id: 'm13', name: 'Camille Dubois', lookNumber: '13',
-    avatar: '/models/Camille-DuBois.png',
+    avatar: '/models/Camille-DuBois-1.png',
     assignedArtists: ['Kenji Watanabe'],
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Camille-DuBois.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Camille-DuBois-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Camille-DuBois-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Camille-DuBois-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '3:00 AM', updatedBy: 'Kenji Watanabe' }, { status: 'done', timestamp: '3:46 AM', updatedBy: 'Kenji Watanabe' }],
   },
@@ -278,12 +280,15 @@ export const models = [
   },
   {
     id: 'm16', name: 'Fatima Hassan', lookNumber: '16',
-    avatar: '/models/Fatima-Hassan.png',
+    avatar: '/models/Fatima-Hassan-1.png',
     assignedArtists: ['Lena Schmidt', 'Aisha Johnson'],
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Fatima-Hassan.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Fatima-Hassan-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Fatima-Hassan-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Fatima-Hassan-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Fatima-Hassan-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '2:20 AM', updatedBy: 'Lena Schmidt' }, { status: 'done', timestamp: '3:05 AM', updatedBy: 'Aisha Johnson' }],
   },
@@ -366,12 +371,13 @@ export const models = [
   },
   {
     id: 'm23', name: 'Rio Yamamoto', lookNumber: '23',
-    avatar: '/models/Rio-Yamamoto.png',
+    avatar: '/models/Rio-Yamamoto-1.png',
     assignedArtists: ['Lena Schmidt'],
     status: 'needs_revisit',
     notes: [{ id: 'note-m23-1', text: 'Root touchup needed.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:25:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Rio-Yamamoto.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Rio-Yamamoto-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Rio-Yamamoto-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '5:00 AM', updatedBy: 'Lena Schmidt' }, { status: 'needs_revisit', timestamp: '5:25 AM', updatedBy: 'Lena Schmidt' }],
   },
@@ -424,7 +430,7 @@ export const modelHistory = {
     { showName: 'Valentino SS25', date: 'March 2025', city: 'Paris', artists: ['Zoe Park'], assistants: ['Cleo Marsh'], notes: 'Excellent. Fast in chair.', incidents: [] },
   ],
   'm11': [
-    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Jen Z', 'Marcus Lee'], assistants: ['Ben Adeyemi'], notes: '', incidents: [] },
+    { showName: 'Valentino FW25', date: 'November 2025', city: 'Milan', artists: ['Jen Z', 'Marcus Lee'], assistants: ['Benji Adams'], notes: '', incidents: [] },
     { showName: 'Valentino FW24', date: 'October 2024', city: 'New York', artists: ['Jen Z'], assistants: [], notes: '', incidents: [] },
   ],
 }

@@ -26,33 +26,33 @@ const BASE_SHOWS = [
 
 // ─── VS26 artists ─────────────────────────────────────────────────────────────
 const VS26_ARTISTS = [
-  { id:'a1', name:'Marcus Lee',  specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=12', onSiteStatus:'late',    confirmed:'CONFIRMED', modelsCompleted:3, stars:3, incidents:['Arrived 45 minutes late to call time'], note:'', inviteBack:'YES'   },
-  { id:'a2', name:'Zoe Park',    specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=5',  onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:5, incidents:[],                                          note:'', inviteBack:'YES'   },
-  { id:'a3', name:'David Kim',   specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=33', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
-  { id:'a4', name:'Priya Osei',  specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=20', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:2, stars:2, incidents:['Left 20 minutes before show ended'],       note:'', inviteBack:'NO'    },
-  { id:'a5', name:'Luna Torres', specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=38', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:5, incidents:[],                                          note:'Excellent — request specifically again', inviteBack:'YES' },
-  { id:'a6', name:'Jen Z',   specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=47', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
+  { id:'a1', name:'Marcus Lee',  specialty:'Makeup', avatar:'/artists/Marcus-Lee.png', onSiteStatus:'late',    confirmed:'CONFIRMED', modelsCompleted:3, stars:3, incidents:['Arrived 45 minutes late to call time'], note:'', inviteBack:'YES'   },
+  { id:'a2', name:'Zoe Park',    specialty:'Makeup', avatar:'/artists/Zoe-Parker.png',  onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:5, incidents:[],                                          note:'', inviteBack:'YES'   },
+  { id:'a3', name:'David Kim',   specialty:'Hair',   avatar:'/artists/David-Kim.png', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
+  { id:'a4', name:'Priya Osei',  specialty:'Hair',   avatar:'/artists/Priya-Osei.png', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:2, stars:2, incidents:['Left 20 minutes before show ended'],       note:'', inviteBack:'NO'    },
+  { id:'a5', name:'Luna Torres', specialty:'Makeup', avatar:'/artists/Luna-Tores.png', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:5, incidents:[],                                          note:'Excellent — request specifically again', inviteBack:'YES' },
+  { id:'a6', name:'Jen Z',   specialty:'Hair',   avatar:'/lead/Jen-Z.png', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
 ]
 
 // ─── Prada artist roster (10) ─────────────────────────────────────────────────
 const PRADA_ARTISTS = [
-  { id:'p1',  name:'Marcus Lee',           specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=12', confirmed:'CONFIRMED' },
-  { id:'p2',  name:'Zoe Park',             specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=5',  confirmed:'CONFIRMED' },
-  { id:'p3',  name:'David Kim',            specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=33', confirmed:'PENDING'   },
-  { id:'p4',  name:'Priya Osei',           specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=20', confirmed:'PENDING'   },
-  { id:'p5',  name:'Kenji Watanabe',       specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=66', confirmed:'CONFIRMED' },
-  { id:'p6',  name:'Sofia Reyes',          specialty:'Nails',  avatar:'https://i.pravatar.cc/150?img=68', confirmed:'CONFIRMED' },
-  { id:'p7',  name:'Aisha Johnson',        specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=58', confirmed:'PENDING'   },
-  { id:'p8',  name:'Lena Schmidt',         specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=26', confirmed:'DECLINED'  },
-  { id:'p9',  name:'Mira Patel',           specialty:'Nails',  avatar:'https://i.pravatar.cc/150?img=37', confirmed:'CONFIRMED' },
+  { id:'p1',  name:'Marcus Lee',           specialty:'Makeup', avatar:'/artists/Marcus-Lee.png', confirmed:'CONFIRMED' },
+  { id:'p2',  name:'Zoe Park',             specialty:'Makeup', avatar:'/artists/Zoe-Parker.png',  confirmed:'CONFIRMED' },
+  { id:'p3',  name:'David Kim',            specialty:'Hair',   avatar:'/artists/David-Kim.png', confirmed:'PENDING'   },
+  { id:'p4',  name:'Priya Osei',           specialty:'Hair',   avatar:'/artists/Priya-Osei.png', confirmed:'PENDING'   },
+  { id:'p5',  name:'Kenji Watanabe',       specialty:'Hair',   avatar:'/artists/Kenji-Watanabe.png', confirmed:'CONFIRMED' },
+  { id:'p6',  name:'Sofia Reyes',          specialty:'Nails',  avatar:'/artists/Sofia-Reyes.png', confirmed:'CONFIRMED' },
+  { id:'p7',  name:'Aisha Johnson',        specialty:'Makeup', avatar:'/artists/Aisha-Johnson.png', confirmed:'PENDING'   },
+  { id:'p8',  name:'Lena Schmidt',         specialty:'Hair',   avatar:'/artists/Lena-Schmidt.png', confirmed:'DECLINED'  },
+  { id:'p9',  name:'Mira Patel',           specialty:'Nails',  avatar:'/artists/Mira-Patel.png', confirmed:'CONFIRMED' },
   { id:'p10', name:'Emma Chen',            specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=1',  confirmed:'PENDING'   },
 ]
 
 // ─── Jacquemus artists (post-show) ────────────────────────────────────────────
 const JACQ_ARTISTS = [
-  { id:'j1', name:'Zoe Park',    specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=5',  modelsCompleted:5, stars:5, incidents:[], note:'Flawless execution throughout',   inviteBack:'YES'   },
-  { id:'j2', name:'Priya Osei',  specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=20', modelsCompleted:4, stars:4, incidents:[], note:'Reliable, good communication',    inviteBack:'YES'   },
-  { id:'j3', name:'Luna Torres', specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=38', modelsCompleted:3, stars:5, incidents:[], note:'Standout performance',             inviteBack:'YES'   },
+  { id:'j1', name:'Zoe Park',    specialty:'Makeup', avatar:'/artists/Zoe-Parker.png',  modelsCompleted:5, stars:5, incidents:[], note:'Flawless execution throughout',   inviteBack:'YES'   },
+  { id:'j2', name:'Priya Osei',  specialty:'Hair',   avatar:'/artists/Priya-Osei.png', modelsCompleted:4, stars:4, incidents:[], note:'Reliable, good communication',    inviteBack:'YES'   },
+  { id:'j3', name:'Luna Torres', specialty:'Makeup', avatar:'/artists/Luna-Tores.png', modelsCompleted:3, stars:5, incidents:[], note:'Standout performance',             inviteBack:'YES'   },
 ]
 
 // ─── VS26 receipts ─────────────────────────────────────────────────────────────

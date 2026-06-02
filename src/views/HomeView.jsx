@@ -52,7 +52,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
     { person: team.find(p => p.name === 'Sophia Rivera'), x: 272, y: 143, drift: true  },
     { person: team.find(p => p.name === 'Cleo Marsh'),    x: 215, y: 158, drift: false },
     { person: team.find(p => p.name === 'James Kim'),     x: 78,  y: 205, drift: false },
-    { person: team.find(p => p.name === 'Ben Adeyemi'),   x: 152, y: 192, drift: false },
+    { person: team.find(p => p.name === 'Benji Adams'),   x: 152, y: 192, drift: false },
   ]
 
   function handlePinTap(e, pin) {
