@@ -33,6 +33,19 @@ body {
   background: #F5F2EE;
 }
 
+/* Tablet and above: lift the mobile max-width cap */
+@media (min-width: 768px) {
+  body {
+    background: #F5F2EE;
+  }
+  .dark body {
+    background: #1A1816;
+  }
+  #root {
+    max-width: 100%;
+  }
+}
+
 .dark #root {
   background: #1A1816;
 }

@@ -436,9 +436,11 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
   // ── Tablet: two-column layout ─────────────────────────────────────────────
   if (isTablet) {
     return (
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Left: all content columns */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', width: '100%', height: '100%', overflow: 'hidden' }}>
+
+        {/* Left column: scrollable content — takes all remaining space */}
+        <div style={{ flex: '1 1 0', minWidth: 0, overflowY: 'auto' }}>
+
           {/* Pace block */}
           <div className="px-6 pt-5 pb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
             <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">{formatDateLine(now)}</p>
@@ -468,10 +470,10 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             </div>
           </div>
 
-          {/* Venue address (no map toggle — map is always in right column) */}
+          {/* Venue address */}
           <div className="px-6 pt-4 pb-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
             <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">{show.name}</p>
-            <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{show.address}</p>
+            <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]" style={{ whiteSpace: 'normal', overflowWrap: 'break-word' }}>{show.address}</p>
           </div>
 
           {/* Location / station */}
@@ -552,20 +554,36 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
           </div>
         </div>
 
-        {/* Right: map — always expanded on tablet */}
-        <div style={{ width: 360, display: 'flex', flexDirection: 'column', borderLeft: '1px solid', flexShrink: 0 }} className="border-[#E0DDD8] dark:border-[#2E2B28]">
-          <div className="px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
-            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">VENUE MAP</p>
+        {/* Right column: map — starts collapsed, toggle to expand, fills column width */}
+        <div style={{ flex: '0 0 42%', minWidth: 280, maxWidth: 480, display: 'flex', flexDirection: 'column', borderLeft: '1px solid' }} className="border-[#E0DDD8] dark:border-[#2E2B28]">
+          {/* Map header with toggle */}
+          <div className="px-4 pt-4 pb-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">{show.name}</p>
+            <button
+              onClick={() => setMapOpen(s => !s)}
+              className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex items-center gap-1.5 outline-none"
+            >
+              {mapOpen ? 'HIDE MAP' : 'SHOW MAP'}
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ transform: mapOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms ease' }}>
+                <polyline points="1 2.5 4 5.5 7 2.5" />
+              </svg>
+            </button>
           </div>
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            <VenueMap dark={dark} currentProfile={currentProfile} team={team} models={liveModels} onToast={onToast} trackLocation={trackLocation} venue={venue} />
-          </div>
-          <div className="px-3 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E0DDD8] dark:border-[#2E2B28]">
-            <span className="flex items-center gap-1"><span className="text-[9px] leading-none">✂</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Hair</span></span>
-            <span className="flex items-center gap-1"><span className="text-[9px] leading-none">💄</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Makeup</span></span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#D4A853' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Active</span></span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#888780' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Last known</span></span>
-          </div>
+
+          {/* Map — fills full right column width when open */}
+          {mapOpen && (
+            <>
+              <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+                <VenueMap dark={dark} currentProfile={currentProfile} team={team} models={liveModels} onToast={onToast} trackLocation={trackLocation} venue={venue} />
+              </div>
+              <div className="px-3 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
+                <span className="flex items-center gap-1"><span className="text-[9px] leading-none">✂</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Hair</span></span>
+                <span className="flex items-center gap-1"><span className="text-[9px] leading-none">💄</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Makeup</span></span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#D4A853' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Active</span></span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#888780' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Last known</span></span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Contact sheet */}
