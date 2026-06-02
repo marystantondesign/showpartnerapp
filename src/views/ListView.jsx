@@ -91,7 +91,13 @@ export default function ListView({ models, currentProfile, onStatusChange, onNot
                 <span className="text-[11px] font-sans text-[#888580] tabular-nums">{model.lookNumber}</span>
                 <span className="font-serif text-base text-[#111] dark:text-[#F0EDE8] truncate">{model.name}</span>
               </div>
-              <p className="text-[11px] font-sans text-[#888580] truncate">{model.assignedArtists.join(', ')}</p>
+              <div className="text-[11px] font-sans text-[#888580] leading-snug mt-0.5">
+                {model.hairArtist   && <span className="block truncate"><span className="text-[9px] tracking-widest uppercase opacity-60">HAIR </span>{model.hairArtist}</span>}
+                {model.makeupArtist && <span className="block truncate"><span className="text-[9px] tracking-widest uppercase opacity-60">MAKEUP </span>{model.makeupArtist}</span>}
+                {model.nailArtist   && <span className="block truncate"><span className="text-[9px] tracking-widest uppercase opacity-60">NAILS </span>{model.nailArtist}</span>}
+                {model.assistant    && <span className="block truncate"><span className="text-[9px] tracking-widest uppercase opacity-60">ASST </span>{model.assistant}</span>}
+                {!model.hairArtist  && <span className="block truncate">{model.assignedArtists.join(', ')}</span>}
+              </div>
             </div>
             <div className="flex flex-col items-end flex-shrink-0 gap-1">
               <StatusChip
