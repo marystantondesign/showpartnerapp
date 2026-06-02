@@ -48,23 +48,31 @@ export const team = profiles
 export const models = [
   {
     id: 'm1', name: 'Sofia Andersen', lookNumber: '01',
-    avatar: 'https://i.pravatar.cc/300?img=44',
+    avatar: '/models/Sofia-Andersen-1.png',
     assignedArtists: ['Jen Z'],
     status: 'needs_revisit',
     notes: [{ id: 'note-m1-1', text: 'Allergic to latex gloves.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:35:00' }],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Sofia-Andersen-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Sofia-Andersen-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Jen Z' },
       { status: 'needs_revisit', timestamp: '5:35 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
-    id: 'm2', name: 'Naomi Williams', lookNumber: '02',
-    avatar: 'https://i.pravatar.cc/300?img=25',
+    id: 'm2', name: 'Neville Williams', lookNumber: '02',
+    avatar: '/models/Neville-Williams-1.png',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Neville-Williams-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Neville-Williams-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Neville-Williams-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Neville-Williams-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:47 AM', updatedBy: 'Marcus Lee' },
@@ -72,23 +80,33 @@ export const models = [
   },
   {
     id: 'm3', name: 'Irina Volkov', lookNumber: '03',
-    avatar: 'https://i.pravatar.cc/300?img=29',
+    avatar: '/models/Irina-Volkov-1.png',
     assignedArtists: ['Jen Z', 'Zoe Park'],
     status: 'paused',
     notes: [{ id: 'note-m3-1', text: 'Requested minimal coverage.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:06:00' }],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Irina-Volkov-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Irina-Volkov-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Irina-Volkov-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:49 AM', updatedBy: 'Zoe Park' },
       { status: 'paused', timestamp: '3:06 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
-    id: 'm4', name: 'Chloe Martin', lookNumber: '04',
-    avatar: 'https://i.pravatar.cc/300?img=15',
+    id: 'm4', name: 'Cassidy Martin', lookNumber: '04',
+    avatar: '/models/Cassidy-Martin-1.png',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Cassidy-Martin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Cassidy-Martin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Cassidy-Martin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Cassidy-Martin-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-5', url: '/models/Cassidy-Martin-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '1:55 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '2:29 AM', updatedBy: 'Marcus Lee' },
@@ -96,11 +114,18 @@ export const models = [
   },
   {
     id: 'm5', name: 'Aaliyah Jones', lookNumber: '05',
-    avatar: 'https://i.pravatar.cc/300?img=32',
+    avatar: '/models/Aaliyah-Jones-1.png',
     assignedArtists: ['Sophia Rivera'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Aaliyah-Jones-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Aaliyah-Jones-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Aaliyah-Jones-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Aaliyah-Jones-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-5', url: '/models/Aaliyah-Jones-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-6', url: '/models/Aaliyah-Jones-6.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:00 AM', updatedBy: 'Sophia Rivera' },
       { status: 'done', timestamp: '2:34 AM', updatedBy: 'Sophia Rivera' },
@@ -108,11 +133,15 @@ export const models = [
   },
   {
     id: 'm6', name: 'Mei Lin', lookNumber: '06',
-    avatar: 'https://i.pravatar.cc/300?img=39',
+    avatar: '/models/Mei-Lin-1.png',
     assignedArtists: ['Zoe Park'],
     status: 'needs_revisit',
     notes: [{ id: 'note-m6-1', text: 'Touch up left brow.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:08:00' }],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Mei-Lin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Mei-Lin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Mei-Lin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:30 AM', updatedBy: 'Zoe Park' },
       { status: 'needs_revisit', timestamp: '3:08 AM', updatedBy: 'Zoe Park' },
@@ -120,11 +149,14 @@ export const models = [
   },
   {
     id: 'm7', name: 'Valentina Cruz', lookNumber: '07',
-    avatar: 'https://i.pravatar.cc/300?img=16',
+    avatar: '/models/Valentina-Cruz-1.png',
     assignedArtists: ['Jen Z'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Valentina-Cruz-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Valentina-Cruz-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Jen Z' },
       { status: 'done', timestamp: '2:24 AM', updatedBy: 'Jen Z' },
@@ -132,22 +164,30 @@ export const models = [
   },
   {
     id: 'm8', name: 'Ingrid Larsen', lookNumber: '08',
-    avatar: 'https://i.pravatar.cc/300?img=43',
+    avatar: '/models/Ingrid-Larson-1.png',
     assignedArtists: ['Sophia Rivera', 'Marcus Lee'],
     status: 'in_progress',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Ingrid-Larson-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Ingrid-Larson-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '3:15 AM', updatedBy: 'Marcus Lee' },
     ],
   },
   {
     id: 'm9', name: 'Priya Sharma', lookNumber: '09',
-    avatar: 'https://i.pravatar.cc/300?img=23',
+    avatar: '/models/Priya-Sharma-1.png',
     assignedArtists: ['Zoe Park'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Priya-Sharma-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Priya-Sharma-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Priya-Sharma-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Priya-Sharma-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:45 AM', updatedBy: 'Zoe Park' },
       { status: 'done', timestamp: '3:20 AM', updatedBy: 'Zoe Park' },
@@ -155,11 +195,15 @@ export const models = [
   },
   {
     id: 'm10', name: 'Elena Morozova', lookNumber: '10',
-    avatar: 'https://i.pravatar.cc/300?img=49',
+    avatar: '/models/Elena-Morozova-1.png',
     assignedArtists: ['Marcus Lee'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Elena-Morozova-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Elena-Morozova-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Elena-Morozova-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '3:30 AM', updatedBy: 'Marcus Lee' },
       { status: 'done', timestamp: '4:05 AM', updatedBy: 'Marcus Lee' },
@@ -167,140 +211,194 @@ export const models = [
   },
   {
     id: 'm11', name: 'Amara Diallo', lookNumber: '11',
-    avatar: 'https://i.pravatar.cc/300?img=36',
+    avatar: '/models/Amara-Diallo-1.png',
     assignedArtists: ['Jen Z'],
     status: 'in_progress',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Amara-Diallo-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Amara-Diallo-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Amara-Diallo-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [
       { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
     id: 'm12', name: 'Hana Tanaka', lookNumber: '12',
-    avatar: 'https://i.pravatar.cc/300?img=21',
+    avatar: '/models/Hana-Tanaka-1.png',
     assignedArtists: ['Sophia Rivera'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Hana-Tanaka-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Hana-Tanaka-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   // New models 13–25
   {
     id: 'm13', name: 'Camille Dubois', lookNumber: '13',
-    avatar: 'https://i.pravatar.cc/300?img=40',
+    avatar: '/models/Camille-DuBois.png',
     assignedArtists: ['Kenji Watanabe'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Camille-DuBois.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '3:00 AM', updatedBy: 'Kenji Watanabe' }, { status: 'done', timestamp: '3:46 AM', updatedBy: 'Kenji Watanabe' }],
   },
   {
     id: 'm14', name: 'Ingrid Strand', lookNumber: '14',
-    avatar: 'https://i.pravatar.cc/300?img=42',
+    avatar: '/models/Ingrid-Strand-1.png',
     assignedArtists: ['Aisha Johnson'],
     status: 'in_progress',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Ingrid-Strand-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Ingrid-Strand-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Ingrid-Strand-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Ingrid-Strand-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-5', url: '/models/Ingrid-Strand-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '4:10 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
     id: 'm15', name: 'Yuki Nakamura', lookNumber: '15',
-    avatar: 'https://i.pravatar.cc/300?img=45',
+    avatar: '/models/Yuki-Nakamura-1.png',
     assignedArtists: ['Kenji Watanabe'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Yuki-Nakamura-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Yuki-Nakamura-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Yuki-Nakamura-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm16', name: 'Fatima Hassan', lookNumber: '16',
-    avatar: 'https://i.pravatar.cc/300?img=46',
+    avatar: '/models/Fatima-Hassan.png',
     assignedArtists: ['Lena Schmidt', 'Aisha Johnson'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Fatima-Hassan.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '2:20 AM', updatedBy: 'Lena Schmidt' }, { status: 'done', timestamp: '3:05 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
     id: 'm17', name: 'Claudia Ferretti', lookNumber: '17',
-    avatar: 'https://i.pravatar.cc/300?img=50',
+    avatar: '/models/Claudia-Ferretti-1.png',
     assignedArtists: ['Sofia Reyes', 'Zoe Park'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Claudia-Ferretti-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Claudia-Ferretti-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Claudia-Ferretti-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-4', url: '/models/Claudia-Ferretti-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm18', name: 'Soo-Yeon Park', lookNumber: '18',
-    avatar: 'https://i.pravatar.cc/300?img=51',
+    avatar: '/models/Soo-Yeon-Park-1.png',
     assignedArtists: ['Lena Schmidt'],
     status: 'in_progress',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Soo-Yeon-Park-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Soo-Yeon-Park-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Soo-Yeon-Park-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '4:30 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
     id: 'm19', name: 'Abdullah Ali', lookNumber: '19',
-    avatar: 'https://i.pravatar.cc/300?img=54',
+    avatar: '/models/Abdullah-Ali-1.png',
     assignedArtists: ['Mira Patel', 'Marcus Lee'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Abdullah-Ali-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Abdullah-Ali-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Abdullah-Ali-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm20', name: 'Justin Mitchell', lookNumber: '20',
-    avatar: 'https://i.pravatar.cc/300?img=55',
+    avatar: '/models/Justin-Mitchell-1.png',
     assignedArtists: ['Kenji Watanabe', 'Luna Torres'],
     status: 'paused',
     notes: [{ id: 'note-m20-1', text: 'Waiting on stylist.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:10:00' }],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Justin-Mitchell-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Justin-Mitchell-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Justin-Mitchell-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '4:50 AM', updatedBy: 'Luna Torres' }, { status: 'paused', timestamp: '5:10 AM', updatedBy: 'Luna Torres' }],
   },
   {
     id: 'm21', name: 'Astrid Lindqvist', lookNumber: '21',
-    avatar: 'https://i.pravatar.cc/300?img=59',
+    avatar: '/models/Astrid-Lindqvist-1.png',
     assignedArtists: ['Aisha Johnson'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Astrid-Lindqvist-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Astrid-Lindqvist-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm22', name: 'Leila Nasser', lookNumber: '22',
-    avatar: 'https://i.pravatar.cc/300?img=61',
+    avatar: '/models/Leila-Nasser-1.png',
     assignedArtists: ['Mira Patel', 'Priya Osei'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Leila-Nasser-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Leila-Nasser-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm23', name: 'Rio Yamamoto', lookNumber: '23',
-    avatar: 'https://i.pravatar.cc/300?img=63',
+    avatar: '/models/Rio-Yamamoto.png',
     assignedArtists: ['Lena Schmidt'],
     status: 'needs_revisit',
     notes: [{ id: 'note-m23-1', text: 'Root touchup needed.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:25:00' }],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Rio-Yamamoto.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '5:00 AM', updatedBy: 'Lena Schmidt' }, { status: 'needs_revisit', timestamp: '5:25 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
     id: 'm24', name: 'Beatrice Fontaine', lookNumber: '24',
-    avatar: 'https://i.pravatar.cc/300?img=69',
+    avatar: '/models/Beatrice-Fontaine-1.png',
     assignedArtists: ['Sofia Reyes', 'David Kim'],
     status: 'not_started',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Beatrice-Fontaine-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Beatrice-Fontaine-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Beatrice-Fontaine-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [],
   },
   {
     id: 'm25', name: 'Zara Osei', lookNumber: '25',
-    avatar: 'https://i.pravatar.cc/300?img=41',
+    avatar: '/models/Zara-Osei-1.png',
     assignedArtists: ['Aisha Johnson', 'Mira Patel'],
     status: 'done',
     notes: [],
-    photos: [],
+    photos: [
+    { id: 'ph-1', url: '/models/Zara-Osei-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-2', url: '/models/Zara-Osei-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
+    { id: 'ph-3', url: '/models/Zara-Osei-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+  ],
     statusLog: [{ status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Aisha Johnson' }, { status: 'done', timestamp: '2:56 AM', updatedBy: 'Mira Patel' }],
   },
 ]
