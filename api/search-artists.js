@@ -15,34 +15,19 @@ export default async function handler(req, res) {
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 512,
-      messages: [{
-        role: 'user',
-        content: `You are a search assistant for an artist database used by fashion show coordinators.
-
-Parse this natural language query and return a JSON filter object.
-
-Query: "${query}"
-
-Available filter fields:
-- specialty: "hair" | "makeup" | "nails" | null
-- cities: string[] | null  (valid values: "New York", "Paris", "Milan", "London", "Los Angeles", "Tokyo", "Sydney", "Berlin")
-- minHourlyRate: number | null
-- maxHourlyRate: number | null
-- minRating: number | null  (1.0–5.0)
-- minExperience: number | null  (years)
-- maxHourlyRate: number | null
-- designerTags: string[] | null  (valid values: Valentino, Prada, Jacquemus, Oscar de la Renta, Diesel, Chanel, Dior, Givenchy, Balenciaga, Saint Laurent, Versace, Fendi, Bottega Veneta, Burberry, Alexander McQueen)
-- skillTags: string[] | null  (valid values: Eyebrow bleaching, Hair extensions, Tooth gems, Editorial makeup, Avant-garde color, Airbrush, Special effects, Natural glam, Nail art, Gel extensions, Acrylic, Press-on sets, Braiding, Wig styling, Color correction)
-
-Respond with only valid JSON, no explanation or markdown. Example:
-{"specialty":"nails","cities":["New York"],"maxHourlyRate":100,"minRating":null,"minExperience":null,"designerTags":null,"skillTags":null}`
-      }]
+      max_tokens: 500,
+      system: 'You are a filter engine. The user will describe what kind of artist they\'re looking for. Return ONLY a JSON object with these possible keys: specialty (HAIR/MAKEUP/NAILS), city (string), maxRate (number), minRating (number), designers (array of strings), skills (array of strings), minYears (number). Only include keys that are clearly specified. Return nothing else — no explanation, no markdown.',
+      messages: [{ role: 'user', content: query }]
     })
 
     const text = message.content[0]?.text?.trim() || '{}'
     let filters = {}
-    try { filters = JSON.parse(text) } catch { filters = {} }
+    try {
+      // Strip any accidental markdown code fences
+      const clean = text.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim()
+      filters = JSON.parse(clean)
+    } catch { filters = {} }
+
     return res.json({ filters })
   } catch (err) {
     console.error('Anthropic error:', err)
