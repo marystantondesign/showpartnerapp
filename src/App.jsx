@@ -13,6 +13,7 @@ import ListView from './views/ListView'
 import LineupView from './views/LineupView'
 import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
+import StudioView from './views/StudioView'
 
 function profileForRole(role) {
   if (role === 'agent') return profiles.find(p => p.role === 'lead') || profiles[0]
@@ -114,10 +115,11 @@ export default function App() {
               dark={dark}
             />
           )}
+          {tab === 'studio'    && <StudioView currentProfile={currentProfile} models={models} />}
           {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} currentProfile={currentProfile} schedule={schedule} onScheduleChange={setSchedule} />}
         </div>
 
-        <BottomNav active={tab} onSelect={setTab} />
+        <BottomNav active={tab} onSelect={setTab} isArtist={currentProfile.role === 'artist'} />
       </div>
 
       {/* Show history full-screen overlay */}
