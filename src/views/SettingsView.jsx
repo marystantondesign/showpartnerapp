@@ -41,7 +41,7 @@ function UploadRow({ label, value, onChange }) {
   )
 }
 
-export default function SettingsView({ dark, onToggleDark, venue, onVenueChange }) {
+export default function SettingsView({ dark, onToggleDark, venue, onVenueChange, onLogOut }) {
   const isTablet = useIsTablet()
   const [files, setFiles] = useState({ callSheet: null, runningOrder: null, faceCharts: null })
   const [pings, setPings] = useState(true)
@@ -192,6 +192,22 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange 
         <div className="mt-8 pt-4 border-t border-[#E0DDD8] dark:border-[#2E2B28]">
           <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">SHOW PARTNER</p>
           <p className="text-[11px] font-sans text-[#B0ACA7] mt-1">Version 1.0 · Valentino SS26</p>
+        </div>
+
+        {/* Log out */}
+        <div className="mt-8 pt-2">
+          <button
+            onClick={onLogOut}
+            className="w-full text-center"
+            style={{
+              fontFamily: 'Inter, system-ui', fontSize: 9, letterSpacing: '0.14em',
+              textTransform: 'uppercase', color: '#888580',
+              background: 'none', border: 'none', cursor: 'pointer',
+              outline: 'none', padding: '14px 0',
+            }}
+          >
+            Log out
+          </button>
         </div>
       </div>
       </div>

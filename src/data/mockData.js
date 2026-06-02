@@ -188,6 +188,55 @@ export const models = [
   },
 ]
 
+export const showHistory = [
+  {
+    id: 'sh1',
+    name: 'Valentino FW25',
+    season: 'Fall / Winter 2025',
+    date: 'November 2025',
+    venue: 'Palazzo Visconti',
+    city: 'Milan',
+    artists: [
+      { name: 'Marcus Lee',  specialty: 'makeup', stars: 4 },
+      { name: 'Zoe Park',    specialty: 'makeup', stars: 5 },
+      { name: 'David Kim',   specialty: 'hair',   stars: 3 },
+    ],
+    incidents: [],
+    receipts: { total: '$12,400', breakdown: ['Artist fees · $9,600', 'Product · $1,800', 'Travel · $1,000'] },
+    notes: 'Smooth show. All artists arrived on time. David needs a stronger pre-show brief next season — timing was slightly off on the first three looks.',
+  },
+  {
+    id: 'sh2',
+    name: 'Valentino SS25',
+    season: 'Spring / Summer 2025',
+    date: 'March 2025',
+    venue: 'Musée Rodin',
+    city: 'Paris',
+    artists: [
+      { name: 'Marcus Lee',   specialty: 'makeup', stars: 3 },
+      { name: 'Luna Torres',  specialty: 'makeup', stars: 5 },
+    ],
+    incidents: ['Artist no-show (original makeup lead). Replaced day-of with Luna Torres, sourced within 2 hours of call time.'],
+    receipts: { total: '$9,800', breakdown: ['Artist fees · $7,200', 'Emergency replacement · $1,400', 'Product · $1,200'] },
+    notes: 'Luna was the standout of the season — flag for all future Paris shows. No-show was handled cleanly but the replacement sourcing needs a standby protocol going forward.',
+  },
+  {
+    id: 'sh3',
+    name: 'Valentino FW24',
+    season: 'Fall / Winter 2024',
+    date: 'October 2024',
+    venue: 'Pier 59 Studios',
+    city: 'New York',
+    artists: [
+      { name: 'Zoe Park',    specialty: 'makeup', stars: 5 },
+      { name: 'Priya Osei',  specialty: 'hair',   stars: 4 },
+    ],
+    incidents: [],
+    receipts: { total: '$11,200', breakdown: ['Artist fees · $8,000', 'Product · $1,600', 'Travel · $1,600'] },
+    notes: 'First NY show with this team configuration. Excellent execution. Priya and Zoe work well together — strong pairing for future US dates.',
+  },
+]
+
 export const notifications = [
   { id: 'n1', text: 'Aria Chen marked Sofia Andersen as Needs Revisit', status: 'needs_revisit', timestamp: '5:35 AM', read: false },
   { id: 'n2', text: 'Zoe Park started Irina Volkov', status: 'in_progress', timestamp: '3:06 AM', read: false },

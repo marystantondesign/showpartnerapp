@@ -3,6 +3,7 @@ import { STATUS_META } from '../data/mockData'
 import DonutChart from '../components/DonutChart'
 import StatusChip from '../components/StatusChip'
 import ModelDetailSheet from '../components/ModelDetailSheet'
+import ManageAssignments from '../components/ManageAssignments'
 import { useIsTablet } from '../hooks/useIsTablet'
 
 const STATUS_DOT_COLOR = {
@@ -49,9 +50,10 @@ function fmtTime(totalMins) {
   return `${hh}:${String(m).padStart(2, '0')} ${ampm}`
 }
 
-function LeadDashboard({ models, team, notifications, onStatusChange, onNote }) {
+function LeadDashboard({ models, team, notifications, onStatusChange, onNote, schedule, onScheduleChange, onAssignArtists, dark }) {
   const [detailModel, setDetailModel] = useState(null)
   const [expandedArtist, setExpandedArtist] = useState(null)
+  const [assignmentsOpen, setAssignmentsOpen] = useState(false)
   const isTablet = useIsTablet()
 
   function toggleArtist(id) {
@@ -168,6 +170,19 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote }) 
     </div>
   )
 
+  // ── Section: Manage Assignments button ───────────────────────────────────
+  const sManageBtn = (
+    <div className="pb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28] mb-4">
+      <button
+        onClick={() => setAssignmentsOpen(true)}
+        className="w-full text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] rounded-lg text-[#111] dark:text-[#F0EDE8] outline-none"
+        style={{ padding: '12px', cursor: 'pointer', background: 'none', minHeight: 44 }}
+      >
+        MANAGE ASSIGNMENTS
+      </button>
+    </div>
+  )
+
   // ── Section: By Artist ────────────────────────────────────────────────────
   const sArtists = (
     <div className="pb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28] mb-4">
@@ -233,14 +248,27 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote }) 
     />
   )
 
+  const assignmentsSheet = (
+    <ManageAssignments
+      open={assignmentsOpen}
+      onClose={() => setAssignmentsOpen(false)}
+      models={models}
+      schedule={schedule}
+      onAssignArtists={onAssignArtists}
+      onScheduleChange={onScheduleChange}
+      dark={dark}
+    />
+  )
+
   // ── Tablet: two-column ────────────────────────────────────────────────────
   if (isTablet) {
     return (
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Left: attention + by artist */}
+        {/* Left: attention + by artist + manage */}
         <div style={{ flex: '0 0 45%', overflowY: 'auto', padding: '16px 24px', borderRight: '1px solid' }} className="border-[#E0DDD8] dark:border-[#2E2B28]">
           {sAttention}
           {sArtists}
+          {sManageBtn}
           {sActivity}
         </div>
         {/* Right: pace + stats */}
@@ -248,6 +276,7 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote }) 
           {sPace}
         </div>
         {detailSheet}
+        {assignmentsSheet}
       </div>
     )
   }
@@ -258,8 +287,10 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote }) 
       {sAttention}
       {sPace}
       {sArtists}
+      {sManageBtn}
       {sActivity}
       {detailSheet}
+      {assignmentsSheet}
     </div>
   )
 }
@@ -320,13 +351,13 @@ function ArtistDashboard({ models, team, currentProfile }) {
   )
 }
 
-export default function DashboardView({ models, team, notifications, currentProfile, onStatusChange, onNote }) {
+export default function DashboardView({ models, team, notifications, currentProfile, onStatusChange, onNote, schedule, onScheduleChange, onAssignArtists, dark }) {
   const isArtist = currentProfile.role === 'artist'
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {isArtist
         ? <ArtistDashboard models={models} team={team} currentProfile={currentProfile} />
-        : <LeadDashboard models={models} team={team} notifications={notifications} onStatusChange={onStatusChange} onNote={onNote} />
+        : <LeadDashboard models={models} team={team} notifications={notifications} onStatusChange={onStatusChange} onNote={onNote} schedule={schedule} onScheduleChange={onScheduleChange} onAssignArtists={onAssignArtists} dark={dark} />
       }
     </div>
   )

@@ -1,38 +1,47 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { profiles } from '../data/mockData'
 import BottomSheet from './BottomSheet'
 import { useIsTablet } from '../hooks/useIsTablet'
 
-export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchProfile, notifications, onBell, onSwitchRole }) {
+export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchProfile, notifications, onBell, onShowHistory }) {
   const [profileOpen, setProfileOpen] = useState(false)
-  const unread    = notifications.filter(n => !n.read).length
-  const isTablet  = useIsTablet()
+  const unread   = notifications.filter(n => !n.read).length
+  const isTablet = useIsTablet()
+
+  // Show name is tappable for lead and assistant roles
+  const canViewHistory = currentProfile.role === 'lead' || currentProfile.role === 'assistant'
 
   return (
     <div className={`flex items-center justify-between border-b border-[#E0DDD8] dark:border-[#2E2B28] bg-greige dark:bg-greige-dark flex-shrink-0 ${isTablet ? 'px-6 py-4' : 'px-4 py-3'}`}>
-      {/* Show name + switch role */}
-      <div className="flex flex-col gap-0.5">
+
+      {/* Show name — tappable for lead / assistant */}
+      {canViewHistory ? (
+        <button
+          onClick={onShowHistory}
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: isTablet ? 28 : 18,
+            color: 'inherit',
+            background: 'none', border: 'none', cursor: 'pointer',
+            outline: 'none', padding: 0, lineHeight: 1,
+          }}
+          className="text-[#111] dark:text-[#F0EDE8]"
+        >
+          Valentino SS26
+        </button>
+      ) : (
         <span
           className="font-serif text-[#111] dark:text-[#F0EDE8] leading-none"
           style={{ fontSize: isTablet ? 28 : 18 }}
-        >Valentino SS26</span>
-        {onSwitchRole && (
-          <button
-            onClick={onSwitchRole}
-            style={{ fontFamily: 'Inter, system-ui', fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#888580', background: 'none', border: 'none', cursor: 'pointer', outline: 'none', padding: 0, textAlign: 'left' }}
-          >
-            Switch role
-          </button>
-        )}
-      </div>
+        >
+          Valentino SS26
+        </span>
+      )}
 
       {/* Right controls */}
       <div className="flex items-center gap-3">
         {/* Profile switcher */}
-        <button
-          onClick={() => setProfileOpen(true)}
-          className="flex items-center gap-1.5 outline-none"
-        >
+        <button onClick={() => setProfileOpen(true)} className="flex items-center gap-1.5 outline-none">
           <img src={currentProfile.avatar} alt={currentProfile.name} className="w-8 h-8 rounded-full object-cover" />
           <span className="text-[11px] font-sans text-[#111] dark:text-[#F0EDE8] leading-none">{currentProfile.name}</span>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">

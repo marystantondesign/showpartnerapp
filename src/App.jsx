@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
-import { models as initModels, notifications as initNotifs, profiles } from './data/mockData'
+import { models as initModels, notifications as initNotifs, profiles, schedule as initSchedule } from './data/mockData'
 import RoleSelect from './components/RoleSelect'
+import ShowHistory from './components/ShowHistory'
 import TopBar from './components/TopBar'
 import BottomNav from './components/BottomNav'
 import Toast from './components/Toast'
@@ -11,22 +12,23 @@ import LineupView from './views/LineupView'
 import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 
-// Map role string → best matching profile
 function profileForRole(role) {
   if (role === 'agent') return profiles.find(p => p.role === 'lead') || profiles[0]
   return profiles.find(p => p.role === role) || profiles[0]
 }
 
 export default function App() {
-  const [selectedRole, setSelectedRole] = useState(null)   // null = show role select
-  const [dark, setDark] = useState(false)
-  const [tab, setTab] = useState('home')
+  const [selectedRole, setSelectedRole]     = useState(null)
+  const [dark, setDark]                     = useState(false)
+  const [tab, setTab]                       = useState('home')
   const [currentProfile, setCurrentProfile] = useState(profiles[0])
-  const [models, setModels] = useState(initModels)
-  const [notifications, setNotifications] = useState(initNotifs)
-  const [toast, setToast] = useState(null)
-  const [bellOpen, setBellOpen] = useState(false)
-  const [venue, setVenue] = useState({ pin: null, area: null, floorPlanImage: null, zones: [], stationPins: [] })
+  const [models, setModels]                 = useState(initModels)
+  const [notifications, setNotifications]   = useState(initNotifs)
+  const [toast, setToast]                   = useState(null)
+  const [bellOpen, setBellOpen]             = useState(false)
+  const [venue, setVenue]                   = useState({ pin: null, area: null, floorPlanImage: null, zones: [], stationPins: [] })
+  const [schedule, setSchedule]             = useState(initSchedule)
+  const [showHistoryOpen, setShowHistoryOpen] = useState(false)
 
   function handleRoleSelect(role) {
     setCurrentProfile(profileForRole(role))
@@ -34,7 +36,7 @@ export default function App() {
     setTab('home')
   }
 
-  function handleSwitchRole() {
+  function handleLogOut() {
     setSelectedRole(null)
   }
 
@@ -60,9 +62,16 @@ export default function App() {
     setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: note } : m))
   }
 
+  function handleAssignArtists(modelId, { hair, makeup }) {
+    setModels(prev => prev.map(m => {
+      if (m.id !== modelId) return m
+      const artists = [hair, makeup].filter(Boolean)
+      return { ...m, assignedArtists: artists, hairArtist: hair, makeupArtist: makeup }
+    }))
+  }
+
   const showToast = useCallback((msg) => setToast(msg), [])
 
-  // Show role select screen if no role chosen yet
   if (!selectedRole) {
     return <RoleSelect onSelect={handleRoleSelect} />
   }
@@ -77,19 +86,41 @@ export default function App() {
           onSwitchProfile={setCurrentProfile}
           notifications={notifications}
           onBell={() => setBellOpen(true)}
-          onSwitchRole={handleSwitchRole}
+          onShowHistory={() => setShowHistoryOpen(true)}
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
-          {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} />}
+          {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />}
           {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
-          {tab === 'dashboard' && <DashboardView models={models} team={profiles} notifications={notifications} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
-          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} />}
+          {tab === 'dashboard' && (
+            <DashboardView
+              models={models}
+              team={profiles}
+              notifications={notifications}
+              currentProfile={currentProfile}
+              onStatusChange={handleStatusChange}
+              onNote={handleNote}
+              schedule={schedule}
+              onScheduleChange={setSchedule}
+              onAssignArtists={handleAssignArtists}
+              dark={dark}
+            />
+          )}
+          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} />}
         </div>
 
         <BottomNav active={tab} onSelect={setTab} />
       </div>
+
+      {/* Show history full-screen overlay */}
+      {showHistoryOpen && (
+        <ShowHistory
+          onClose={() => setShowHistoryOpen(false)}
+          currentProfile={currentProfile}
+          dark={dark}
+        />
+      )}
 
       <Toast message={toast} onDone={() => setToast(null)} />
 

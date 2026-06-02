@@ -41,3 +41,4 @@ Thumbs.db
 # Allow app icon PNG in public/
 *.png
 !public/*.png
+.vercel

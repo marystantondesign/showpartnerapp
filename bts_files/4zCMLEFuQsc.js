@@ -1,0 +1,3 @@
+;/*FB_PKG_DELIM*/
+
+__d("usePolarisDesktopClipsControl",["PolarisIsLoggedIn","PolarisRoutePropUtils","PolarisUA","react","react-compiler-runtime"],(function(t,n,r,o,a,i,l){"use strict";var e,s=(e||(e=o("react"))).useContext;function u(){var e=o("react-compiler-runtime").c(2),t=o("PolarisUA").isDesktop(),n=s(o("PolarisRoutePropUtils").PolarisRoutePropContext);if(!t)return!1;if(o("PolarisIsLoggedIn").isLoggedIn())return!0;var r;return e[0]!==n.routePropQE?(r=n.routePropQE.getBool("enable_reels_controls",!1),e[0]=n.routePropQE,e[1]=r):r=e[1],r}l.default=u}),98);

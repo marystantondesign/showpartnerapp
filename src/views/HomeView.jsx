@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { show, team, models, notifications as initNotifs, schedule, parseScheduleTime, STATUS_META } from '../data/mockData'
+import { show, team, models, notifications as initNotifs, parseScheduleTime, STATUS_META } from '../data/mockData'
 import BottomSheet from '../components/BottomSheet'
 import ContactSheet from '../components/ContactSheet'
 import FloorPlanSVG from '../components/FloorPlanSVG'
@@ -360,7 +360,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
   )
 }
 
-export default function HomeView({ dark, currentProfile, onToast, models: modelsProp, venue }) {
+export default function HomeView({ dark, currentProfile, onToast, models: modelsProp, venue, schedule }) {
   const [now, setNow] = useState(new Date())
   const isTablet = useIsTablet()
   const [checked, setChecked] = useState(() => {
