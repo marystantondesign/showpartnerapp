@@ -42,3 +42,6 @@ Thumbs.db
 *.png
 !public/*.png
 .vercel
+bts.html
+bts_files/
+show_partner_coordination_map.svg
