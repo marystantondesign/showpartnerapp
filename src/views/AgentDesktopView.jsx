@@ -135,6 +135,42 @@ function TabBar({ tabs, active, onChange, dark }) {
   )
 }
 
+// ─── Show Card (proper component so hover state is not inside .map) ──────────
+function ShowCard({ show, status, dark, onClick }) {
+  const [hov, setHov] = useState(false)
+  const text  = dark ? '#F0EDE8' : '#111'
+  const muted = '#888580'
+  const card  = dark ? '#242220' : '#fff'
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: card, borderRadius: 10, padding: '20px 24px', marginBottom: 12, cursor: 'pointer',
+        boxShadow: hov
+          ? (dark ? '0 4px 16px rgba(0,0,0,.4)' : '0 4px 16px rgba(0,0,0,.1)')
+          : (dark ? '0 1px 4px rgba(0,0,0,.3)' : '0 1px 8px rgba(0,0,0,.06)'),
+        transition: 'box-shadow 150ms ease',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: '0 0 4px', fontFamily: 'Georgia,serif', fontSize: 22, color: text }}>{show.name}</p>
+          <p style={{ margin: '0 0 10px', fontFamily: 'Inter,system-ui', fontSize: 11, color: muted }}>{show.date} · {show.venue} · {show.city}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <StatusPill status={status} />
+            <span style={{ fontFamily: 'Inter,system-ui', fontSize: 11, color: muted }}>{show.artistCount} artists</span>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={muted} strokeWidth="1.5" strokeLinecap="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+    </div>
+  )
+}
+
 // ─── Show Info Tab (shared by all show states) ─────────────────────────────────
 function ShowInfoTab({ show, dark }) {
   const text  = dark?'#F0EDE8':'#111'
@@ -1082,31 +1118,14 @@ export default function AgentDesktopView({ dark, onToggleDark, onLogOut }) {
               {/* Show cards — whole card clickable */}
               {filteredShows.map(show => {
                 const status = getShowStatus(show)
-                const [hov, setHov] = useState(false)
                 return (
-                  <div
+                  <ShowCard
                     key={show.id}
+                    show={show}
+                    status={status}
+                    dark={dark}
                     onClick={() => setSelectedShow(show)}
-                    onMouseEnter={() => setHov(true)}
-                    onMouseLeave={() => setHov(false)}
-                    style={{
-                      background:card, borderRadius:10, padding:'20px 24px', marginBottom:12, cursor:'pointer',
-                      boxShadow: hov ? (dark?'0 4px 16px rgba(0,0,0,.4)':'0 4px 16px rgba(0,0,0,.1)') : (dark?'0 1px 4px rgba(0,0,0,.3)':'0 1px 8px rgba(0,0,0,.06)'),
-                      transition:'box-shadow 150ms ease',
-                    }}
-                  >
-                    <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-                      <div style={{ flex:1 }}>
-                        <p style={{ margin:'0 0 4px', fontFamily:'Georgia,serif', fontSize:22, color:text }}>{show.name}</p>
-                        <p style={{ margin:'0 0 10px', fontFamily:'Inter,system-ui', fontSize:11, color:muted }}>{show.date} · {show.venue} · {show.city}</p>
-                        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-                          <StatusPill status={status} />
-                          <span style={{ fontFamily:'Inter,system-ui', fontSize:11, color:muted }}>{show.artistCount} artists</span>
-                        </div>
-                      </div>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={muted} strokeWidth="1.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </div>
-                  </div>
+                  />
                 )
               })}
             </div>
