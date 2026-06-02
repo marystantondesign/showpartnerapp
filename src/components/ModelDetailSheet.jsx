@@ -5,10 +5,8 @@ import { STATUS_META, STATUS_ORDER, cycleStatus, modelHistory } from '../data/mo
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatPhotoTs(ts) {
-  // If ts already contains month names / slashes, show as-is; otherwise prefix show date
-  if (!ts) return ''
-  if (/[A-Za-z]/.test(ts) && ts.includes('·')) return ts  // already formatted
-  return `Jun 1 · ${ts}`
+  // Just show the timestamp as stored — seeded photos now use "Apr 12, 2026" format
+  return ts || ''
 }
 
 function roleChip(authorRole, authorSpecialty) {

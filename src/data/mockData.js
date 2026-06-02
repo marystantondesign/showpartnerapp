@@ -49,12 +49,16 @@ export const models = [
   {
     id: 'm1', name: 'Sofia Andersen', lookNumber: '01',
     avatar: '/models/Sofia-Andersen-1.png',
-    assignedArtists: ['Jen Z'],
+    assignedArtists: ['David Kim', 'Marcus Lee', 'Sofia Reyes'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Sophia Rivera',
     status: 'needs_revisit',
     notes: [{ id: 'note-m1-1', text: 'Allergic to latex gloves.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:35:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Sofia-Andersen-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Sofia-Andersen-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Sofia-Andersen-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Sofia-Andersen-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Jen Z' },
@@ -64,14 +68,18 @@ export const models = [
   {
     id: 'm2', name: 'Neville Williams', lookNumber: '02',
     avatar: '/models/Neville-Williams-1.png',
-    assignedArtists: ['Marcus Lee'],
+    assignedArtists: ['Priya Osei', 'Zoe Park'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: null,
+    assistant: 'James Kim',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Neville-Williams-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Neville-Williams-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Neville-Williams-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Neville-Williams-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Neville-Williams-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Neville-Williams-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Neville-Williams-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Neville-Williams-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Marcus Lee' },
@@ -81,13 +89,17 @@ export const models = [
   {
     id: 'm3', name: 'Irina Volkov', lookNumber: '03',
     avatar: '/models/Irina-Volkov-1.png',
-    assignedArtists: ['Jen Z', 'Zoe Park'],
+    assignedArtists: ['Kenji Watanabe', 'Luna Torres', 'Mira Patel'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Luna Torres',
+    nailArtist: 'Mira Patel',
+    assistant: 'Cleo Marsh',
     status: 'paused',
     notes: [{ id: 'note-m3-1', text: 'Requested minimal coverage.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:06:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Irina-Volkov-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Irina-Volkov-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Irina-Volkov-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Irina-Volkov-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Irina-Volkov-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Irina-Volkov-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:49 AM', updatedBy: 'Zoe Park' },
@@ -97,15 +109,19 @@ export const models = [
   {
     id: 'm4', name: 'Cassidy Martin', lookNumber: '04',
     avatar: '/models/Cassidy-Martin-1.png',
-    assignedArtists: ['Marcus Lee'],
+    assignedArtists: ['David Kim', 'Aisha Johnson'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: null,
+    assistant: 'Benji Adams',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Cassidy-Martin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Cassidy-Martin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Cassidy-Martin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Cassidy-Martin-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-5', url: '/models/Cassidy-Martin-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Cassidy-Martin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Cassidy-Martin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Cassidy-Martin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Cassidy-Martin-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-5', url: '/models/Cassidy-Martin-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '1:55 AM', updatedBy: 'Marcus Lee' },
@@ -115,16 +131,20 @@ export const models = [
   {
     id: 'm5', name: 'Aaliyah Jones', lookNumber: '05',
     avatar: '/models/Aaliyah-Jones-1.png',
-    assignedArtists: ['Sophia Rivera'],
+    assignedArtists: ['Lena Schmidt', 'Marcus Lee', 'Sofia Reyes'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Nadia Faris',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Aaliyah-Jones-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Aaliyah-Jones-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Aaliyah-Jones-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Aaliyah-Jones-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-5', url: '/models/Aaliyah-Jones-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-6', url: '/models/Aaliyah-Jones-6.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Aaliyah-Jones-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Aaliyah-Jones-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Aaliyah-Jones-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Aaliyah-Jones-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-5', url: '/models/Aaliyah-Jones-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-6', url: '/models/Aaliyah-Jones-6.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:00 AM', updatedBy: 'Sophia Rivera' },
@@ -134,13 +154,17 @@ export const models = [
   {
     id: 'm6', name: 'Mei Lin', lookNumber: '06',
     avatar: '/models/Mei-Lin-1.png',
-    assignedArtists: ['Zoe Park'],
+    assignedArtists: ['Priya Osei', 'Zoe Park'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: null,
+    assistant: 'Sophia Rivera',
     status: 'needs_revisit',
     notes: [{ id: 'note-m6-1', text: 'Touch up left brow.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T03:08:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Mei-Lin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Mei-Lin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Mei-Lin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Mei-Lin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Mei-Lin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Mei-Lin-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:30 AM', updatedBy: 'Zoe Park' },
@@ -150,12 +174,16 @@ export const models = [
   {
     id: 'm7', name: 'Valentina Cruz', lookNumber: '07',
     avatar: '/models/Valentina-Cruz-1.png',
-    assignedArtists: ['Jen Z'],
+    assignedArtists: ['Kenji Watanabe', 'Luna Torres', 'Mira Patel'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Luna Torres',
+    nailArtist: 'Mira Patel',
+    assistant: 'James Kim',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Valentina-Cruz-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Valentina-Cruz-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Valentina-Cruz-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Valentina-Cruz-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Jen Z' },
@@ -165,12 +193,16 @@ export const models = [
   {
     id: 'm8', name: 'Ingrid Larsen', lookNumber: '08',
     avatar: '/models/Ingrid-Larson-1.png',
-    assignedArtists: ['Sophia Rivera', 'Marcus Lee'],
+    assignedArtists: ['David Kim', 'Aisha Johnson'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: null,
+    assistant: 'Cleo Marsh',
     status: 'in_progress',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Ingrid-Larson-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Ingrid-Larson-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Ingrid-Larson-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Ingrid-Larson-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '3:15 AM', updatedBy: 'Marcus Lee' },
@@ -179,14 +211,18 @@ export const models = [
   {
     id: 'm9', name: 'Priya Sharma', lookNumber: '09',
     avatar: '/models/Priya-Sharma-1.png',
-    assignedArtists: ['Zoe Park'],
+    assignedArtists: ['Lena Schmidt', 'Marcus Lee', 'Sofia Reyes'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Benji Adams',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Priya-Sharma-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Priya-Sharma-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Priya-Sharma-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Priya-Sharma-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Priya-Sharma-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Priya-Sharma-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Priya-Sharma-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Priya-Sharma-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:45 AM', updatedBy: 'Zoe Park' },
@@ -196,13 +232,17 @@ export const models = [
   {
     id: 'm10', name: 'Elena Morozova', lookNumber: '10',
     avatar: '/models/Elena-Morozova-1.png',
-    assignedArtists: ['Marcus Lee'],
+    assignedArtists: ['Priya Osei', 'Zoe Park'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: null,
+    assistant: 'Nadia Faris',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Elena-Morozova-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Elena-Morozova-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Elena-Morozova-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Elena-Morozova-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Elena-Morozova-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Elena-Morozova-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '3:30 AM', updatedBy: 'Marcus Lee' },
@@ -212,13 +252,17 @@ export const models = [
   {
     id: 'm11', name: 'Amara Diallo', lookNumber: '11',
     avatar: '/models/Amara-Diallo-1.png',
-    assignedArtists: ['Jen Z'],
+    assignedArtists: ['Kenji Watanabe', 'Luna Torres'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Luna Torres',
+    nailArtist: null,
+    assistant: 'Sophia Rivera',
     status: 'in_progress',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Amara-Diallo-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Amara-Diallo-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Amara-Diallo-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Amara-Diallo-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Amara-Diallo-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Amara-Diallo-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [
       { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Jen Z' },
@@ -227,12 +271,16 @@ export const models = [
   {
     id: 'm12', name: 'Hana Tanaka', lookNumber: '12',
     avatar: '/models/Hana-Tanaka-1.png',
-    assignedArtists: ['Sophia Rivera'],
+    assignedArtists: ['David Kim', 'Aisha Johnson', 'Mira Patel'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: 'Mira Patel',
+    assistant: 'James Kim',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Hana-Tanaka-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Hana-Tanaka-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Hana-Tanaka-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Hana-Tanaka-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
@@ -240,170 +288,220 @@ export const models = [
   {
     id: 'm13', name: 'Camille Dubois', lookNumber: '13',
     avatar: '/models/Camille-DuBois-1.png',
-    assignedArtists: ['Kenji Watanabe'],
+    assignedArtists: ['Lena Schmidt', 'Marcus Lee', 'Sofia Reyes'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Cleo Marsh',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Camille-DuBois-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Camille-DuBois-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Camille-DuBois-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Camille-DuBois-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Camille-DuBois-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Camille-DuBois-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '3:00 AM', updatedBy: 'Kenji Watanabe' }, { status: 'done', timestamp: '3:46 AM', updatedBy: 'Kenji Watanabe' }],
   },
   {
     id: 'm14', name: 'Ingrid Strand', lookNumber: '14',
     avatar: '/models/Ingrid-Strand-1.png',
-    assignedArtists: ['Aisha Johnson'],
+    assignedArtists: ['Priya Osei', 'Zoe Park'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: null,
+    assistant: 'Benji Adams',
     status: 'in_progress',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Ingrid-Strand-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Ingrid-Strand-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Ingrid-Strand-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Ingrid-Strand-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-5', url: '/models/Ingrid-Strand-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Ingrid-Strand-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Ingrid-Strand-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Ingrid-Strand-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Ingrid-Strand-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-5', url: '/models/Ingrid-Strand-5.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '4:10 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
     id: 'm15', name: 'Yuki Nakamura', lookNumber: '15',
     avatar: '/models/Yuki-Nakamura-1.png',
-    assignedArtists: ['Kenji Watanabe'],
+    assignedArtists: ['Kenji Watanabe', 'Luna Torres', 'Mira Patel'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Luna Torres',
+    nailArtist: 'Mira Patel',
+    assistant: 'Nadia Faris',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Yuki-Nakamura-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Yuki-Nakamura-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Yuki-Nakamura-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Yuki-Nakamura-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Yuki-Nakamura-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Yuki-Nakamura-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
     id: 'm16', name: 'Fatima Hassan', lookNumber: '16',
     avatar: '/models/Fatima-Hassan-1.png',
-    assignedArtists: ['Lena Schmidt', 'Aisha Johnson'],
+    assignedArtists: ['David Kim', 'Aisha Johnson', 'Sofia Reyes'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Sophia Rivera',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Fatima-Hassan-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Fatima-Hassan-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Fatima-Hassan-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Fatima-Hassan-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Fatima-Hassan-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Fatima-Hassan-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Fatima-Hassan-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Fatima-Hassan-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '2:20 AM', updatedBy: 'Lena Schmidt' }, { status: 'done', timestamp: '3:05 AM', updatedBy: 'Aisha Johnson' }],
   },
   {
     id: 'm17', name: 'Claudia Ferretti', lookNumber: '17',
     avatar: '/models/Claudia-Ferretti-1.png',
-    assignedArtists: ['Sofia Reyes', 'Zoe Park'],
+    assignedArtists: ['Lena Schmidt', 'Marcus Lee'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: null,
+    assistant: 'James Kim',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Claudia-Ferretti-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Claudia-Ferretti-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Claudia-Ferretti-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-4', url: '/models/Claudia-Ferretti-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Claudia-Ferretti-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Claudia-Ferretti-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Claudia-Ferretti-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-4', url: '/models/Claudia-Ferretti-4.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
     id: 'm18', name: 'Soo-Yeon Park', lookNumber: '18',
     avatar: '/models/Soo-Yeon-Park-1.png',
-    assignedArtists: ['Lena Schmidt'],
+    assignedArtists: ['Priya Osei', 'Zoe Park', 'Mira Patel'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: 'Mira Patel',
+    assistant: 'Cleo Marsh',
     status: 'in_progress',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Soo-Yeon-Park-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Soo-Yeon-Park-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Soo-Yeon-Park-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Soo-Yeon-Park-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Soo-Yeon-Park-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Soo-Yeon-Park-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '4:30 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
     id: 'm19', name: 'Abdullah Ali', lookNumber: '19',
     avatar: '/models/Abdullah-Ali-1.png',
-    assignedArtists: ['Mira Patel', 'Marcus Lee'],
+    assignedArtists: ['Kenji Watanabe', 'Aisha Johnson'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: null,
+    assistant: 'Benji Adams',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Abdullah-Ali-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Abdullah-Ali-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Abdullah-Ali-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Abdullah-Ali-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Abdullah-Ali-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Abdullah-Ali-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
     id: 'm20', name: 'Justin Mitchell', lookNumber: '20',
     avatar: '/models/Justin-Mitchell-1.png',
-    assignedArtists: ['Kenji Watanabe', 'Luna Torres'],
+    assignedArtists: ['David Kim', 'Marcus Lee'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: null,
+    assistant: 'Nadia Faris',
     status: 'paused',
     notes: [{ id: 'note-m20-1', text: 'Waiting on stylist.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:10:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Justin-Mitchell-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Justin-Mitchell-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Justin-Mitchell-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Justin-Mitchell-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Justin-Mitchell-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Justin-Mitchell-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '4:50 AM', updatedBy: 'Luna Torres' }, { status: 'paused', timestamp: '5:10 AM', updatedBy: 'Luna Torres' }],
   },
   {
     id: 'm21', name: 'Astrid Lindqvist', lookNumber: '21',
     avatar: '/models/Astrid-Lindqvist-1.png',
-    assignedArtists: ['Aisha Johnson'],
+    assignedArtists: ['Lena Schmidt', 'Luna Torres', 'Sofia Reyes'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Luna Torres',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Sophia Rivera',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Astrid-Lindqvist-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Astrid-Lindqvist-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Astrid-Lindqvist-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Astrid-Lindqvist-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
     id: 'm22', name: 'Leila Nasser', lookNumber: '22',
     avatar: '/models/Leila-Nasser-1.png',
-    assignedArtists: ['Mira Patel', 'Priya Osei'],
+    assignedArtists: ['Priya Osei', 'Zoe Park', 'Mira Patel'],
+    hairArtist: 'Priya Osei',
+    makeupArtist: 'Zoe Park',
+    nailArtist: 'Mira Patel',
+    assistant: 'James Kim',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Leila-Nasser-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Leila-Nasser-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Leila-Nasser-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Leila-Nasser-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
-    id: 'm23', name: 'Rio Yamamoto', lookNumber: '23',
-    avatar: '/models/Rio-Yamamoto-1.png',
-    assignedArtists: ['Lena Schmidt'],
+    id: 'm23', name: 'Rio Sakamoto', lookNumber: '23',
+    avatar: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='300' height='300' fill='%238A9BB0'/%3E%3Ctext x='150' y='175' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='100' font-weight='500' fill='white'%3ERS%3C/text%3E%3C/svg%3E",
+    assignedArtists: ['Kenji Watanabe', 'Aisha Johnson'],
+    hairArtist: 'Kenji Watanabe',
+    makeupArtist: 'Aisha Johnson',
+    nailArtist: null,
+    assistant: 'Cleo Marsh',
     status: 'needs_revisit',
     notes: [{ id: 'note-m23-1', text: 'Root touchup needed.', authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-06-01T05:25:00' }],
     photos: [
-    { id: 'ph-1', url: '/models/Rio-Yamamoto-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Rio-Yamamoto-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '5:00 AM', updatedBy: 'Lena Schmidt' }, { status: 'needs_revisit', timestamp: '5:25 AM', updatedBy: 'Lena Schmidt' }],
   },
   {
     id: 'm24', name: 'Beatrice Fontaine', lookNumber: '24',
     avatar: '/models/Beatrice-Fontaine-1.png',
-    assignedArtists: ['Sofia Reyes', 'David Kim'],
+    assignedArtists: ['David Kim', 'Luna Torres'],
+    hairArtist: 'David Kim',
+    makeupArtist: 'Luna Torres',
+    nailArtist: null,
+    assistant: 'Benji Adams',
     status: 'not_started',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Beatrice-Fontaine-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Beatrice-Fontaine-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Beatrice-Fontaine-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Beatrice-Fontaine-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Beatrice-Fontaine-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Beatrice-Fontaine-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [],
   },
   {
     id: 'm25', name: 'Zara Osei', lookNumber: '25',
     avatar: '/models/Zara-Osei-1.png',
-    assignedArtists: ['Aisha Johnson', 'Mira Patel'],
+    assignedArtists: ['Lena Schmidt', 'Marcus Lee', 'Sofia Reyes'],
+    hairArtist: 'Lena Schmidt',
+    makeupArtist: 'Marcus Lee',
+    nailArtist: 'Sofia Reyes',
+    assistant: 'Nadia Faris',
     status: 'done',
     notes: [],
     photos: [
-    { id: 'ph-1', url: '/models/Zara-Osei-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-2', url: '/models/Zara-Osei-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' },
-    { id: 'ph-3', url: '/models/Zara-Osei-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Jun 1', label: '' }
+    { id: 'ph-1', url: '/models/Zara-Osei-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-2', url: '/models/Zara-Osei-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' },
+    { id: 'ph-3', url: '/models/Zara-Osei-3.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 12, 2026', label: '' }
   ],
     statusLog: [{ status: 'in_progress', timestamp: '2:10 AM', updatedBy: 'Aisha Johnson' }, { status: 'done', timestamp: '2:56 AM', updatedBy: 'Mira Patel' }],
   },
