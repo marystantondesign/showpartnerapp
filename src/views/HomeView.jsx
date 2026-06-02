@@ -3,6 +3,7 @@ import { show, team, models, notifications as initNotifs, schedule, parseSchedul
 import BottomSheet from '../components/BottomSheet'
 import ContactSheet from '../components/ContactSheet'
 import FloorPlanSVG from '../components/FloorPlanSVG'
+import { useIsTablet } from '../hooks/useIsTablet'
 
 
 function formatTime(date) {
@@ -361,6 +362,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
 
 export default function HomeView({ dark, currentProfile, onToast, models: modelsProp, venue }) {
   const [now, setNow] = useState(new Date())
+  const isTablet = useIsTablet()
   const [checked, setChecked] = useState(() => {
     const cur = currentMinutes(new Date())
     return schedule.reduce((acc, item) => {
@@ -431,6 +433,150 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
     return `${hh}:${String(m).padStart(2,'0')} ${ap}`
   }
 
+  // ── Tablet: two-column layout ─────────────────────────────────────────────
+  if (isTablet) {
+    return (
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left: all content columns */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          {/* Pace block */}
+          <div className="px-6 pt-5 pb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">{formatDateLine(now)}</p>
+            <p className={`font-serif text-[28px] leading-tight mb-1 ${pace.past ? 'text-[#888580]' : 'text-[#111] dark:text-[#F0EDE8]'}`}>{pace.text}</p>
+            <p className="text-[11px] font-sans text-[#888580] mb-4">{formatTime(now)}</p>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              <div className="bg-white/60 dark:bg-white/5 rounded-lg px-3 py-2.5">
+                <p className="font-serif text-xl text-[#111] dark:text-[#F0EDE8] leading-none">{remaining}</p>
+                <p className="text-[10px] font-sans text-[#888580] mt-1">models remaining</p>
+              </div>
+              <div className="bg-white/60 dark:bg-white/5 rounded-lg px-3 py-2.5">
+                <p className="font-serif text-xl leading-none" style={{ color: workRemainingMins > minsUntilShow ? '#C4614A' : '#7A9E7E' }}>{fmtMins(minsUntilShow)}</p>
+                <p className="text-[10px] font-sans text-[#888580] mt-1">until showtime</p>
+              </div>
+            </div>
+            <div className="relative mb-1">
+              <div className="w-full rounded-full bg-[#E0DDD8] dark:bg-[#2E2B28] relative overflow-visible" style={{ height: 6 }}>
+                <div className="absolute left-0 top-0 h-full rounded-full bg-[#7A9E7E]" style={{ width: `${progressPct}%` }} />
+                <div className="absolute top-1/2 -translate-y-1/2 rounded" style={{ left: `${estFinishPct}%`, width: 2, height: 12, backgroundColor: '#7A9E7E', opacity: 0.5 }} />
+                <div className="absolute top-1/2 -translate-y-1/2 rounded" style={{ left: 'calc(100% - 1px)', width: 2, height: 14, backgroundColor: '#111' }} />
+              </div>
+            </div>
+            <div className="flex justify-between mb-1.5">
+              <span className="text-[9px] font-sans text-[#888580]">9 AM</span>
+              <span className="text-[9px] font-sans text-[#888580]">now · {formatTime(now)}</span>
+              <span className="text-[9px] font-sans text-[#888580]">6 PM</span>
+            </div>
+          </div>
+
+          {/* Venue address (no map toggle — map is always in right column) */}
+          <div className="px-6 pt-4 pb-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">{show.name}</p>
+            <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{show.address}</p>
+          </div>
+
+          {/* Location / station */}
+          <div className="px-6 py-4 flex items-center justify-between border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            {currentProfile.role === 'artist' ? (
+              <div className="flex items-center gap-3 w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{stationLogged ? `Station logged at ${stationLogged}` : 'LOG MY STATION'}</span>
+                {!stationLogged && (
+                  <button onClick={() => { setStationLogged(formatTime(new Date())); onToast('Station logged') }} className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0">LOG</button>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">TRACK MY LOCATION</span>
+                <button onClick={() => setTrackLocation(s => !s)} className="flex-shrink-0 relative rounded-full outline-none" style={{ width: 40, height: 22, backgroundColor: trackLocation ? '#7A9E7E' : '#D0CCC7', transition: 'background-color 150ms ease' }}>
+                  <span style={{ position: 'absolute', top: 3, left: trackLocation ? 21 : 3, width: 16, height: 16, borderRadius: '50%', backgroundColor: 'white', transition: 'left 150ms ease', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Schedule */}
+          <div className="px-6 pt-4 pb-2 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-3">TODAY'S SCHEDULE</p>
+            {schedule.map(item => (
+              <div key={item.time} className={`flex items-center py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${item.isShowtime ? 'border-t border-[#E0DDD8] dark:border-[#2E2B28] mt-1' : ''}`} style={{ minHeight: 48 }}>
+                <span className="w-[72px] text-[11px] font-sans text-[#888580] tabular-nums flex-shrink-0">{item.time}</span>
+                <span className={`flex-1 text-sm font-sans ${item.isShowtime ? 'font-serif' : ''} text-[#111] dark:text-[#F0EDE8] ${checked[item.time] ? 'line-through text-[#B0ACA7]' : ''}`}>{item.label}</span>
+                <button onClick={() => toggleCheck(item.time)} className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center outline-none ${checked[item.time] ? 'bg-[#7A9E7E] border-[#7A9E7E]' : 'border-[#C8C4BF] dark:border-[#3A3632] bg-transparent'}`}>
+                  {checked[item.time] && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Team */}
+          <div className="px-6 pt-4 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">TEAM</p>
+            {SECTIONS.map(sec => (
+              <div key={sec.key} className="border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0">
+                <button onClick={() => toggleSection(sec.key)} className="flex items-center w-full py-3 outline-none" style={{ minHeight: 48 }}>
+                  <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{sec.label} · {sec.count}</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className={`text-[#888580] ${expandedSections[sec.key] ? 'rotate-180' : ''}`} style={{ transition: 'transform 150ms ease' }}><polyline points="2 4 6 8 10 4"/></svg>
+                </button>
+                {expandedSections[sec.key] && (
+                  <div className="grid grid-cols-4 gap-1.5 pt-1 pb-2">
+                    {sec.people.map(p => (
+                      <button key={p.id} onClick={() => setContactPerson(p)} className="flex flex-col items-center gap-1 bg-white/50 dark:bg-white/5 rounded-lg px-2 py-2 outline-none text-center" style={{ minHeight: 72 }}>
+                        <div className="relative">
+                          <img src={p.avatar} alt={p.name} className="w-9 h-9 rounded-full object-cover" />
+                          {(p.role === 'lead' || p.role === 'assistant') && <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#7A9E7E]" />}
+                          {p.role === 'artist' && <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />}
+                        </div>
+                        <p className="text-[10px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight w-full truncate">{p.name}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Notifications */}
+          <div className="px-6 pt-4 pb-8">
+            <button onClick={() => setExpandNotifs(s => !s)} className="flex items-center w-full mb-2 outline-none">
+              <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">NOTIFICATIONS</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className={`text-[#888580] ${expandNotifs ? 'rotate-180' : ''}`} style={{ transition: 'transform 150ms ease' }}><polyline points="2 4 6 8 10 4"/></svg>
+            </button>
+            {expandNotifs && allNotifs.map(n => (
+              <div key={n.id} className={`flex items-start gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${!n.read ? 'border-l-[2px] border-l-[#D4A853] pl-3 -ml-3' : ''}`}>
+                <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: n.status ? STATUS_META[n.status]?.color : '#C8C4BF' }} />
+                <p className="flex-1 text-xs font-sans text-[#111] dark:text-[#F0EDE8] leading-snug">{n.text}</p>
+                <span className="text-[10px] font-sans text-[#888580] flex-shrink-0 whitespace-nowrap">{n.timestamp}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: map — always expanded on tablet */}
+        <div style={{ width: 360, display: 'flex', flexDirection: 'column', borderLeft: '1px solid', flexShrink: 0 }} className="border-[#E0DDD8] dark:border-[#2E2B28]">
+          <div className="px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">VENUE MAP</p>
+          </div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <VenueMap dark={dark} currentProfile={currentProfile} team={team} models={liveModels} onToast={onToast} trackLocation={trackLocation} venue={venue} />
+          </div>
+          <div className="px-3 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E0DDD8] dark:border-[#2E2B28]">
+            <span className="flex items-center gap-1"><span className="text-[9px] leading-none">✂</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Hair</span></span>
+            <span className="flex items-center gap-1"><span className="text-[9px] leading-none">💄</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Makeup</span></span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#D4A853' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Active</span></span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#888780' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Last known</span></span>
+          </div>
+        </div>
+
+        {/* Contact sheet */}
+        <BottomSheet open={!!contactPerson} onClose={() => setContactPerson(null)} height="auto">
+          {contactPerson && <ContactSheet person={contactPerson} onClose={() => setContactPerson(null)} onToast={onToast} models={liveModels} isMe={contactPerson?.id === currentProfile?.id} />}
+        </BottomSheet>
+      </div>
+    )
+  }
+
+  // ── Mobile: original layout (unchanged) ──────────────────────────────────
   return (
     <div className="flex-1 overflow-y-auto">
       {/* 1. Full Pace Block */}

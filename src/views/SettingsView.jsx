@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import VenuePinMap from '../components/VenuePinMap'
 import VenueZonePlacer from '../components/VenueZonePlacer'
+import { useIsTablet } from '../hooks/useIsTablet'
 
 function Toggle({ value, onChange }) {
   return (
@@ -41,6 +42,7 @@ function UploadRow({ label, value, onChange }) {
 }
 
 export default function SettingsView({ dark, onToggleDark, venue, onVenueChange }) {
+  const isTablet = useIsTablet()
   const [files, setFiles] = useState({ callSheet: null, runningOrder: null, faceCharts: null })
   const [pings, setPings] = useState(true)
   const [statusAlerts, setStatusAlerts] = useState(true)
@@ -79,7 +81,8 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange 
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: isTablet ? 'center' : 'stretch' }}>
+      <div style={{ width: '100%', maxWidth: isTablet ? 600 : undefined, padding: isTablet ? '24px 32px' : '16px' }}>
 
         {/* Show setup */}
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">SHOW SETUP</p>
@@ -190,6 +193,7 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange 
           <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">SHOW PARTNER</p>
           <p className="text-[11px] font-sans text-[#B0ACA7] mt-1">Version 1.0 · Valentino SS26</p>
         </div>
+      </div>
       </div>
 
       {/* Venue map overlay */}

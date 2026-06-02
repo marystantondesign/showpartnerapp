@@ -1,3 +1,5 @@
+import { useIsTablet } from '../hooks/useIsTablet'
+
 const TABS = [
   {
     id: 'home', label: 'HOME',
@@ -46,6 +48,8 @@ const TABS = [
 ]
 
 export default function BottomNav({ active, onSelect }) {
+  const isTablet = useIsTablet()
+
   return (
     <div className="flex items-stretch border-t border-[#E0DDD8] dark:border-[#2E2B28] bg-greige dark:bg-greige-dark flex-shrink-0">
       {TABS.map(tab => {
@@ -54,7 +58,10 @@ export default function BottomNav({ active, onSelect }) {
           <button
             key={tab.id}
             onClick={() => onSelect(tab.id)}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 outline-none ${
+            style={{ minHeight: isTablet ? 60 : undefined }}
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 outline-none ${
+              isTablet ? 'py-3.5' : 'py-2.5'
+            } ${
               isActive
                 ? 'text-[#111] dark:text-[#F0EDE8]'
                 : 'text-[#B0ACA7] dark:text-[#5A5652]'
@@ -62,7 +69,9 @@ export default function BottomNav({ active, onSelect }) {
           >
             {tab.icon}
             <span
-              className={`text-[8px] font-sans font-semibold tracking-widest uppercase mt-0.5 pb-0.5 ${
+              className={`font-sans font-semibold tracking-widest uppercase mt-0.5 pb-0.5 ${
+                isTablet ? 'text-[9px]' : 'text-[8px]'
+              } ${
                 isActive ? 'border-b border-[#111] dark:border-[#F0EDE8]' : ''
               }`}
             >
