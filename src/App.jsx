@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react'
 import { models as initModels, notifications as initNotifs, profiles, schedule as initSchedule } from './data/mockData'
 import RoleSelect from './components/RoleSelect'
 import ShowHistory from './components/ShowHistory'
+import AgentDesktopView from './views/AgentDesktopView'
+import { useIsDesktop } from './hooks/useIsDesktop'
 import TopBar from './components/TopBar'
 import BottomNav from './components/BottomNav'
 import Toast from './components/Toast'
@@ -18,6 +20,7 @@ function profileForRole(role) {
 }
 
 export default function App() {
+  const isDesktop = useIsDesktop()
   const [selectedRole, setSelectedRole]     = useState(null)
   const [dark, setDark]                     = useState(false)
   const [tab, setTab]                       = useState('home')
@@ -74,6 +77,11 @@ export default function App() {
 
   if (!selectedRole) {
     return <RoleSelect onSelect={handleRoleSelect} />
+  }
+
+  // Agent on desktop → full separate layout
+  if (selectedRole === 'agent' && isDesktop) {
+    return <AgentDesktopView dark={dark} onToggleDark={toggleDark} onLogOut={handleLogOut} />
   }
 
   return (
