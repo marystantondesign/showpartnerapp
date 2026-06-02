@@ -4,7 +4,49 @@ import DonutChart from '../components/DonutChart'
 import StatusChip from '../components/StatusChip'
 import ModelDetailSheet from '../components/ModelDetailSheet'
 import ManageAssignments from '../components/ManageAssignments'
+import BottomSheet from '../components/BottomSheet'
 import { useIsTablet } from '../hooks/useIsTablet'
+
+function specialtyLabel(artist) {
+  if (!artist.specialty) return 'ARTIST'
+  return artist.specialty.toUpperCase()
+}
+
+function ArtistDetailSheet({ artist, models, open, onClose }) {
+  if (!artist) return null
+  const assigned = models.filter(m => m.assignedArtists.includes(artist.name))
+  return (
+    <BottomSheet open={open} onClose={onClose} height="auto">
+      <div className="pt-2 pb-6">
+        <div className="flex items-center gap-4 px-4 mb-4">
+          <img src={artist.avatar} alt={artist.name} className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
+          <div>
+            <p className="font-serif text-xl text-[#111] dark:text-[#F0EDE8]">{artist.name}</p>
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mt-0.5">{specialtyLabel(artist)}</p>
+          </div>
+        </div>
+        {artist.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 px-4 mb-5">
+            {artist.tags.map(tag => (
+              <span key={tag} className="text-[10px] font-sans text-[#888580] border border-[#D0CCC7] dark:border-[#3A3632] rounded-full px-2.5 py-1">{tag}</span>
+            ))}
+          </div>
+        )}
+        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] px-4 mb-2">TODAY'S MODELS</p>
+        {assigned.length === 0 ? (
+          <p className="text-xs font-sans text-[#888580] px-4">No models assigned.</p>
+        ) : assigned.map(m => (
+          <div key={m.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0">
+            <img src={m.avatar} alt={m.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+            <span className="flex-1 font-serif text-sm text-[#111] dark:text-[#F0EDE8]">{m.name}</span>
+            <span className="text-[10px] font-sans text-[#888580] mr-2">LOOK {m.lookNumber}</span>
+            <StatusChip status={m.status} small />
+          </div>
+        ))}
+      </div>
+    </BottomSheet>
+  )
+}
 
 const STATUS_DOT_COLOR = {
   not_started:  '#C8C4BF',
@@ -50,10 +92,11 @@ function fmtTime(totalMins) {
   return `${hh}:${String(m).padStart(2, '0')} ${ampm}`
 }
 
-function LeadDashboard({ models, team, notifications, onStatusChange, onNote, schedule, onScheduleChange, onAssignArtists, dark }) {
+function LeadDashboard({ models, team, notifications, onStatusChange, onNote, onAssignArtists, dark }) {
   const [detailModel, setDetailModel] = useState(null)
   const [expandedArtist, setExpandedArtist] = useState(null)
   const [assignmentsOpen, setAssignmentsOpen] = useState(false)
+  const [artistDetail, setArtistDetail] = useState(null)
   const isTablet = useIsTablet()
 
   function toggleArtist(id) {
@@ -65,7 +108,8 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote, sc
   const remaining = total - done
 
   const attentionNeeded = models.filter(m => m.status === 'paused' || m.status === 'needs_revisit')
-  const artists = team.filter(p => p.role === 'artist' || p.role === 'lead')
+  // Lead excluded — BY ARTIST shows working artists only
+  const artists = team.filter(p => p.role === 'artist')
 
   const now = new Date()
   const nowMins      = now.getHours() * 60 + now.getMinutes()
@@ -193,19 +237,28 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote, sc
         const isOpen     = expandedArtist === artist.id
         return (
           <div key={artist.id} className="border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0">
-            <button onClick={() => toggleArtist(artist.id)} className="w-full outline-none pt-3 pb-2">
-              <div className="flex items-center gap-2 mb-2">
+            {/* Tappable header row — opens expand AND artist detail sheet */}
+            <div className="flex items-center pt-3 pb-2 gap-2">
+              <button
+                onClick={() => setArtistDetail(artist)}
+                className="flex items-center gap-2 flex-1 outline-none text-left min-w-0"
+              >
                 <img src={artist.avatar} alt={artist.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                <span className="text-sm font-sans text-[#111] dark:text-[#F0EDE8] flex-1 text-left">{artist.name}</span>
-                <span className="text-[11px] font-sans text-[#888580] mr-1">{artistDone}/{assigned.length}</span>
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className="text-[#888580] flex-shrink-0" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-sans text-[#111] dark:text-[#F0EDE8] block truncate">{artist.name}</span>
+                  <span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">{specialtyLabel(artist)}</span>
+                </div>
+              </button>
+              <span className="text-[11px] font-sans text-[#888580]">{artistDone}/{assigned.length}</span>
+              <button onClick={() => toggleArtist(artist.id)} className="outline-none p-1">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className="text-[#888580]" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
                   <polyline points="2 3.5 5 6.5 8 3.5" />
                 </svg>
-              </div>
-              <div className="flex flex-wrap gap-1 pl-10">
-                {assigned.map(m => <span key={m.id} className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: STATUS_DOT_COLOR[m.status] || '#C8C4BF' }} />)}
-              </div>
-            </button>
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1 pl-10 pb-2">
+              {assigned.map(m => <span key={m.id} className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: STATUS_DOT_COLOR[m.status] || '#C8C4BF' }} />)}
+            </div>
             <div style={{ overflow: 'hidden', maxHeight: isOpen ? assigned.length * 36 + 8 : 0, transition: 'max-height 150ms ease' }}>
               <div className="pl-10 pb-3 pt-1">
                 {assigned.map(m => (
@@ -248,14 +301,21 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote, sc
     />
   )
 
+  const artistDetailSheet = (
+    <ArtistDetailSheet
+      artist={artistDetail}
+      models={models}
+      open={!!artistDetail}
+      onClose={() => setArtistDetail(null)}
+    />
+  )
+
   const assignmentsSheet = (
     <ManageAssignments
       open={assignmentsOpen}
       onClose={() => setAssignmentsOpen(false)}
       models={models}
-      schedule={schedule}
       onAssignArtists={onAssignArtists}
-      onScheduleChange={onScheduleChange}
       dark={dark}
     />
   )
@@ -277,6 +337,7 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote, sc
         </div>
         {detailSheet}
         {assignmentsSheet}
+        {artistDetailSheet}
       </div>
     )
   }
@@ -291,6 +352,7 @@ function LeadDashboard({ models, team, notifications, onStatusChange, onNote, sc
       {sActivity}
       {detailSheet}
       {assignmentsSheet}
+      {artistDetailSheet}
     </div>
   )
 }
@@ -351,13 +413,13 @@ function ArtistDashboard({ models, team, currentProfile }) {
   )
 }
 
-export default function DashboardView({ models, team, notifications, currentProfile, onStatusChange, onNote, schedule, onScheduleChange, onAssignArtists, dark }) {
+export default function DashboardView({ models, team, notifications, currentProfile, onStatusChange, onNote, onAssignArtists, dark }) {
   const isArtist = currentProfile.role === 'artist'
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {isArtist
         ? <ArtistDashboard models={models} team={team} currentProfile={currentProfile} />
-        : <LeadDashboard models={models} team={team} notifications={notifications} onStatusChange={onStatusChange} onNote={onNote} schedule={schedule} onScheduleChange={onScheduleChange} onAssignArtists={onAssignArtists} dark={dark} />
+        : <LeadDashboard models={models} team={team} notifications={notifications} onStatusChange={onStatusChange} onNote={onNote} onAssignArtists={onAssignArtists} dark={dark} />
       }
     </div>
   )

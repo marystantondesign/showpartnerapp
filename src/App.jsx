@@ -109,13 +109,11 @@ export default function App() {
               currentProfile={currentProfile}
               onStatusChange={handleStatusChange}
               onNote={handleNote}
-              schedule={schedule}
-              onScheduleChange={setSchedule}
               onAssignArtists={handleAssignArtists}
               dark={dark}
             />
           )}
-          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} />}
+          {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} currentProfile={currentProfile} schedule={schedule} onScheduleChange={setSchedule} />}
         </div>
 
         <BottomNav active={tab} onSelect={setTab} />

@@ -392,16 +392,16 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
     setExpandedSections(s => ({ ...s, [key]: !s[key] }))
   }
 
-  const leads = team.filter(p => p.role === 'lead')
-  const assistants = team.filter(p => p.role === 'assistant')
-  const artists = team.filter(p => p.role === 'artist')
+  // Contact My Team — exclude self, exclude models (no app access)
+  const leads      = team.filter(p => p.role === 'lead'      && p.id !== currentProfile.id)
+  const assistants = team.filter(p => p.role === 'assistant' && p.id !== currentProfile.id)
+  const artists    = team.filter(p => p.role === 'artist'    && p.id !== currentProfile.id)
 
   const SECTIONS = [
-    { key: 'lead', label: 'LEAD', count: leads.length, people: leads },
-    { key: 'assistants', label: 'ASSISTANTS', count: assistants.length, people: assistants },
-    { key: 'artists', label: 'ARTISTS', count: artists.length, people: artists },
-    { key: 'models', label: 'MODELS', count: liveModels.length, people: liveModels.map(m => ({ ...m, role: `Look ${m.lookNumber}` })) },
-  ]
+    leads.length > 0      && { key: 'lead',       label: 'LEAD',       people: leads      },
+    assistants.length > 0 && { key: 'assistants', label: 'ASSISTANTS', people: assistants },
+    artists.length > 0    && { key: 'artists',    label: 'ARTISTS',    people: artists    },
+  ].filter(Boolean)
 
   const allNotifs = initNotifs
   const nowMins = currentMinutes(now)
@@ -497,27 +497,42 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             )}
           </div>
 
-          {/* Schedule */}
-          <div className="px-6 pt-4 pb-2 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-3">TODAY'S SCHEDULE</p>
-            {schedule.map(item => (
-              <div key={item.time} className={`flex items-center py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${item.isShowtime ? 'border-t border-[#E0DDD8] dark:border-[#2E2B28] mt-1' : ''}`} style={{ minHeight: 48 }}>
-                <span className="w-[72px] text-[11px] font-sans text-[#888580] tabular-nums flex-shrink-0">{item.time}</span>
-                <span className={`flex-1 text-sm font-sans ${item.isShowtime ? 'font-serif' : ''} text-[#111] dark:text-[#F0EDE8] ${checked[item.time] ? 'line-through text-[#B0ACA7]' : ''}`}>{item.label}</span>
-                <button onClick={() => toggleCheck(item.time)} className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center outline-none ${checked[item.time] ? 'bg-[#7A9E7E] border-[#7A9E7E]' : 'border-[#C8C4BF] dark:border-[#3A3632] bg-transparent'}`}>
-                  {checked[item.time] && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </button>
-              </div>
-            ))}
+          {/* SHOW MAP — inline in left column on tablet */}
+          <div className="border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+            <div className="px-6 pt-3 pb-3 flex items-center justify-between">
+              <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">{show.name}</p>
+              <button
+                onClick={() => setMapOpen(s => !s)}
+                className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex items-center gap-1.5 outline-none"
+              >
+                {mapOpen ? 'HIDE MAP' : 'SHOW MAP'}
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ transform: mapOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms ease' }}>
+                  <polyline points="1 2.5 4 5.5 7 2.5" />
+                </svg>
+              </button>
+            </div>
+            {mapOpen && (
+              <>
+                <div style={{ overflow: 'hidden' }}>
+                  <VenueMap dark={dark} currentProfile={currentProfile} team={team} models={liveModels} onToast={onToast} trackLocation={trackLocation} venue={venue} />
+                </div>
+                <div className="px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E0DDD8] dark:border-[#2E2B28]">
+                  <span className="flex items-center gap-1"><span className="text-[9px] leading-none">✂</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Hair</span></span>
+                  <span className="flex items-center gap-1"><span className="text-[9px] leading-none">💄</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Makeup</span></span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#D4A853' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Active</span></span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#888780' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Last known</span></span>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Team */}
+          {/* Contact My Team */}
           <div className="px-6 pt-4 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">TEAM</p>
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">CONTACT MY TEAM</p>
             {SECTIONS.map(sec => (
               <div key={sec.key} className="border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0">
                 <button onClick={() => toggleSection(sec.key)} className="flex items-center w-full py-3 outline-none" style={{ minHeight: 48 }}>
-                  <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{sec.label} · {sec.count}</span>
+                  <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{sec.label} · {sec.people.length}</span>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className={`text-[#888580] ${expandedSections[sec.key] ? 'rotate-180' : ''}`} style={{ transition: 'transform 150ms ease' }}><polyline points="2 4 6 8 10 4"/></svg>
                 </button>
                 {expandedSections[sec.key] && (
@@ -537,58 +552,44 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
               </div>
             ))}
           </div>
-
-          {/* Notifications */}
-          <div className="px-6 pt-4 pb-8">
-            <button onClick={() => setExpandNotifs(s => !s)} className="flex items-center w-full mb-2 outline-none">
-              <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">NOTIFICATIONS</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className={`text-[#888580] ${expandNotifs ? 'rotate-180' : ''}`} style={{ transition: 'transform 150ms ease' }}><polyline points="2 4 6 8 10 4"/></svg>
-            </button>
-            {expandNotifs && allNotifs.map(n => (
-              <div key={n.id} className={`flex items-start gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${!n.read ? 'border-l-[2px] border-l-[#D4A853] pl-3 -ml-3' : ''}`}>
-                <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: n.status ? STATUS_META[n.status]?.color : '#C8C4BF' }} />
-                <p className="flex-1 text-xs font-sans text-[#111] dark:text-[#F0EDE8] leading-snug">{n.text}</p>
-                <span className="text-[10px] font-sans text-[#888580] flex-shrink-0 whitespace-nowrap">{n.timestamp}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* Right column: map — starts collapsed, toggle to expand, fills column width */}
+        {/* Right column: Schedule + Notifications (scrollable) */}
         <div style={{ flex: '0 0 42%', minWidth: 280, maxWidth: 480, display: 'flex', flexDirection: 'column', borderLeft: '1px solid' }} className="border-[#E0DDD8] dark:border-[#2E2B28]">
-          {/* Map header with toggle */}
-          <div className="px-4 pt-4 pb-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
-            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">{show.name}</p>
-            <button
-              onClick={() => setMapOpen(s => !s)}
-              className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex items-center gap-1.5 outline-none"
-            >
-              {mapOpen ? 'HIDE MAP' : 'SHOW MAP'}
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" style={{ transform: mapOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms ease' }}>
-                <polyline points="1 2.5 4 5.5 7 2.5" />
-              </svg>
-            </button>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {/* Schedule */}
+            <div className="px-5 pt-4 pb-2 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-3">TODAY'S SCHEDULE</p>
+              {schedule.map(item => (
+                <div key={item.time} className={`flex items-center py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${item.isShowtime ? 'border-t mt-1' : ''}`} style={{ minHeight: 48 }}>
+                  <span className="w-[72px] text-[11px] font-sans text-[#888580] tabular-nums flex-shrink-0">{item.time}</span>
+                  <span className={`flex-1 text-sm font-sans ${item.isShowtime ? 'font-serif' : ''} text-[#111] dark:text-[#F0EDE8] ${checked[item.time] ? 'line-through text-[#B0ACA7]' : ''}`}>{item.label}</span>
+                  <button onClick={() => toggleCheck(item.time)} className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center outline-none ${checked[item.time] ? 'bg-[#7A9E7E] border-[#7A9E7E]' : 'border-[#C8C4BF] dark:border-[#3A3632] bg-transparent'}`}>
+                    {checked[item.time] && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                </div>
+              ))}
+            </div>
+            {/* Notifications */}
+            <div className="px-5 pt-4 pb-8">
+              <button onClick={() => setExpandNotifs(s => !s)} className="flex items-center w-full mb-2 outline-none">
+                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">NOTIFICATIONS</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className={`text-[#888580] ${expandNotifs ? 'rotate-180' : ''}`} style={{ transition: 'transform 150ms ease' }}><polyline points="2 4 6 8 10 4"/></svg>
+              </button>
+              {expandNotifs && allNotifs.map(n => (
+                <div key={n.id} className={`flex items-start gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0 ${!n.read ? 'border-l-[2px] border-l-[#D4A853] pl-3 -ml-3' : ''}`}>
+                  <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ backgroundColor: n.status ? STATUS_META[n.status]?.color : '#C8C4BF' }} />
+                  <p className="flex-1 text-xs font-sans text-[#111] dark:text-[#F0EDE8] leading-snug">{n.text}</p>
+                  <span className="text-[10px] font-sans text-[#888580] flex-shrink-0 whitespace-nowrap">{n.timestamp}</span>
+                </div>
+              ))}
+            </div>
           </div>
-
-          {/* Map — fills full right column width when open */}
-          {mapOpen && (
-            <>
-              <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
-                <VenueMap dark={dark} currentProfile={currentProfile} team={team} models={liveModels} onToast={onToast} trackLocation={trackLocation} venue={venue} />
-              </div>
-              <div className="px-3 py-2 flex flex-wrap gap-x-4 gap-y-1 border-t border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
-                <span className="flex items-center gap-1"><span className="text-[9px] leading-none">✂</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Hair</span></span>
-                <span className="flex items-center gap-1"><span className="text-[9px] leading-none">💄</span><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Makeup</span></span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#D4A853' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Active</span></span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0 inline-block" style={{ backgroundColor: '#888780' }} /><span className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">Last known</span></span>
-              </div>
-            </>
-          )}
         </div>
 
         {/* Contact sheet */}
         <BottomSheet open={!!contactPerson} onClose={() => setContactPerson(null)} height="auto">
-          {contactPerson && <ContactSheet person={contactPerson} onClose={() => setContactPerson(null)} onToast={onToast} models={liveModels} isMe={contactPerson?.id === currentProfile?.id} />}
+          {contactPerson && <ContactSheet person={contactPerson} onClose={() => setContactPerson(null)} onToast={onToast} models={liveModels} isMe={contactPerson?.id === currentProfile?.id} currentProfile={currentProfile} />}
         </BottomSheet>
       </div>
     )
@@ -792,14 +793,14 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
 
       {/* Team */}
       <div className="px-4 pt-4 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">TEAM</p>
+        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">CONTACT MY TEAM</p>
         {SECTIONS.map(sec => (
           <div key={sec.key} className="border-b border-[#E0DDD8] dark:border-[#2E2B28] last:border-0">
             <button
               onClick={() => toggleSection(sec.key)}
               className="flex items-center w-full py-3 outline-none"
             >
-              <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{sec.label} · {sec.count}</span>
+              <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{sec.label} · {sec.people.length}</span>
               <svg
                 width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"
                 className={`text-[#888580] ${expandedSections[sec.key] ? 'rotate-180' : ''}`}

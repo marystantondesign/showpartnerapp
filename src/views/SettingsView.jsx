@@ -41,11 +41,31 @@ function UploadRow({ label, value, onChange }) {
   )
 }
 
-export default function SettingsView({ dark, onToggleDark, venue, onVenueChange, onLogOut }) {
+export default function SettingsView({ dark, onToggleDark, venue, onVenueChange, onLogOut, currentProfile, schedule, onScheduleChange }) {
   const isTablet = useIsTablet()
+  const isLead   = currentProfile?.role === 'lead'
+  const isLeadOrAssistant = currentProfile?.role === 'lead' || currentProfile?.role === 'assistant'
   const [files, setFiles] = useState({ callSheet: null, runningOrder: null, faceCharts: null })
   const [pings, setPings] = useState(true)
   const [statusAlerts, setStatusAlerts] = useState(true)
+  const [showScheduleEditor, setShowScheduleEditor] = useState(false)
+  const [localSchedule, setLocalSchedule] = useState(schedule || [])
+
+  function handleScheduleChange(idx, field, value) {
+    const updated = localSchedule.map((item, i) => i === idx ? { ...item, [field]: value } : item)
+    setLocalSchedule(updated)
+    onScheduleChange?.(updated)
+  }
+  function deleteScheduleRow(idx) {
+    const updated = localSchedule.filter((_, i) => i !== idx)
+    setLocalSchedule(updated)
+    onScheduleChange?.(updated)
+  }
+  function addScheduleRow() {
+    const updated = [...localSchedule, { time: '', label: '' }]
+    setLocalSchedule(updated)
+    onScheduleChange?.(updated)
+  }
 
   // Venue setup overlay states
   const [showVenueMap, setShowVenueMap] = useState(false)
@@ -84,15 +104,30 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange,
       <div className="flex-1 overflow-y-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: isTablet ? 'center' : 'stretch' }}>
       <div style={{ width: '100%', maxWidth: isTablet ? 600 : undefined, padding: isTablet ? '24px 32px' : '16px' }}>
 
-        {/* Show setup */}
-        <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">SHOW SETUP</p>
-        <div className="mb-6">
-          <UploadRow label="Call Sheet"    value={files.callSheet}    onChange={n => setFile('callSheet', n)} />
-          <UploadRow label="Running Order" value={files.runningOrder} onChange={n => setFile('runningOrder', n)} />
-          <UploadRow label="Face Charts"   value={files.faceCharts}   onChange={n => setFile('faceCharts', n)} />
-        </div>
+        {/* Show setup — Lead only */}
+        {isLead && (
+          <>
+            <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">SHOW SETUP</p>
+            <div className="mb-6">
+              <UploadRow label="Call Sheet"    value={files.callSheet}    onChange={n => setFile('callSheet', n)} />
+              <UploadRow label="Running Order" value={files.runningOrder} onChange={n => setFile('runningOrder', n)} />
+              <UploadRow label="Face Charts"   value={files.faceCharts}   onChange={n => setFile('faceCharts', n)} />
+              {/* Schedule Editor */}
+              <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+                <div>
+                  <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Schedule Editor</p>
+                  <p className="text-[11px] font-sans text-[#888580] mt-0.5">Edit today's call times and events</p>
+                </div>
+                <button onClick={() => setShowScheduleEditor(true)} className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0">
+                  EDIT
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
-        {/* Venue setup */}
+        {/* Venue setup — Lead only */}
+        {isLead && <>
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">VENUE SETUP</p>
         <div className="mb-6">
 
@@ -164,6 +199,7 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange,
             </div>
           )}
         </div>
+        </>}
 
         {/* App preferences */}
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">APP PREFERENCES</p>
@@ -211,6 +247,44 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange,
         </div>
       </div>
       </div>
+
+      {/* Schedule editor overlay — Lead only */}
+      {showScheduleEditor && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: 'var(--greige, #F5F2EE)', display: 'flex', flexDirection: 'column' }} className="bg-greige dark:bg-greige-dark">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
+            <button onClick={() => setShowScheduleEditor(false)} className="text-[9px] tracking-widest uppercase font-sans text-[#888580] outline-none border-none bg-transparent cursor-pointer">CANCEL</button>
+            <p className="text-[9px] tracking-widest uppercase font-sans text-[#888580]">SCHEDULE EDITOR</p>
+            <button onClick={() => setShowScheduleEditor(false)} className="text-[9px] tracking-widest uppercase font-sans text-[#111] dark:text-[#F0EDE8] outline-none border border-[#C8C4BF] dark:border-[#3A3632] rounded px-3 py-1 bg-transparent cursor-pointer">DONE</button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div className="px-4 py-2 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              <p className="text-[10px] font-sans text-[#888580]">Edits reflect on the Home tab immediately.</p>
+            </div>
+            {localSchedule.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]" style={{ minHeight: 52 }}>
+                <input
+                  value={item.time}
+                  onChange={e => handleScheduleChange(idx, 'time', e.target.value)}
+                  placeholder="9:00 AM"
+                  className="text-[11px] font-sans text-[#888580] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-0.5 w-[76px] flex-shrink-0"
+                />
+                <input
+                  value={item.label}
+                  onChange={e => handleScheduleChange(idx, 'label', e.target.value)}
+                  placeholder="Event label…"
+                  className={`flex-1 text-sm font-sans text-[#111] dark:text-[#F0EDE8] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-0.5 ${item.isShowtime ? 'font-serif' : ''}`}
+                />
+                <button onClick={() => deleteScheduleRow(idx)} className="text-[#888580] outline-none bg-transparent border-none cursor-pointer p-1 flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/></svg>
+                </button>
+              </div>
+            ))}
+            <button onClick={addScheduleRow} className="w-full text-left px-4 py-3 text-[9px] tracking-widest uppercase font-sans text-[#888580] border-b border-[#E0DDD8] dark:border-[#2E2B28] bg-transparent outline-none cursor-pointer">
+              + ADD EVENT
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Venue map overlay */}
       {showVenueMap && (
