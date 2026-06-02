@@ -94,6 +94,8 @@ export default function VenuePinMap({ initialPin, onSave, onClose, onCapture }) 
     markerRef.current = marker
     leafletMap.current = map
     reverseGeocode(pin.lat, pin.lng)
+    // Auto-highlight building polygon on open (shows the venue building immediately)
+    fetchBuilding(pin.lat, pin.lng, map)
   }, [])
 
   async function reverseGeocode(lat, lng) {

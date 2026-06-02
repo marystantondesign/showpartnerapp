@@ -108,6 +108,23 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
         <line x1="242" y1="68" x2="242" y2="140" stroke="#525869" strokeWidth="0.5" />
         <line x1="24"  y1="140" x2="314" y2="140" stroke="#525869" strokeWidth="0.5" strokeDasharray="3 3" />
         <line x1="24"  y1="162" x2="314" y2="162" stroke="#525869" strokeWidth="0.5" />
+        {/* Zones with polygon coordinates render as filled SVG shapes */}
+        {venue?.zones?.filter(z => z.polygon?.length >= 3).map(z => {
+          const pts = z.polygon.map(p => `${(p.xPct/100)*340},${(p.yPct/100)*260}`).join(' ')
+          const cx  = z.polygon.reduce((s, p) => s + p.xPct, 0) / z.polygon.length / 100 * 340
+          const cy  = z.polygon.reduce((s, p) => s + p.yPct, 0) / z.polygon.length / 100 * 260
+          return (
+            <g key={z.id} style={{ pointerEvents: 'none' }}>
+              <polygon points={pts} fill={z.color} fillOpacity={0.25} stroke={z.color} strokeOpacity={0.8} strokeWidth={1.5} />
+              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                fill="rgba(255,255,255,0.92)" fontSize={8}
+                fontFamily="Inter,system-ui,sans-serif" letterSpacing="1.2"
+                style={{ userSelect: 'none' }}>
+                {z.label.toUpperCase()}
+              </text>
+            </g>
+          )
+        })}
       </svg>
 
       {/* Floor plan overlay at 30% opacity */}
@@ -254,8 +271,8 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
         )
       })()}
 
-      {/* Venue zones */}
-      {venue?.zones?.map(z => (
+      {/* Venue zones — single-point fallback for zones placed via VenueZonePlacer */}
+      {venue?.zones?.filter(z => !z.polygon).map(z => (
         <div
           key={z.id}
           style={{

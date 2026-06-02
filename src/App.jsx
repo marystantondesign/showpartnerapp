@@ -15,6 +15,49 @@ import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 import StudioView from './views/StudioView'
 
+// Default venue — Agger Fish Building, Brooklyn, NY
+// Zones have both a centroid (xPct/yPct) and a polygon array for proper SVG rendering
+const DEFAULT_VENUE = {
+  pin: { lat: 40.6782, lng: -73.9442, address: 'Agger Fish Building, 640 Columbia St, Brooklyn, NY' },
+  area: { name: 'Agger Fish Building', geometry: null },
+  floorPlanImage: null,
+  zones: [
+    {
+      id: 'dz-runway', type: 'runway', label: 'Runway', color: '#C8C4BF',
+      xPct: 50, yPct: 53,
+      polygon: [{xPct:30,yPct:36},{xPct:70,yPct:36},{xPct:70,yPct:70},{xPct:30,yPct:70}],
+    },
+    {
+      id: 'dz-backstage', type: 'backstage', label: 'Backstage', color: '#888580',
+      xPct: 50, yPct: 76,
+      polygon: [{xPct:7,yPct:70},{xPct:93,yPct:70},{xPct:93,yPct:82},{xPct:7,yPct:82}],
+    },
+    {
+      id: 'dz-hair', type: 'hair', label: 'Hair', color: '#D4A853',
+      xPct: 17, yPct: 48,
+      polygon: [{xPct:7,yPct:26},{xPct:28,yPct:26},{xPct:28,yPct:70},{xPct:7,yPct:70}],
+    },
+    {
+      id: 'dz-makeup', type: 'makeup', label: 'Makeup', color: '#C4614A',
+      xPct: 83, yPct: 48,
+      polygon: [{xPct:72,yPct:26},{xPct:93,yPct:26},{xPct:93,yPct:70},{xPct:72,yPct:70}],
+    },
+    {
+      id: 'dz-holding', type: 'holding', label: 'Holding', color: '#7A9E7E',
+      xPct: 50, yPct: 30,
+      polygon: [{xPct:30,yPct:26},{xPct:70,yPct:26},{xPct:70,yPct:36},{xPct:30,yPct:36}],
+    },
+  ],
+  stationPins: [
+    { id: 'ds-hair1', type: 'station_hair',   label: 'Hair Station',   color: '#D4A853', xPct: 13, yPct: 38 },
+    { id: 'ds-hair2', type: 'station_hair',   label: 'Hair Station',   color: '#D4A853', xPct: 13, yPct: 58 },
+    { id: 'ds-mk1',   type: 'station_makeup', label: 'Makeup Station', color: '#C4614A', xPct: 87, yPct: 38 },
+    { id: 'ds-mk2',   type: 'station_makeup', label: 'Makeup Station', color: '#C4614A', xPct: 87, yPct: 58 },
+    { id: 'ds-ent',   type: 'entrance',       label: 'Entrance',       color: '#7A9E7E', xPct: 40, yPct: 29 },
+    { id: 'ds-exit',  type: 'exit',           label: 'Exit',           color: '#C4614A', xPct: 60, yPct: 29 },
+  ],
+}
+
 function profileForRole(role) {
   if (role === 'agent') return profiles.find(p => p.role === 'lead') || profiles[0]
   return profiles.find(p => p.role === role) || profiles[0]
@@ -30,7 +73,7 @@ export default function App() {
   const [notifications, setNotifications]   = useState(initNotifs)
   const [toast, setToast]                   = useState(null)
   const [bellOpen, setBellOpen]             = useState(false)
-  const [venue, setVenue]                   = useState({ pin: null, area: null, floorPlanImage: null, zones: [], stationPins: [] })
+  const [venue, setVenue]                   = useState(DEFAULT_VENUE)
   const [schedule, setSchedule]             = useState(initSchedule)
   const [showHistoryOpen, setShowHistoryOpen] = useState(false)
 
