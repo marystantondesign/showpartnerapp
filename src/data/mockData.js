@@ -10,7 +10,7 @@ export const show = {
 
 export const profiles = [
   // Lead
-  { id: 'p1',  name: 'Aria Chen',       role: 'lead',      specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=47',
+  { id: 'p1',  name: 'Jen Z',       role: 'lead',      specialty: 'hair',   avatar: 'https://i.pravatar.cc/150?img=47',
     tags: ['Show direction', 'Team coordination', 'Hair + Beauty'] },
 
   // Artists (10 total)
@@ -49,17 +49,17 @@ export const models = [
   {
     id: 'm1', name: 'Sofia Andersen', lookNumber: '01',
     avatar: 'https://i.pravatar.cc/300?img=44',
-    assignedArtists: ['Aria Chen'],
+    assignedArtists: ['Jen Z'],
     status: 'needs_revisit',
     notes: 'Allergic to latex gloves.',
     photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=44', uploadedBy: 'Aria Chen', timestamp: '5:12 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=48', uploadedBy: 'Aria Chen', timestamp: '5:34 AM', label: 'After' },
-      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=56', uploadedBy: 'Aria Chen', timestamp: '5:40 AM', label: 'Revisit' },
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=44', uploadedBy: 'Jen Z', timestamp: '5:12 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=48', uploadedBy: 'Jen Z', timestamp: '5:34 AM', label: 'After' },
+      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=56', uploadedBy: 'Jen Z', timestamp: '5:40 AM', label: 'Revisit' },
     ],
     statusLog: [
-      { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Aria Chen' },
-      { status: 'needs_revisit', timestamp: '5:35 AM', updatedBy: 'Aria Chen' },
+      { status: 'in_progress', timestamp: '5:12 AM', updatedBy: 'Jen Z' },
+      { status: 'needs_revisit', timestamp: '5:35 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
@@ -80,16 +80,16 @@ export const models = [
   {
     id: 'm3', name: 'Irina Volkov', lookNumber: '03',
     avatar: 'https://i.pravatar.cc/300?img=29',
-    assignedArtists: ['Aria Chen', 'Zoe Park'],
+    assignedArtists: ['Jen Z', 'Zoe Park'],
     status: 'paused',
     notes: 'Requested minimal coverage.',
     photos: [
       { id: 'ph1', url: 'https://i.pravatar.cc/300?img=29', uploadedBy: 'Zoe Park', timestamp: '2:49 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=53', uploadedBy: 'Aria Chen', timestamp: '3:05 AM', label: 'Paused' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=53', uploadedBy: 'Jen Z', timestamp: '3:05 AM', label: 'Paused' },
     ],
     statusLog: [
       { status: 'in_progress', timestamp: '2:49 AM', updatedBy: 'Zoe Park' },
-      { status: 'paused', timestamp: '3:06 AM', updatedBy: 'Aria Chen' },
+      { status: 'paused', timestamp: '3:06 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
@@ -135,13 +135,13 @@ export const models = [
   {
     id: 'm7', name: 'Valentina Cruz', lookNumber: '07',
     avatar: 'https://i.pravatar.cc/300?img=16',
-    assignedArtists: ['Aria Chen'],
+    assignedArtists: ['Jen Z'],
     status: 'done',
     notes: '',
     photos: [],
     statusLog: [
-      { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Aria Chen' },
-      { status: 'done', timestamp: '2:24 AM', updatedBy: 'Aria Chen' },
+      { status: 'in_progress', timestamp: '1:50 AM', updatedBy: 'Jen Z' },
+      { status: 'done', timestamp: '2:24 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
@@ -187,16 +187,16 @@ export const models = [
   {
     id: 'm11', name: 'Amara Diallo', lookNumber: '11',
     avatar: 'https://i.pravatar.cc/300?img=36',
-    assignedArtists: ['Aria Chen'],
+    assignedArtists: ['Jen Z'],
     status: 'in_progress',
     notes: '',
     photos: [
-      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=36', uploadedBy: 'Aria Chen', timestamp: '4:40 AM', label: 'Before' },
-      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=65', uploadedBy: 'Aria Chen', timestamp: '5:02 AM', label: 'In Progress' },
-      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=67', uploadedBy: 'Aria Chen', timestamp: '5:18 AM', label: 'Detail' },
+      { id: 'ph1', url: 'https://i.pravatar.cc/300?img=36', uploadedBy: 'Jen Z', timestamp: '4:40 AM', label: 'Before' },
+      { id: 'ph2', url: 'https://i.pravatar.cc/300?img=65', uploadedBy: 'Jen Z', timestamp: '5:02 AM', label: 'In Progress' },
+      { id: 'ph3', url: 'https://i.pravatar.cc/300?img=67', uploadedBy: 'Jen Z', timestamp: '5:18 AM', label: 'Detail' },
     ],
     statusLog: [
-      { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Aria Chen' },
+      { status: 'in_progress', timestamp: '4:40 AM', updatedBy: 'Jen Z' },
     ],
   },
   {
@@ -380,7 +380,7 @@ export const showHistory = [
 ]
 
 export const notifications = [
-  { id: 'n1', text: 'Aria Chen marked Sofia Andersen as Needs Revisit', status: 'needs_revisit', timestamp: '5:35 AM', read: false },
+  { id: 'n1', text: 'Jen Z marked Sofia Andersen as Needs Revisit', status: 'needs_revisit', timestamp: '5:35 AM', read: false },
   { id: 'n2', text: 'Zoe Park started Irina Volkov', status: 'in_progress', timestamp: '3:06 AM', read: false },
   { id: 'n3', text: 'Marcus Lee added a note to Chloe Martin', status: null, timestamp: '2:29 AM', read: true },
   { id: 'n4', text: 'James Kim logged station', status: null, timestamp: '9:12 AM', read: true },

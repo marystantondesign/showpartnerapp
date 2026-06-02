@@ -39,7 +39,7 @@ function VenueMap({ dark, currentProfile, team, models, onToast, trackLocation, 
 
   // Artist station pins — hair near HAIR zone, makeup near MAKEUP zone
   const artistPins = [
-    { person: team.find(p => p.name === 'Aria Chen'),   x: 100, y: 75 },
+    { person: team.find(p => p.name === 'Jen Z'),   x: 100, y: 75 },
     { person: team.find(p => p.name === 'David Kim'),   x: 128, y: 58 },
     { person: team.find(p => p.name === 'Priya Osei'),  x: 150, y: 92 },
     { person: team.find(p => p.name === 'Marcus Lee'),  x: 182, y: 70 },
@@ -589,7 +589,7 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
 
         {/* Contact sheet */}
         <BottomSheet open={!!contactPerson} onClose={() => setContactPerson(null)} height="auto">
-          {contactPerson && <ContactSheet person={contactPerson} onClose={() => setContactPerson(null)} onToast={onToast} models={liveModels} isMe={contactPerson?.id === currentProfile?.id} currentProfile={currentProfile} />}
+          {contactPerson && <ContactSheet person={contactPerson} onClose={() => setContactPerson(null)} onToast={onToast} models={liveModels.filter(m => m.assignedArtists.includes(contactPerson.name))} isMe={contactPerson?.id === currentProfile?.id} currentProfile={currentProfile} />}
         </BottomSheet>
       </div>
     )

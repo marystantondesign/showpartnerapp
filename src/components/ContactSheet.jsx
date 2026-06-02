@@ -2,8 +2,8 @@ import { useState } from 'react'
 import BottomSheet from './BottomSheet'
 import ModelPicker from './ModelPicker'
 
-const ALL_PINGS     = ['Call me', 'Where are you?', 'Come find me', 'Check this model ›', 'FaceTime me']
-const ARTIST_PINGS  = ['Call me', 'Where are you?', 'Come find me', 'FaceTime me']
+const BASE_PINGS        = ['Call me', 'Where are you?', 'Come find me', 'FaceTime me']
+const PINGS_WITH_MODEL  = ['Call me', 'Where are you?', 'Come find me', 'Check this model ›', 'FaceTime me']
 
 function specialtyLabel(person) {
   if (person.specialty) return person.specialty.toUpperCase()
@@ -16,7 +16,8 @@ export default function ContactSheet({ person, onClose, onToast, models, isMe, c
   if (!person) return null
 
   const viewerIsArtist = currentProfile?.role === 'artist'
-  const pings = viewerIsArtist ? ARTIST_PINGS : ALL_PINGS
+  // Hide "Check this model" if viewer is artist OR if tapped person has no assigned models
+  const pings = (viewerIsArtist || models.length === 0) ? BASE_PINGS : PINGS_WITH_MODEL
 
   function handlePing(phrase) {
     if (phrase === 'Check this model ›') {

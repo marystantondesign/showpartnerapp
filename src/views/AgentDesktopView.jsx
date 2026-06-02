@@ -31,7 +31,7 @@ const VS26_ARTISTS = [
   { id:'a3', name:'David Kim',   specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=33', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
   { id:'a4', name:'Priya Osei',  specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=20', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:2, stars:2, incidents:['Left 20 minutes before show ended'],       note:'', inviteBack:'NO'    },
   { id:'a5', name:'Luna Torres', specialty:'Makeup', avatar:'https://i.pravatar.cc/150?img=38', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:3, stars:5, incidents:[],                                          note:'Excellent — request specifically again', inviteBack:'YES' },
-  { id:'a6', name:'Aria Chen',   specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=47', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
+  { id:'a6', name:'Jen Z',   specialty:'Hair',   avatar:'https://i.pravatar.cc/150?img=47', onSiteStatus:'on-site', confirmed:'CONFIRMED', modelsCompleted:4, stars:4, incidents:[],                                          note:'', inviteBack:'YES'   },
 ]
 
 // ─── Prada artist roster (10) ─────────────────────────────────────────────────
