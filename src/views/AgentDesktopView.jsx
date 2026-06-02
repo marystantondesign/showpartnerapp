@@ -80,12 +80,12 @@ const INIT_INCIDENTS = [
 ]
 // Receipts & adjustments logged during VS26 (reverse-chron order displayed in UI)
 const VS26_RECEIPTS_ADJ = [
-  { id:'ra6', artist:'Priya Osei',  item:'Ground transport — missed team car',              amount:35,  type:'Adjustment', time:'8:30 PM' },
-  { id:'ra4', artist:'Luna Torres', item:'Emergency mascara replacement',                   amount:22,  type:'Receipt',    time:'9:30 AM' },
-  { id:'ra3', artist:'Marcus Lee',  item:'Extra hair extensions ×20 — beyond budgeted qty', amount:40,  type:'Adjustment', time:'8:00 AM' },
-  { id:'ra2', artist:'Zoe Park',    item:'Setting spray replacement (2 units)',             amount:28,  type:'Receipt',    time:'7:15 AM' },
-  { id:'ra1', artist:'Marcus Lee',  item:'Hair extension adhesive ×3',                     amount:45,  type:'Receipt',    time:'6:30 AM' },
-  { id:'ra5', artist:'David Kim',   item:'Car service to venue',                           amount:120, type:'Receipt',    time:'5:00 AM' },
+  { id:'ra6', artist:'Priya Osei',  item:'Ground transport',                               amount:35,  type:'Receipt',    time:'8:30 PM', hasFile:true },
+  { id:'ra3', artist:'Marcus Lee',  item:'Extra hair extensions ×20 — beyond budgeted qty', amount:40, type:'Adjustment', time:'8:00 AM', hasFile:false },
+  { id:'ra4', artist:'Luna Torres', item:'Emergency mascara replacement',                   amount:22,  type:'Receipt',    time:'9:30 AM', hasFile:true },
+  { id:'ra2', artist:'Zoe Park',    item:'Setting spray replacement (2 units)',             amount:28,  type:'Adjustment', time:'7:15 AM', hasFile:false },
+  { id:'ra1', artist:'Marcus Lee',  item:'Hair extension adhesive ×3',                     amount:45,  type:'Receipt',    time:'6:30 AM', hasFile:true },
+  { id:'ra5', artist:'David Kim',   item:'Car service to venue',                           amount:120, type:'Receipt',    time:'5:00 AM', hasFile:true },
 ]
 
 // Artist review data for completed shows (10 artists each)
@@ -392,6 +392,10 @@ function PreShowDetail({ show, dark }) {
       {tab==='SHOW INFO' && <ShowInfoTab show={show} dark={dark} />}
       {tab==='ARTIST ROSTER' && (
         <div>
+          {/* + ADD ARTIST at top right, always visible */}
+          <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:14 }}>
+            <button onClick={()=>setAddArtist(true)} style={{ fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:text, border:`1px solid ${border}`, borderRadius:6, padding:'7px 14px', background:'none', cursor:'pointer', outline:'none' }}>+ ADD ARTIST</button>
+          </div>
           {roster.map(a=>(
             <Card key={a.id} dark={dark} style={{ display:'flex', alignItems:'center', gap:16, marginBottom:10 }}>
               <img src={a.avatar} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', objectPosition:'center top', flexShrink:0 }} />
@@ -402,7 +406,6 @@ function PreShowDetail({ show, dark }) {
               <ConfirmPill status={a.confirmed} />
             </Card>
           ))}
-          <button onClick={()=>setAddArtist(true)} style={{ marginTop:8, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:text, border:`1px solid ${border}`, borderRadius:6, padding:'9px 16px', background:'none', cursor:'pointer', outline:'none' }}>+ ADD ARTIST</button>
         </div>
       )}
       {tab==='BUDGET' && (
@@ -456,8 +459,6 @@ function PreShowDetail({ show, dark }) {
 // ─── Day-Of Detail ─────────────────────────────────────────────────────────────
 function DayOfDetail({ artists, incidents, show, dark }) {
   const [tab, setTab] = useState('SHOW INFO')
-  const [addArtist, setAddArtist] = useState(false)
-  const [roster, setRoster] = useState(artists)
   const text  = dark?'#F0EDE8':'#111'
   const muted = '#888580'
   const border= dark?'#2E2B28':'#E0DDD8'
@@ -486,25 +487,9 @@ function DayOfDetail({ artists, incidents, show, dark }) {
         </div>
       </div>
 
-      <TabBar tabs={['SHOW INFO','ARTIST ROSTER','BUDGET','RECEIPTS & ADJUSTMENTS']} active={tab} onChange={setTab} dark={dark} />
+      <TabBar tabs={['SHOW INFO','BUDGET','RECEIPTS & ADJUSTMENTS']} active={tab} onChange={setTab} dark={dark} />
 
       {tab==='SHOW INFO' && <ShowInfoTab show={show} dark={dark} />}
-
-      {tab==='ARTIST ROSTER' && (
-        <div>
-          {roster.map(a=>(
-            <Card key={a.id} dark={dark} style={{ display:'flex', alignItems:'center', gap:16, marginBottom:10 }}>
-              <img src={a.avatar} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', objectPosition:'center top', flexShrink:0 }} />
-              <div style={{ flex:1 }}>
-                <p style={{ margin:0, fontFamily:'Georgia,serif', fontSize:16, color:text }}>{a.name}</p>
-                <p style={{ margin:'2px 0 0', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.08em', textTransform:'uppercase', color:muted }}>{a.specialty}</p>
-              </div>
-              <ConfirmPill status={a.confirmed} />
-            </Card>
-          ))}
-          <button onClick={()=>setAddArtist(true)} style={{ marginTop:8, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:text, border:`1px solid ${border}`, borderRadius:6, padding:'9px 16px', background:'none', cursor:'pointer', outline:'none' }}>+ ADD ARTIST</button>
-        </div>
-      )}
 
       {tab==='BUDGET' && (
         <div>
@@ -534,6 +519,16 @@ function DayOfDetail({ artists, incidents, show, dark }) {
           <p style={{ margin:'0 0 14px', fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>Submitted by artists during the show · read only</p>
           {VS26_RECEIPTS_ADJ.map(entry=>(
             <Card key={entry.id} dark={dark} style={{ display:'flex', alignItems:'flex-start', gap:16, marginBottom:10 }}>
+              {/* File icon for receipts, blank for adjustments */}
+              <div style={{ width:32, flexShrink:0, paddingTop:2 }}>
+                {entry.hasFile && (
+                  <div style={{ width:28, height:34, borderRadius:4, background:dark?'#2A2724':'#F0EDE8', border:`1px solid ${border}`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={muted} strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
               <div style={{ flex:1 }}>
                 <div style={{ display:'flex', gap:10, marginBottom:4, alignItems:'center', flexWrap:'wrap' }}>
                   <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:12, fontWeight:500, color:text }}>{entry.artist}</p>
@@ -548,7 +543,6 @@ function DayOfDetail({ artists, incidents, show, dark }) {
         </div>
       )}
 
-      {addArtist && <AddArtistModal dark={dark} existingNames={roster.map(a=>a.name)} onAdd={a=>setRoster(r=>[...r,a])} onClose={()=>setAddArtist(false)} />}
     </div>
   )
 }
