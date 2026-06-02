@@ -78,6 +78,15 @@ const INIT_INCIDENTS = [
   { id:'i1', artist:'Marcus Lee', type:'Late Arrival', notes:'Arrived 45 minutes late to call time',              time:'5:45 AM' },
   { id:'i2', artist:'Priya Osei', type:'Left Early',   notes:'Left 20 minutes before show ended without checking out', time:'7:40 PM' },
 ]
+// Receipts & adjustments logged during VS26 (reverse-chron order displayed in UI)
+const VS26_RECEIPTS_ADJ = [
+  { id:'ra6', artist:'Priya Osei',  item:'Ground transport — missed team car',              amount:35,  type:'Adjustment', time:'8:30 PM' },
+  { id:'ra4', artist:'Luna Torres', item:'Emergency mascara replacement',                   amount:22,  type:'Receipt',    time:'9:30 AM' },
+  { id:'ra3', artist:'Marcus Lee',  item:'Extra hair extensions ×20 — beyond budgeted qty', amount:40,  type:'Adjustment', time:'8:00 AM' },
+  { id:'ra2', artist:'Zoe Park',    item:'Setting spray replacement (2 units)',             amount:28,  type:'Receipt',    time:'7:15 AM' },
+  { id:'ra1', artist:'Marcus Lee',  item:'Hair extension adhesive ×3',                     amount:45,  type:'Receipt',    time:'6:30 AM' },
+  { id:'ra5', artist:'David Kim',   item:'Car service to venue',                           amount:120, type:'Receipt',    time:'5:00 AM' },
+]
 
 // Artist review data for completed shows (10 artists each)
 const REVIEW_ARTISTS = [
@@ -477,7 +486,7 @@ function DayOfDetail({ artists, incidents, show, dark }) {
         </div>
       </div>
 
-      <TabBar tabs={['SHOW INFO','ARTIST ROSTER','BUDGET','INCIDENTS']} active={tab} onChange={setTab} dark={dark} />
+      <TabBar tabs={['SHOW INFO','ARTIST ROSTER','BUDGET','RECEIPTS & ADJUSTMENTS']} active={tab} onChange={setTab} dark={dark} />
 
       {tab==='SHOW INFO' && <ShowInfoTab show={show} dark={dark} />}
 
@@ -499,42 +508,41 @@ function DayOfDetail({ artists, incidents, show, dark }) {
 
       {tab==='BUDGET' && (
         <div>
-          <SLabel>BUDGET — BUDGETED VS ACTUAL</SLabel>
-          {VS26_RECEIPTS.map(cat=>{
-            const catTotal = cat.items.reduce((s,i)=>s+(i.actual||0),0)
-            const catBudget= cat.items.reduce((s,i)=>s+(i.budgeted||0),0)
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 100px 100px', gap:'6px 12px', padding:'8px 0 10px', borderBottom:`1px solid ${border}`, marginBottom:4 }}>
+            <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted }}>ITEM</p>
+            <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted, textAlign:'right' }}>BUDGETED</p>
+            <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted, textAlign:'right' }}>ADJUSTED</p>
+          </div>
+          {VS26_RECEIPTS.map(cat=>cat.items.map((item,i)=>{
+            const over = (item.actual||0) > (item.budgeted||0)
             return (
-              <Card key={cat.category} dark={dark} style={{ marginBottom:12 }}>
-                <p style={{ margin:'0 0 12px', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted }}>{cat.category}</p>
-                {cat.items.map((item,i)=>{
-                  const over = item.actual > item.budgeted
-                  return (
-                    <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px', gap:'8px 12px', padding:'8px 0', borderTop:`1px solid ${border}` }}>
-                      <div><p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text }}>{item.desc}</p><p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>{item.artist}</p></div>
-                      <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right' }}>{fmt(item.budgeted)}</p>
-                      <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:over?'#B8862A':'#7A9E7E', fontWeight:over?500:400 }}>{fmt(item.actual)}</p>
-                    </div>
-                  )
-                })}
-              </Card>
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 100px 100px', gap:'6px 12px', padding:'10px 12px', marginBottom:2, borderRadius:6, background: over ? (dark?'rgba(184,134,42,0.12)':'rgba(184,134,42,0.08)') : 'transparent' }}>
+                <div>
+                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text }}>{item.desc}</p>
+                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>{item.artist}</p>
+                </div>
+                <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right' }}>{fmt(item.budgeted)}</p>
+                <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:over?'#B8862A':text, fontWeight:over?500:400 }}>{fmt(item.actual)}</p>
+              </div>
             )
-          })}
+          }))}
         </div>
       )}
 
-      {tab==='INCIDENTS' && (
+      {tab==='RECEIPTS & ADJUSTMENTS' && (
         <div>
-          <p style={{ margin:'0 0 6px', fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>Logged by the on-site Lead · read only</p>
-          {incidents.length===0 ? <p style={{ fontFamily:'Inter,system-ui', fontSize:13, color:muted }}>No incidents logged.</p> : incidents.map((inc,i)=>(
-            <Card key={i} dark={dark} style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:10, borderLeft:'2px solid #C4614A', borderRadius:'0 10px 10px 0' }}>
+          <p style={{ margin:'0 0 14px', fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>Submitted by artists during the show · read only</p>
+          {VS26_RECEIPTS_ADJ.map(entry=>(
+            <Card key={entry.id} dark={dark} style={{ display:'flex', alignItems:'flex-start', gap:16, marginBottom:10 }}>
               <div style={{ flex:1 }}>
-                <div style={{ display:'flex', gap:10, marginBottom:4, alignItems:'center' }}>
-                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:12, fontWeight:500, color:text }}>{inc.artist}</p>
-                  <span style={{ fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.08em', textTransform:'uppercase', color:'#C4614A' }}>{inc.type}</span>
+                <div style={{ display:'flex', gap:10, marginBottom:4, alignItems:'center', flexWrap:'wrap' }}>
+                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:12, fontWeight:500, color:text }}>{entry.artist}</p>
+                  <span style={{ fontFamily:'Inter,system-ui', fontSize:8, letterSpacing:'0.1em', textTransform:'uppercase', color: entry.type==='Receipt'?'#7A9E7E':'#8A9BB0', background: entry.type==='Receipt'?'rgba(122,158,126,0.12)':'rgba(138,155,176,0.12)', borderRadius:20, padding:'2px 8px' }}>{entry.type}</span>
+                  <span style={{ fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>{entry.time}</span>
                 </div>
-                <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:12, color:muted, lineHeight:1.5 }}>{inc.notes}</p>
+                <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, lineHeight:1.5 }}>{entry.item}</p>
               </div>
-              <span style={{ fontFamily:'Inter,system-ui', fontSize:10, color:muted, whiteSpace:'nowrap', flexShrink:0 }}>{inc.time}</span>
+              <p style={{ margin:0, fontFamily:'Georgia,serif', fontSize:16, color:text, flexShrink:0 }}>{fmt(entry.amount)}</p>
             </Card>
           ))}
         </div>
@@ -600,37 +608,49 @@ function WrapDetail({ show, reviewArtists, receipts, dark }) {
 
       {tab==='BUDGET' && (
         <div>
-          <SLabel>BUDGET BREAKDOWN</SLabel>
+          <SLabel>FINAL BUDGET SUMMARY</SLabel>
+          {/* Column headers */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 95px 95px 95px', gap:'6px 12px', padding:'6px 12px 8px', borderBottom:`1px solid ${border}`, marginBottom:4 }}>
+            <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted }}>ITEM</p>
+            {['BUDGETED','ADJUSTED','DIFFERENCE'].map(h=>(
+              <p key={h} style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.08em', textTransform:'uppercase', color:muted, textAlign:'right' }}>{h}</p>
+            ))}
+          </div>
           {receipts.map(cat=>{
-            const catActual = cat.items.reduce((s,i)=>s+(i.actual||0),0)
-            const catBudget = cat.items.reduce((s,i)=>s+(i.budgeted||0),0)
-            const catVar    = catActual - catBudget
+            const catAdjusted = cat.items.reduce((s,i)=>s+(i.actual||0),0)
+            const catBudget   = cat.items.reduce((s,i)=>s+(i.budgeted||0),0)
+            const catDiff     = catAdjusted - catBudget
             return (
-              <Card key={cat.category} dark={dark} style={{ marginBottom:12 }}>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 90px', gap:'6px 12px', marginBottom:10 }}>
-                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted }}>{cat.category}</p>
-                  {['Budgeted','Actual','Variance'].map(h=><p key={h} style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.08em', textTransform:'uppercase', color:muted, textAlign:'right' }}>{h}</p>)}
-                </div>
+              <div key={cat.category}>
+                <p style={{ margin:'10px 12px 4px', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:muted }}>{cat.category}</p>
                 {cat.items.map((item,i)=>{
-                  const v = (item.actual||0) - (item.budgeted||0)
+                  const diff = (item.actual||0) - (item.budgeted||0)
+                  const over = diff > 0
                   return (
-                    <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 90px', gap:'6px 12px', padding:'8px 0', borderTop:`1px solid ${border}` }}>
+                    <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 95px 95px 95px', gap:'6px 12px', padding:'8px 12px', borderRadius:6, marginBottom:2, background: over ? (dark?'rgba(184,134,42,0.12)':'rgba(184,134,42,0.08)') : 'transparent' }}>
                       <div><p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text }}>{item.desc}</p><p style={{ margin:'2px 0 0', fontFamily:'Inter,system-ui', fontSize:10, color:muted }}>{item.artist}</p></div>
                       <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right' }}>{fmt(item.budgeted)}</p>
                       <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right' }}>{fmt(item.actual)}</p>
-                      <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:v>0?'#C4614A':'#7A9E7E', fontWeight:500 }}>{v>0?'+':''}{fmt(v)}</p>
+                      <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:over?'#C4614A':'#7A9E7E', fontWeight:500 }}>{diff>0?'+':''}{fmt(diff)}</p>
                     </div>
                   )
                 })}
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 90px 90px 90px', gap:'6px 12px', padding:'10px 0 0', borderTop:`2px solid ${border}`, marginTop:4 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 95px 95px 95px', gap:'6px 12px', padding:'8px 12px', borderTop:`1px solid ${border}`, marginTop:2, marginBottom:8 }}>
                   <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.08em', textTransform:'uppercase', color:muted }}>Subtotal</p>
                   <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right', fontWeight:500 }}>{fmt(catBudget)}</p>
-                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right', fontWeight:500 }}>{fmt(catActual)}</p>
-                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:catVar>0?'#C4614A':'#7A9E7E', fontWeight:600 }}>{catVar>0?'+':''}{fmt(catVar)}</p>
+                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, color:text, textAlign:'right', fontWeight:500 }}>{fmt(catAdjusted)}</p>
+                  <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:13, textAlign:'right', color:catDiff>0?'#C4614A':'#7A9E7E', fontWeight:600 }}>{catDiff>0?'+':''}{fmt(catDiff)}</p>
                 </div>
-              </Card>
+              </div>
             )
           })}
+          {/* Grand total */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 95px 95px 95px', gap:'6px 12px', padding:'12px', borderTop:`2px solid ${border}`, marginTop:4 }}>
+            <p style={{ margin:0, fontFamily:'Inter,system-ui', fontSize:10, letterSpacing:'0.1em', textTransform:'uppercase', color:muted, fontWeight:600 }}>TOTAL</p>
+            <p style={{ margin:0, fontFamily:'Georgia,serif', fontSize:18, color:text, textAlign:'right' }}>{fmt(totalBudget)}</p>
+            <p style={{ margin:0, fontFamily:'Georgia,serif', fontSize:18, color:text, textAlign:'right' }}>{fmt(totalActual)}</p>
+            <p style={{ margin:0, fontFamily:'Georgia,serif', fontSize:18, textAlign:'right', color:(totalActual-totalBudget)>0?'#C4614A':'#7A9E7E' }}>{(totalActual-totalBudget)>0?'+':''}{fmt(totalActual-totalBudget)}</p>
+          </div>
 
           <div style={{ marginTop:20 }}>
             <SLabel>BUDGET ADJUSTMENTS</SLabel>
@@ -700,7 +720,8 @@ function ArtistsView({ dark, upcomingShows, onAddArtistsToShow }) {
   const [fMinRating, setFMinRating] = useState('')
   const [fDesigner, setFDesigner]   = useState('')
   const [fSkill, setFSkill]         = useState('')
-  const [nlQuery, setNlQuery]   = useState('')
+  const [nlQuery, setNlQuery]     = useState('')
+  const [nameFilter, setNameFilter] = useState('')  // real-time name search
   const [nlLoading, setNlLoading] = useState(false)
   const [nlError, setNlError]   = useState('')
   const [selected, setSelected] = useState(null)
@@ -723,16 +744,18 @@ function ArtistsView({ dark, upcomingShows, onAddArtistsToShow }) {
     designerTags:  fDesigner ? [fDesigner] : (filters.designerTags || null),
     skillTags:     fSkill ? [fSkill] : (filters.skillTags || null),
   }
-  const hasFilters = Object.values(activeFilters).some(v => v !== null && (Array.isArray(v) ? v.length>0 : true))
+  const hasFilters = Object.values(activeFilters).some(v => v !== null && (Array.isArray(v) ? v.length>0 : true)) || !!nameFilter
 
-  const filtered = applyFilters(AGENT_ARTISTS, activeFilters)
+  const filtered = applyFilters(AGENT_ARTISTS, activeFilters).filter(a =>
+    !nameFilter || a.name.toLowerCase().includes(nameFilter.toLowerCase())
+  )
   const sorted   = applySort(filtered, sort)
 
   function toggleSort(col) {
     setSort(s => s.col===col ? { col, dir: s.dir==='asc'?'desc':'asc' } : { col, dir:'asc' })
   }
   function clearAll() {
-    setFilters({}); setFSpec(''); setFCity(''); setFMinRate(''); setFMaxRate(''); setFMinRating(''); setFDesigner(''); setFSkill(''); setNlQuery(''); setChecked(new Set())
+    setFilters({}); setFSpec(''); setFCity(''); setFMinRate(''); setFMaxRate(''); setFMinRating(''); setFDesigner(''); setFSkill(''); setNlQuery(''); setNameFilter(''); setChecked(new Set())
   }
   function toggleCheck(id, e) {
     e.stopPropagation()
@@ -750,7 +773,7 @@ function ArtistsView({ dark, upcomingShows, onAddArtistsToShow }) {
   async function handleNLSearch(e) {
     e.preventDefault()
     if (!nlQuery.trim()) return
-    setNlLoading(true); setNlError('')
+    setNlLoading(true); setNlError(''); setNameFilter('')
     try {
       const res = await fetch('/api/search-artists', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ query: nlQuery }) })
       const data = await res.json()
@@ -795,7 +818,7 @@ function ArtistsView({ dark, upcomingShows, onAddArtistsToShow }) {
 
       {/* NL search */}
       <form onSubmit={handleNLSearch} style={{ display:'flex', gap:8, marginBottom:12 }}>
-        <input value={nlQuery} onChange={e=>setNlQuery(e.target.value)} placeholder="Search artists… try 'nail artists in NYC under $100/hr'" style={{ flex:1, fontFamily:'Inter,system-ui', fontSize:13, color:text, background:card, border:`1px solid ${border}`, borderRadius:8, padding:'10px 14px', outline:'none' }} />
+        <input value={nlQuery} onChange={e=>{ setNlQuery(e.target.value); setNameFilter(e.target.value); setFilters({}) }} placeholder="Search artists by name, or try 'nail artists in NYC under $100/hr' and hit Search" style={{ flex:1, fontFamily:'Inter,system-ui', fontSize:13, color:text, background:card, border:`1px solid ${border}`, borderRadius:8, padding:'10px 14px', outline:'none' }} />
         <button type="submit" disabled={nlLoading} style={{ padding:'10px 18px', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:'#111', background:'#D4A853', border:'none', borderRadius:8, cursor:'pointer', outline:'none', fontWeight:500, opacity:nlLoading?0.6:1, flexShrink:0 }}>
           {nlLoading ? '···' : 'SEARCH'}
         </button>
@@ -1099,8 +1122,8 @@ export default function AgentDesktopView({ dark, onToggleDark, onLogOut }) {
         </div>
       </div>
 
-      {/* Main content */}
-      <div style={{ marginLeft:SIDEBAR_W, paddingTop:DEMO_BAR_H }}>
+      {/* Main content — fixed scrolling container so it scrolls independently of sidebar */}
+      <div style={{ position:'fixed', top:DEMO_BAR_H, left:SIDEBAR_W, right:0, bottom:0, overflowY:'auto' }}>
         <div style={{ padding:40, maxWidth: nav==='artists' ? 'none' : 960 }}>
 
           {/* ── SHOWS ── */}
