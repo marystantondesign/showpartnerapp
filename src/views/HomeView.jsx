@@ -463,16 +463,6 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">{formatDateLine(now)}</p>
             <p className={`font-serif text-[28px] leading-tight mb-1 ${pace.past ? 'text-[#888580]' : 'text-[#111] dark:text-[#F0EDE8]'}`}>{pace.text}</p>
             <p className="text-[11px] font-sans text-[#888580] mb-4">{formatTime(now)}</p>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              <div className="bg-white/60 dark:bg-white/5 rounded-lg px-3 py-2.5">
-                <p className="font-serif text-xl text-[#111] dark:text-[#F0EDE8] leading-none">{remaining}</p>
-                <p className="text-[10px] font-sans text-[#888580] mt-1">models remaining</p>
-              </div>
-              <div className="bg-white/60 dark:bg-white/5 rounded-lg px-3 py-2.5">
-                <p className="font-serif text-xl leading-none" style={{ color: workRemainingMins > minsUntilShow ? '#C4614A' : '#7A9E7E' }}>{fmtMins(minsUntilShow)}</p>
-                <p className="text-[10px] font-sans text-[#888580] mt-1">until showtime</p>
-              </div>
-            </div>
             <div className="relative mb-1">
               <div className="w-full rounded-full bg-[#E0DDD8] dark:bg-[#2E2B28] relative overflow-visible" style={{ height: 6 }}>
                 <div className="absolute left-0 top-0 h-full rounded-full bg-[#7A9E7E]" style={{ width: `${progressPct}%` }} />
@@ -623,7 +613,7 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
         </p>
         <p className="text-[11px] font-sans text-[#888580] mb-4">{formatTime(now)}</p>
 
-        {/* Stat cards */}
+
         <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="bg-white/60 dark:bg-white/5 rounded-lg px-3 py-2.5">
             <p className="font-serif text-xl text-[#111] dark:text-[#F0EDE8] leading-none">{remaining}</p>
