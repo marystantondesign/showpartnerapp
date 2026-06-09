@@ -1,16 +1,3 @@
-The changes exist locally but can't reach you because of the push block. Let me tighten the implementation to exactly match your spec, then give you the complete file to paste.
-
-Now I can see the exact text. Let me update it:
-
-The file is exactly right. Let me commit this and then give you the full file to copy-paste locally.
-
-Now let me try to push:
-
-Push is blocked as expected. Here's the complete updated `src/views/StudioView.jsx` — replace your local copy with this:
-
----
-
-```jsx
 import { useState, useRef } from 'react'
 
 // ─── Show looks ────────────────────────────────────────────────────────────────
@@ -246,6 +233,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const hasOverage = overages.length > 0
 
   function handleSubmit() {
+    // Persist final state and mark submitted
     lsSet(invKey, inventory)
     setSubmitted(true)
   }
@@ -319,4 +307,98 @@ export default function StudioView({ currentProfile, models: allModels }) {
                 </div>
 
                 {/* Stepper */}
-                <div className="flex items-center gap-3
+                <div className="flex items-center gap-3 mt-2">
+                  <span className="text-[11px] font-sans text-[#888580]">Used:</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => updateUsed(item.id, item.used - 1)}
+                      className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none"
+                    >−</button>
+                    <input
+                      type="number"
+                      value={item.used}
+                      onChange={e => updateUsed(item.id, parseInt(e.target.value) || 0)}
+                      className="w-14 text-center text-sm font-sans font-medium text-[#111] dark:text-[#F0EDE8] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none tabular-nums py-1"
+                    />
+                    <button
+                      onClick={() => updateUsed(item.id, item.used + 1)}
+                      className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none"
+                    >+</button>
+                  </div>
+                </div>
+
+                {/* Overage banner */}
+                {over && (
+                  <div className="mt-3 px-3 py-2 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#C4614A22', color: '#C4614A' }}>
+                    You've exceeded your allocation by {item.used - item.allocated} {item.unit}. This will be flagged for adjustment.
+                  </div>
+                )}
+              </div>
+            )
+          })}
+
+          {inventory.length > 0 && (
+            <div className="mt-6">
+              {submitted ? (
+                <div className="text-center py-3 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#7A9E7E22', color: '#7A9E7E' }}>
+                  ✓ Inventory submitted{hasOverage ? ' — overages flagged for review' : ''}
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  className="w-full py-3 text-[10px] tracking-widest uppercase font-sans rounded-lg font-semibold outline-none border-none cursor-pointer"
+                  style={{ backgroundColor: '#111', color: '#F5F2EE' }}
+                >
+                  SUBMIT INVENTORY
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── RECEIPTS ──────────────────────────────────────────────────────── */}
+      {section === 'RECEIPTS' && (
+        <div className="flex-1 overflow-y-auto px-4 py-4 relative">
+          {receipts.length === 0 && (
+            <p className="text-sm font-sans text-[#B0ACA7] italic">No receipts uploaded yet.</p>
+          )}
+          {receipts.map(rec => (
+            <div key={rec.id} className="flex items-center gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+              {rec.thumb ? (
+                <img src={rec.thumb} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-10 h-10 rounded bg-white/60 dark:bg-white/5 border border-[#E0DDD8] dark:border-[#2E2B28] flex items-center justify-center flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[#888580]">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8] truncate">{rec.merchant}</p>
+                <p className="text-[10px] font-sans text-[#888580]">{rec.category} · {rec.date}</p>
+              </div>
+              <p className="font-serif text-base text-[#111] dark:text-[#F0EDE8] flex-shrink-0">{fmt(rec.amount)}</p>
+            </div>
+          ))}
+
+          {/* Floating upload button */}
+          <button
+            onClick={() => setShowUpload(true)}
+            className="fixed bottom-24 right-4 w-12 h-12 rounded-full flex items-center justify-center outline-none border-none cursor-pointer shadow-lg z-10"
+            style={{ backgroundColor: '#111' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round">
+              <line x1="9" y1="3" x2="9" y2="15"/><line x1="3" y1="9" x2="15" y2="9"/>
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Receipt upload sheet */}
+      {showUpload && (
+        <ReceiptUploadSheet onSave={handleSaveReceipt} onClose={() => setShowUpload(false)} />
+      )}
+    </div>
+  )
+}
