@@ -1,25 +1,68 @@
-import { useState, useEffect, useRef } from 'react'
+Here's the complete new `src/views/StudioView.jsx` — replace the entire file with this:
+
+```jsx
+import { useState, useRef } from 'react'
+
+// ─── Show looks ────────────────────────────────────────────────────────────────
+const SHOW_LOOKS = [
+  {
+    id: 'look-01',
+    number: '01',
+    title: 'Dewy Skin, Graphic Liner',
+    steps: [
+      'Apply hydrating primer to clean skin.',
+      'Press sheer luminous foundation with fingers for a second-skin finish.',
+      'Draw a precise graphic liner wing in deep black.',
+      'Brush clear brow gel through arches.',
+      'Apply a single coat of black mascara on upper lashes only.',
+    ],
+    models: ['Luna Torres', 'Priya Osei'],
+  },
+  {
+    id: 'look-02',
+    number: '02',
+    title: 'Matte Base, Smoked Eye',
+    steps: [
+      'Apply mattifying primer across T-zone.',
+      'Build medium-coverage foundation with a damp sponge.',
+      'Press a deep espresso shadow into the crease and lower lash line.',
+      'Smudge a black kohl pencil along the waterline.',
+      'Finish with two coats of volumizing mascara.',
+    ],
+    models: ['David Kim', 'Zoe Park'],
+  },
+  {
+    id: 'look-03',
+    number: '03',
+    title: 'Bare Skin, Bold Lip',
+    steps: [
+      'Use a tinted moisturizer for minimal coverage.',
+      'Conceal only where needed under eyes and around nose.',
+      'Set lightly with a translucent powder.',
+      'Line lips slightly overdrawn with a deep berry liner.',
+      'Fill with a satin berry-red lipstick.',
+    ],
+    models: ['Marcus Lee', 'Luna Torres', 'Priya Osei'],
+  },
+]
 
 // ─── Seeded data ───────────────────────────────────────────────────────────────
-const REFERENCE_PHOTOS = {
-  // Marcus Lee's first 3 assigned models (by model id)
-  'm1': { caption: 'Bleached brows, glass skin, red tooth gems',    url: '/models/Sofia-Andersen-1.png' },
-  'm5': { caption: 'Natural wave, loose braid, gold pins',          url: '/models/Aaliyah-Jones-1.png'  },
-  'm9': { caption: 'Bold liner, nude lip, defined cheekbone',       url: '/models/Priya-Sharma-1.png'   },
-}
+const SHOW_INVENTORY = [
+  { id: 'si-1',  item: 'Hair Extensions (clip-in sets)',    unit: 'sets',    allocated: 12, used: 0 },
+  { id: 'si-2',  item: 'Hairspray (travel size)',           unit: 'cans',    allocated: 24, used: 0 },
+  { id: 'si-3',  item: 'Bobby Pins',                        unit: 'pack',    allocated: 8,  used: 0 },
+  { id: 'si-4',  item: 'Mascara (Maybelline Sky High)',     unit: 'tubes',   allocated: 10, used: 0 },
+  { id: 'si-5',  item: 'Foundation (Armani Luminous Silk)', unit: 'bottles', allocated: 6,  used: 0 },
+  { id: 'si-6',  item: 'Setting Powder',                    unit: 'jars',    allocated: 4,  used: 0 },
+  { id: 'si-7',  item: 'Lip Liner (deep berry)',            unit: 'pencils', allocated: 14, used: 0 },
+  { id: 'si-8',  item: 'Acrylic Nail Tips',                 unit: 'packs',   allocated: 20, used: 0 },
+  { id: 'si-9',  item: 'Nail Glue',                         unit: 'tubes',   allocated: 16, used: 0 },
+  { id: 'si-10', item: 'Nail File',                         unit: 'pieces',  allocated: 30, used: 0 },
+  { id: 'si-11', item: 'Lash Glue',                         unit: 'tubes',   allocated: 8,  used: 0 },
+  { id: 'si-12', item: 'Individual Lashes',                 unit: 'sets',    allocated: 18, used: 0 },
+]
 
-const SEEDED_INVENTORY = {
-  'Marcus Lee': [
-    { id: 'inv-ml-1', item: 'Hair Extensions',   unit: 'units',   allocated: 60, used: 80 },
-    { id: 'inv-ml-2', item: 'Setting Spray',     unit: 'bottles', allocated: 4,  used: 3  },
-    { id: 'inv-ml-3', item: 'Bobby Pins (pack)', unit: 'packs',   allocated: 10, used: 10 },
-  ],
-  'Zoe Park': [
-    { id: 'inv-zp-1', item: 'Foundation',     unit: 'bottles', allocated: 8,  used: 6  },
-    { id: 'inv-zp-2', item: 'Setting Powder', unit: 'bottles', allocated: 5,  used: 7  },
-    { id: 'inv-zp-3', item: 'Mascara',        unit: 'tubes',   allocated: 12, used: 14 },
-  ],
-}
+const SEEDED_INVENTORY = {}
 
 const SEEDED_RECEIPTS = {
   'Marcus Lee': [
@@ -41,117 +84,36 @@ function lsSet(key, val) {
 
 function fmt(n) { return `$${Number(n).toLocaleString()}` }
 
-// ─── Look Documentation Sheet (full-screen overlay) ───────────────────────────
-function LookSheet({ model, artistId, onClose }) {
-  const lsKey = `showpartner_looks_${artistId}_${model.id}`
-  const [docs, setDocs] = useState(() => lsGet(lsKey, []))
-  const [editCaption, setEditCaption] = useState({}) // { photoId: string }
-  const fileInputRef = useRef(null)
-
-  const refPhoto = REFERENCE_PHOTOS[model.id]
-
-  function handleFileChange(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => {
-      const newDoc = {
-        id: `doc-${Date.now()}`,
-        url: ev.target.result,
-        caption: '',
-        timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
-      }
-      const updated = [...docs, newDoc]
-      setDocs(updated)
-      lsSet(lsKey, updated)
-    }
-    reader.readAsDataURL(file)
-    e.target.value = ''
-  }
-
-  function updateCaption(id, caption) {
-    const updated = docs.map(d => d.id === id ? { ...d, caption } : d)
-    setDocs(updated)
-    lsSet(lsKey, updated)
-  }
-
-  function removeDoc(id) {
-    const updated = docs.filter(d => d.id !== id)
-    setDocs(updated)
-    lsSet(lsKey, updated)
-  }
-
+// ─── Look card ────────────────────────────────────────────────────────────────
+function LookCard({ look }) {
+  const [expanded, setExpanded] = useState(false)
   return (
-    <div className="fixed inset-0 z-50 bg-greige dark:bg-greige-dark flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
-        <button onClick={onClose} className="outline-none p-1 -ml-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[#888580]">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="font-serif text-base text-[#111] dark:text-[#F0EDE8] leading-tight truncate">{model.name}</p>
-          <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">LOOK {model.lookNumber}</p>
-        </div>
-        {model.avatar && (
-          <img src={model.avatar} alt="" className="w-9 h-9 rounded-full object-cover object-top flex-shrink-0" />
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {/* Reference photos */}
-        <div className="mb-6">
-          <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-3">REFERENCE PHOTOS</p>
-          {refPhoto ? (
-            <div className="rounded-xl overflow-hidden mb-2">
-              <img src={refPhoto.url} alt="" className="w-full object-cover" style={{ maxHeight: 220, objectPosition: 'center top' }} />
-              {refPhoto.caption && (
-                <p className="text-[11px] font-sans text-[#888580] px-3 py-2 bg-white/60 dark:bg-white/5">{refPhoto.caption}</p>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm font-sans text-[#B0ACA7] italic">No reference photos uploaded yet.</p>
-          )}
-        </div>
-
-        {/* My documentation */}
-        <div className="mb-4">
-          <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-3">MY DOCUMENTATION</p>
-          {docs.length === 0 && (
-            <p className="text-sm font-sans text-[#B0ACA7] italic mb-4">No photos added yet.</p>
-          )}
-          {docs.map(doc => (
-            <div key={doc.id} className="mb-4 rounded-xl overflow-hidden border border-[#E0DDD8] dark:border-[#2E2B28]">
-              <img src={doc.url} alt="" className="w-full object-cover" style={{ maxHeight: 220, objectPosition: 'center top' }} />
-              <div className="px-3 py-2 bg-white/60 dark:bg-white/5">
-                <input
-                  value={editCaption[doc.id] ?? doc.caption}
-                  onChange={e => {
-                    setEditCaption(c => ({ ...c, [doc.id]: e.target.value }))
-                    updateCaption(doc.id, e.target.value)
-                  }}
-                  placeholder="Add a caption…"
-                  className="w-full bg-transparent text-[11px] font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] outline-none border-none"
-                />
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-[10px] font-sans text-[#B0ACA7]">{doc.timestamp}</span>
-                  <button onClick={() => removeDoc(doc.id)} className="text-[9px] tracking-widest uppercase font-sans text-[#C4614A] bg-transparent border-none outline-none cursor-pointer">REMOVE</button>
-                </div>
-              </div>
-            </div>
+    <div className="rounded-2xl border border-[#E0DDD8] dark:border-[#2E2B28] bg-white/60 dark:bg-white/5 px-5 py-5 mb-4">
+      <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">LOOK {look.number}</p>
+      <p className="font-serif text-[18px] text-[#111] dark:text-[#F0EDE8] leading-snug mb-3">{look.title}</p>
+      <ol className="list-none p-0 m-0 space-y-1">
+        {look.steps.map((step, i) => (
+          <li key={i} className="text-[13px] font-sans text-[#444] dark:text-[#C8C4BF] leading-relaxed">
+            <span className="text-[#888580] mr-1.5">{i + 1}.</span>{step}
+          </li>
+        ))}
+      </ol>
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="mt-4 text-[11px] tracking-widest uppercase font-sans text-[#888580] bg-transparent border-none outline-none cursor-pointer p-0"
+      >
+        MODELS ASSIGNED
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className={`inline-block ml-1.5 transition-transform ${expanded ? 'rotate-180' : ''}`}>
+          <polyline points="2 3 5 7 8 3"/>
+        </svg>
+      </button>
+      {expanded && (
+        <ul className="mt-2 list-none p-0 m-0 space-y-1">
+          {look.models.map(name => (
+            <li key={name} className="text-[13px] font-sans text-[#111] dark:text-[#F0EDE8] pl-3 before:content-['·'] before:mr-2 before:text-[#888580]">{name}</li>
           ))}
-        </div>
-
-        {/* Add photo */}
-        <label className="flex items-center justify-center gap-2 w-full py-3 border border-dashed border-[#C8C4BF] dark:border-[#3A3632] rounded-xl cursor-pointer">
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-[#888580]">
-            <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
-          </svg>
-          <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">ADD PHOTO</span>
-        </label>
-      </div>
+        </ul>
+      )}
     </div>
   )
 }
@@ -185,7 +147,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
         <div className="w-8 h-1 rounded-full bg-[#C8C4BF] dark:bg-[#3A3632] mx-auto mb-4" />
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-4">UPLOAD RECEIPT</p>
 
-        {/* File picker */}
         <label className="flex items-center gap-3 py-3 mb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28] cursor-pointer">
           <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileChange} />
           {thumb ? (
@@ -200,15 +161,12 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           <span className="text-sm font-sans text-[#888580]">{thumb ? 'Photo attached' : 'Choose photo or file'}</span>
         </label>
 
-        {/* Merchant */}
         <input
           value={merchant}
           onChange={e => setMerchant(e.target.value)}
           placeholder="Merchant name"
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
-
-        {/* Amount */}
         <input
           value={amount}
           onChange={e => setAmount(e.target.value)}
@@ -218,7 +176,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
 
-        {/* Category chips */}
         <div className="flex flex-wrap gap-2 mb-6">
           {CATEGORIES.map(cat => (
             <button
@@ -252,27 +209,17 @@ function ReceiptUploadSheet({ onSave, onClose }) {
 // ─── Main StudioView ───────────────────────────────────────────────────────────
 export default function StudioView({ currentProfile, models: allModels }) {
   const [section, setSection] = useState('LOOKS')
-  const [lookModel, setLookModel] = useState(null)
   const [showUpload, setShowUpload] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const artistId = currentProfile?.id || 'unknown'
   const artistName = currentProfile?.name || ''
 
-  // Models assigned to this artist
-  const myModels = allModels.filter(m =>
-    m.hairArtist === artistName ||
-    m.makeupArtist === artistName ||
-    m.nailArtist === artistName ||
-    m.assignedArtists?.includes(artistName)
-  )
-
-  // Inventory (localStorage → seeded defaults)
   const invKey = `showpartner_inventory_${artistId}`
   const [inventory, setInventory] = useState(() => {
     const saved = lsGet(invKey, null)
     if (saved) return saved
-    return (SEEDED_INVENTORY[artistName] || []).map(i => ({ ...i }))
+    return (SEEDED_INVENTORY[artistName] || SHOW_INVENTORY).map(i => ({ ...i }))
   })
 
   function updateUsed(id, val) {
@@ -285,12 +232,10 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const hasOverage = overages.length > 0
 
   function handleSubmit() {
-    // Persist final state and mark submitted
     lsSet(invKey, inventory)
     setSubmitted(true)
   }
 
-  // Receipts (localStorage → seeded defaults)
   const recKey = `showpartner_receipts_${artistId}`
   const [receipts, setReceipts] = useState(() => {
     const saved = lsGet(recKey, null)
@@ -307,7 +252,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Section toggle */}
       <div className="flex border-b border-[#E0DDD8] dark:border-[#2E2B28] px-4 flex-shrink-0">
         {['LOOKS', 'INVENTORY', 'RECEIPTS'].map(s => (
           <button
@@ -325,37 +269,19 @@ export default function StudioView({ currentProfile, models: allModels }) {
         ))}
       </div>
 
-      {/* ── LOOKS ─────────────────────────────────────────────────────────── */}
       {section === 'LOOKS' && (
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          {myModels.length === 0 && (
-            <p className="text-sm font-sans text-[#B0ACA7] italic">No models assigned to you today.</p>
-          )}
-          {myModels.map(model => (
-            <div key={model.id} className="flex items-center gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-              <img src={model.avatar} alt={model.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" style={{ objectPosition: 'center top' }} />
-              <div className="flex-1 min-w-0">
-                <p className="font-serif text-sm text-[#111] dark:text-[#F0EDE8] truncate">{model.name}</p>
-                <p className="text-[10px] font-sans text-[#888580]">LOOK {model.lookNumber}</p>
-              </div>
-              <button
-                onClick={() => setLookModel(model)}
-                className="text-[9px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] bg-transparent outline-none cursor-pointer flex-shrink-0"
-              >
-                DOCUMENT LOOK
-              </button>
-            </div>
+        <div className="flex-1 overflow-y-auto px-4 py-5">
+          {SHOW_LOOKS.map(look => (
+            <LookCard key={look.id} look={look} />
           ))}
         </div>
       )}
 
-      {/* ── INVENTORY ─────────────────────────────────────────────────────── */}
       {section === 'INVENTORY' && (
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {inventory.length === 0 && (
             <p className="text-sm font-sans text-[#B0ACA7] italic">No inventory allocated for this show.</p>
           )}
-
           {inventory.map(item => {
             const over = item.used > item.allocated
             const atBudget = item.used === item.allocated
@@ -372,105 +298,14 @@ export default function StudioView({ currentProfile, models: allModels }) {
                     {statusLabel}
                   </span>
                 </div>
-
-                {/* Stepper */}
                 <div className="flex items-center gap-3 mt-2">
                   <span className="text-[11px] font-sans text-[#888580]">Used:</span>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateUsed(item.id, item.used - 1)}
-                      className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none"
-                    >−</button>
-                    <input
-                      type="number"
-                      value={item.used}
-                      onChange={e => updateUsed(item.id, parseInt(e.target.value) || 0)}
-                      className="w-14 text-center text-sm font-sans font-medium text-[#111] dark:text-[#F0EDE8] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none tabular-nums py-1"
-                    />
-                    <button
-                      onClick={() => updateUsed(item.id, item.used + 1)}
-                      className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none"
-                    >+</button>
+                    <button onClick={() => updateUsed(item.id, item.used - 1)} className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none">−</button>
+                    <input type="number" value={item.used} onChange={e => updateUsed(item.id, parseInt(e.target.value) || 0)} className="w-14 text-center text-sm font-sans font-medium text-[#111] dark:text-[#F0EDE8] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none tabular-nums py-1" />
+                    <button onClick={() => updateUsed(item.id, item.used + 1)} className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none">+</button>
                   </div>
                 </div>
-
-                {/* Overage banner */}
                 {over && (
                   <div className="mt-3 px-3 py-2 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#C4614A22', color: '#C4614A' }}>
-                    You've exceeded your allocation by {item.used - item.allocated} {item.unit}. This will be flagged for adjustment.
-                  </div>
-                )}
-              </div>
-            )
-          })}
-
-          {inventory.length > 0 && (
-            <div className="mt-6">
-              {submitted ? (
-                <div className="text-center py-3 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#7A9E7E22', color: '#7A9E7E' }}>
-                  ✓ Inventory submitted{hasOverage ? ' — overages flagged for review' : ''}
-                </div>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  className="w-full py-3 text-[10px] tracking-widest uppercase font-sans rounded-lg font-semibold outline-none border-none cursor-pointer"
-                  style={{ backgroundColor: '#111', color: '#F5F2EE' }}
-                >
-                  SUBMIT INVENTORY
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── RECEIPTS ──────────────────────────────────────────────────────── */}
-      {section === 'RECEIPTS' && (
-        <div className="flex-1 overflow-y-auto px-4 py-4 relative">
-          {receipts.length === 0 && (
-            <p className="text-sm font-sans text-[#B0ACA7] italic">No receipts uploaded yet.</p>
-          )}
-          {receipts.map(rec => (
-            <div key={rec.id} className="flex items-center gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-              {rec.thumb ? (
-                <img src={rec.thumb} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
-              ) : (
-                <div className="w-10 h-10 rounded bg-white/60 dark:bg-white/5 border border-[#E0DDD8] dark:border-[#2E2B28] flex items-center justify-center flex-shrink-0">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[#888580]">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                  </svg>
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8] truncate">{rec.merchant}</p>
-                <p className="text-[10px] font-sans text-[#888580]">{rec.category} · {rec.date}</p>
-              </div>
-              <p className="font-serif text-base text-[#111] dark:text-[#F0EDE8] flex-shrink-0">{fmt(rec.amount)}</p>
-            </div>
-          ))}
-
-          {/* Floating upload button */}
-          <button
-            onClick={() => setShowUpload(true)}
-            className="fixed bottom-24 right-4 w-12 h-12 rounded-full flex items-center justify-center outline-none border-none cursor-pointer shadow-lg z-10"
-            style={{ backgroundColor: '#111' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round">
-              <line x1="9" y1="3" x2="9" y2="15"/><line x1="3" y1="9" x2="15" y2="9"/>
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* Look documentation sheet */}
-      {lookModel && (
-        <LookSheet model={lookModel} artistId={artistId} onClose={() => setLookModel(null)} />
-      )}
-
-      {/* Receipt upload sheet */}
-      {showUpload && (
-        <ReceiptUploadSheet onSave={handleSaveReceipt} onClose={() => setShowUpload(false)} />
-      )}
-    </div>
-  )
-}
+                    You
