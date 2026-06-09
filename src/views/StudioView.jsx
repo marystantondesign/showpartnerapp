@@ -1,4 +1,14 @@
-Here's the complete new `src/views/StudioView.jsx` — replace the entire file with this:
+The changes exist locally but can't reach you because of the push block. Let me tighten the implementation to exactly match your spec, then give you the complete file to paste.
+
+Now I can see the exact text. Let me update it:
+
+The file is exactly right. Let me commit this and then give you the full file to copy-paste locally.
+
+Now let me try to push:
+
+Push is blocked as expected. Here's the complete updated `src/views/StudioView.jsx` — replace your local copy with this:
+
+---
 
 ```jsx
 import { useState, useRef } from 'react'
@@ -84,33 +94,31 @@ function lsSet(key, val) {
 
 function fmt(n) { return `$${Number(n).toLocaleString()}` }
 
-// ─── Look card ────────────────────────────────────────────────────────────────
+// ─── Look card ─────────────────────────────────────────────────────────────────
 function LookCard({ look }) {
   const [expanded, setExpanded] = useState(false)
   return (
-    <div className="rounded-2xl border border-[#E0DDD8] dark:border-[#2E2B28] bg-white/60 dark:bg-white/5 px-5 py-5 mb-4">
-      <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">LOOK {look.number}</p>
-      <p className="font-serif text-[18px] text-[#111] dark:text-[#F0EDE8] leading-snug mb-3">{look.title}</p>
-      <ol className="list-none p-0 m-0 space-y-1">
+    <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: 20, marginBottom: 16 }} className="dark:bg-white/5">
+      <p className="text-[11px] tracking-widest uppercase font-sans text-[#888580]" style={{ marginBottom: 6 }}>LOOK {look.number}</p>
+      <p className="font-serif text-[#111] dark:text-[#F0EDE8]" style={{ fontSize: 18, lineHeight: 1.3, marginBottom: 14 }}>{look.title}</p>
+      <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {look.steps.map((step, i) => (
-          <li key={i} className="text-[13px] font-sans text-[#444] dark:text-[#C8C4BF] leading-relaxed">
-            <span className="text-[#888580] mr-1.5">{i + 1}.</span>{step}
+          <li key={i} className="font-sans text-[#444] dark:text-[#C8C4BF]" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 4 }}>
+            <span className="text-[#888580]">{i + 1}. </span>{step}
           </li>
         ))}
       </ol>
       <button
         onClick={() => setExpanded(e => !e)}
-        className="mt-4 text-[11px] tracking-widest uppercase font-sans text-[#888580] bg-transparent border-none outline-none cursor-pointer p-0"
+        className="font-sans text-[#888580] bg-transparent border-none outline-none cursor-pointer p-0"
+        style={{ marginTop: 16, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
       >
-        MODELS ASSIGNED
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className={`inline-block ml-1.5 transition-transform ${expanded ? 'rotate-180' : ''}`}>
-          <polyline points="2 3 5 7 8 3"/>
-        </svg>
+        MODELS ASSIGNED {expanded ? '▴' : '▾'}
       </button>
       {expanded && (
-        <ul className="mt-2 list-none p-0 m-0 space-y-1">
+        <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
           {look.models.map(name => (
-            <li key={name} className="text-[13px] font-sans text-[#111] dark:text-[#F0EDE8] pl-3 before:content-['·'] before:mr-2 before:text-[#888580]">{name}</li>
+            <li key={name} className="font-sans text-[#111] dark:text-[#F0EDE8]" style={{ fontSize: 13, lineHeight: 1.6 }}>· {name}</li>
           ))}
         </ul>
       )}
@@ -147,6 +155,7 @@ function ReceiptUploadSheet({ onSave, onClose }) {
         <div className="w-8 h-1 rounded-full bg-[#C8C4BF] dark:bg-[#3A3632] mx-auto mb-4" />
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-4">UPLOAD RECEIPT</p>
 
+        {/* File picker */}
         <label className="flex items-center gap-3 py-3 mb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28] cursor-pointer">
           <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileChange} />
           {thumb ? (
@@ -161,12 +170,15 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           <span className="text-sm font-sans text-[#888580]">{thumb ? 'Photo attached' : 'Choose photo or file'}</span>
         </label>
 
+        {/* Merchant */}
         <input
           value={merchant}
           onChange={e => setMerchant(e.target.value)}
           placeholder="Merchant name"
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
+
+        {/* Amount */}
         <input
           value={amount}
           onChange={e => setAmount(e.target.value)}
@@ -176,6 +188,7 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
 
+        {/* Category chips */}
         <div className="flex flex-wrap gap-2 mb-6">
           {CATEGORIES.map(cat => (
             <button
@@ -215,6 +228,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const artistId = currentProfile?.id || 'unknown'
   const artistName = currentProfile?.name || ''
 
+  // Inventory (localStorage → seeded defaults)
   const invKey = `showpartner_inventory_${artistId}`
   const [inventory, setInventory] = useState(() => {
     const saved = lsGet(invKey, null)
@@ -236,6 +250,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
     setSubmitted(true)
   }
 
+  // Receipts (localStorage → seeded defaults)
   const recKey = `showpartner_receipts_${artistId}`
   const [receipts, setReceipts] = useState(() => {
     const saved = lsGet(recKey, null)
@@ -252,6 +267,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Section toggle */}
       <div className="flex border-b border-[#E0DDD8] dark:border-[#2E2B28] px-4 flex-shrink-0">
         {['LOOKS', 'INVENTORY', 'RECEIPTS'].map(s => (
           <button
@@ -269,6 +285,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
         ))}
       </div>
 
+      {/* ── LOOKS ─────────────────────────────────────────────────────────── */}
       {section === 'LOOKS' && (
         <div className="flex-1 overflow-y-auto px-4 py-5">
           {SHOW_LOOKS.map(look => (
@@ -277,11 +294,13 @@ export default function StudioView({ currentProfile, models: allModels }) {
         </div>
       )}
 
+      {/* ── INVENTORY ─────────────────────────────────────────────────────── */}
       {section === 'INVENTORY' && (
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {inventory.length === 0 && (
             <p className="text-sm font-sans text-[#B0ACA7] italic">No inventory allocated for this show.</p>
           )}
+
           {inventory.map(item => {
             const over = item.used > item.allocated
             const atBudget = item.used === item.allocated
@@ -298,14 +317,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
                     {statusLabel}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 mt-2">
-                  <span className="text-[11px] font-sans text-[#888580]">Used:</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => updateUsed(item.id, item.used - 1)} className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none">−</button>
-                    <input type="number" value={item.used} onChange={e => updateUsed(item.id, parseInt(e.target.value) || 0)} className="w-14 text-center text-sm font-sans font-medium text-[#111] dark:text-[#F0EDE8] bg-transparent border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none tabular-nums py-1" />
-                    <button onClick={() => updateUsed(item.id, item.used + 1)} className="w-8 h-8 rounded-full border border-[#C8C4BF] dark:border-[#3A3632] flex items-center justify-center text-[#111] dark:text-[#F0EDE8] outline-none bg-transparent cursor-pointer text-lg leading-none">+</button>
-                  </div>
-                </div>
-                {over && (
-                  <div className="mt-3 px-3 py-2 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#C4614A22', color: '#C4614A' }}>
-                    You
+
+                {/* Stepper */}
+                <div className="flex items-center gap-3
