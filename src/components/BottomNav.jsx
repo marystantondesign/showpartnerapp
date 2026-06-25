@@ -38,27 +38,37 @@ const ICONS = {
   ),
 }
 
-// Producer/Lead tabs: includes ARTISTS dashboard
+// Producer: ASSISTANTS tab, no STUDIO
 const TABS_LEAD = [
-  { id: 'home',      label: 'HOME'     },
-  { id: 'dashboard', label: 'ARTISTS'  },
-  { id: 'list',      label: 'MGMT'     },
-  { id: 'lineup',    label: 'LINEUP'   },
-  { id: 'settings',  label: 'SETTINGS' },
+  { id: 'home',      label: 'HOME'       },
+  { id: 'dashboard', label: 'ASSISTANTS' },
+  { id: 'list',      label: 'MGMT'       },
+  { id: 'lineup',    label: 'LINEUP'     },
+  { id: 'settings',  label: 'SETTINGS'   },
 ]
 
-// Artist + Assistant tabs: includes STUDIO, no ARTISTS dashboard
-const TABS_STUDIO = [
-  { id: 'home',     label: 'HOME'     },
-  { id: 'list',     label: 'MGMT'     },
-  { id: 'lineup',   label: 'LINEUP'   },
-  { id: 'studio',   label: 'STUDIO'   },
-  { id: 'settings', label: 'SETTINGS' },
+// Artist: ASSISTANTS + STUDIO (6 tabs)
+const TABS_ARTIST = [
+  { id: 'home',      label: 'HOME'       },
+  { id: 'dashboard', label: 'ASSISTANTS' },
+  { id: 'list',      label: 'MGMT'       },
+  { id: 'lineup',    label: 'LINEUP'     },
+  { id: 'studio',    label: 'STUDIO'     },
+  { id: 'settings',  label: 'SETTINGS'   },
+]
+
+// Assistant: no ASSISTANTS tab
+const TABS_ASSISTANT = [
+  { id: 'home',      label: 'HOME'     },
+  { id: 'list',      label: 'MGMT'     },
+  { id: 'lineup',    label: 'LINEUP'   },
+  { id: 'studio',    label: 'STUDIO'   },
+  { id: 'settings',  label: 'SETTINGS' },
 ]
 
 export default function BottomNav({ active, onSelect, role }) {
   const isTablet = useIsTablet()
-  const TABS = role === 'lead' ? TABS_LEAD : TABS_STUDIO
+  const TABS = role === 'lead' ? TABS_LEAD : role === 'artist' ? TABS_ARTIST : TABS_ASSISTANT
 
   return (
     <div className="flex items-stretch border-t border-[#E0DDD8] dark:border-[#2E2B28] bg-greige dark:bg-greige-dark flex-shrink-0">
