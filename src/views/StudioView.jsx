@@ -84,6 +84,28 @@ function fmt(n) { return `$${Number(n).toLocaleString()}` }
 // ─── Look card ─────────────────────────────────────────────────────────────────
 function LookCard({ look }) {
   const [expanded, setExpanded] = useState(false)
+  const [photos, setPhotos] = useState(() => lsGet(`showpartner_look_photos_${look.id}`, [null, null, null]))
+
+  function handlePhotoChange(e, slotIndex) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const updated = photos.map((p, i) => i === slotIndex ? ev.target.result : p)
+      setPhotos(updated)
+      lsSet(`showpartner_look_photos_${look.id}`, updated)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  function handleRemovePhoto(slotIndex) {
+    if (!window.confirm('Remove this photo?')) return
+    const updated = photos.map((p, i) => i === slotIndex ? null : p)
+    setPhotos(updated)
+    lsSet(`showpartner_look_photos_${look.id}`, updated)
+  }
+
   return (
     <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: 20, marginBottom: 16 }} className="dark:bg-white/5">
       <p className="text-[11px] tracking-widest uppercase font-sans text-[#888580]" style={{ marginBottom: 6 }}>LOOK {look.number}</p>
@@ -109,6 +131,32 @@ function LookCard({ look }) {
           ))}
         </ul>
       )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 16 }}>
+        {photos.map((photo, slotIndex) => (
+          <div key={slotIndex} style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden' }}>
+            {photo ? (
+              <button
+                onClick={() => handleRemovePhoto(slotIndex)}
+                style={{ width: '100%', height: '100%', padding: 0, border: 'none', cursor: 'pointer', background: 'none', display: 'block' }}
+              >
+                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </button>
+            ) : (
+              <label style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #C8C4BF', borderRadius: 8, cursor: 'pointer', background: 'rgba(255,255,255,0.4)' }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={e => handlePhotoChange(e, slotIndex)}
+                />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-[#888580]">
+                  <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
+                </svg>
+              </label>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -208,6 +256,9 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const [showUpload, setShowUpload] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
+  const isArtist = currentProfile?.role === 'artist'
+  const studioTabs = isArtist ? ['LOOKS', 'INVENTORY', 'RECEIPTS'] : ['LOOKS', 'INVENTORY']
+
   const artistId = currentProfile?.id || 'unknown'
   const artistName = currentProfile?.name || ''
 
@@ -249,7 +300,7 @@ export default function StudioView({ currentProfile, models: allModels }) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="flex border-b border-[#E0DDD8] dark:border-[#2E2B28] px-4 flex-shrink-0">
-        {['LOOKS', 'INVENTORY', 'RECEIPTS'].map(s => (
+        {studioTabs.map(s => (
           <button
             key={s}
             onClick={() => setSection(s)}
