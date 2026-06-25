@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react'
 import { show, team, models, notifications as initNotifs, parseScheduleTime, STATUS_META } from '../data/mockData'
+
+const SPEC_ICON = { hair: '✂', makeup: '💄', nails: '💅' }
+
+function disciplineTag(p) {
+  if (p.specialty) return `${SPEC_ICON[p.specialty]} ${p.specialty.charAt(0).toUpperCase() + p.specialty.slice(1)}`
+  if (p.role === 'lead') return 'Producer'
+  return null
+}
 import BottomSheet from '../components/BottomSheet'
 import ContactSheet from '../components/ContactSheet'
 import FloorPlanSVG from '../components/FloorPlanSVG'
@@ -553,6 +561,9 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
                           {p.role === 'artist' && <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-[#F5F2EE] dark:border-[#1A1816] bg-[#D0CCC7]" />}
                         </div>
                         <p className="text-[10px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight w-full truncate">{p.name}</p>
+                        {disciplineTag(p) && (
+                          <p className="text-[9px] font-sans text-[#888580] leading-tight w-full truncate">{disciplineTag(p)}</p>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -817,6 +828,9 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
                       )}
                     </div>
                     <p className="text-[10px] font-sans text-[#111] dark:text-[#F0EDE8] leading-tight w-full truncate">{p.name}</p>
+                    {disciplineTag(p) && (
+                      <p className="text-[9px] font-sans text-[#888580] leading-tight w-full truncate">{disciplineTag(p)}</p>
+                    )}
                   </button>
                 ))}
               </div>

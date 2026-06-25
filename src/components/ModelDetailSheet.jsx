@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import BottomSheet from './BottomSheet'
 import StatusChip from './StatusChip'
-import { STATUS_META, STATUS_ORDER, cycleStatus, modelHistory } from '../data/mockData'
+import { STATUS_META, STATUS_ORDER, cycleStatus, modelHistory, profiles } from '../data/mockData'
+import { SHOW_LOOKS } from '../data/showLooks'
+
+const SPEC_ICON = { hair: '✂', makeup: '💄', nails: '💅' }
+
+function lsGet(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback }
+  catch { return fallback }
+}
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────────────
 function formatPhotoTs(ts) {
@@ -308,8 +316,69 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
       </div>
       <div className="mb-5">
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">ARTISTS</p>
-        <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">{model.assignedArtists.join(', ')}</p>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {model.assignedArtists.map(name => {
+            const prof = profiles.find(pr => pr.name === name)
+            const icon = prof?.specialty ? SPEC_ICON[prof.specialty] : null
+            return (
+              <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                {prof?.avatar ? (
+                  <img src={prof.avatar} alt={name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#E0DDD8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span className="font-sans text-[#888580]" style={{ fontSize: 11 }}>{name.charAt(0)}</span>
+                  </div>
+                )}
+                <div>
+                  <p className="font-sans text-[#111] dark:text-[#F0EDE8]" style={{ margin: 0, fontSize: 13, lineHeight: 1.3 }}>{name}</p>
+                  {prof?.specialty && (
+                    <p className="font-sans text-[#888580]" style={{ margin: 0, fontSize: 10, lineHeight: 1.4 }}>
+                      {icon} {prof.specialty.charAt(0).toUpperCase() + prof.specialty.slice(1)}
+                    </p>
+                  )}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
       </div>
+      {/* Look reference blocks */}
+      {(() => {
+        const look = SHOW_LOOKS.find(l => l.number === model.lookNumber)
+        if (!look) return null
+        const storedPhotos = lsGet(`showpartner_look_photos_${look.id}`, [null, null, null])
+        const lookPhotos = storedPhotos.filter(Boolean)
+        const disciplines = [
+          model.hairArtist   && { key: 'hair',   label: 'HAIR' },
+          model.makeupArtist && { key: 'makeup', label: 'MAKEUP' },
+          model.nailArtist   && { key: 'nails',  label: 'NAILS' },
+        ].filter(Boolean)
+        if (disciplines.length === 0) return null
+        return (
+          <>
+            {disciplines.map(disc => (
+              <div key={disc.key} className="mb-5">
+                <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-1">
+                  {disc.label} · LOOK {model.lookNumber}
+                </p>
+                <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8] mb-2">{look.title}</p>
+                {lookPhotos.length > 0 ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                    {lookPhotos.map((photo, idx) => (
+                      <div key={idx}>
+                        <img src={photo} alt="" style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', borderRadius: 6, display: 'block' }} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs font-sans text-[#B0ACA7]">No reference photos yet.</p>
+                )}
+              </div>
+            ))}
+            <div className="h-px bg-[#E0DDD8] dark:bg-[#2E2B28] mb-5" />
+          </>
+        )
+      })()}
       {photoStripJSX}
       <div className="h-px bg-[#E0DDD8] dark:bg-[#2E2B28] mb-5" />
       <div className="mb-5">

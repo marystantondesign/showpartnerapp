@@ -5,8 +5,16 @@ import ModelPicker from './ModelPicker'
 const BASE_PINGS        = ['Call me', 'Where are you?', 'Come find me', 'FaceTime me']
 const PINGS_WITH_MODEL  = ['Call me', 'Where are you?', 'Come find me', 'Check this model ›', 'FaceTime me']
 
+const SPEC_ICON = { hair: '✂', makeup: '💄', nails: '💅' }
+
 function specialtyLabel(person) {
-  if (person.specialty) return person.specialty.toUpperCase()
+  if (person.specialty) {
+    const icon = SPEC_ICON[person.specialty] || ''
+    const spec = person.specialty.charAt(0).toUpperCase() + person.specialty.slice(1)
+    const role = person.role === 'artist' ? 'Artist' : 'Assistant'
+    return `${icon} ${spec} · ${role}`
+  }
+  if (person.role === 'lead') return 'Producer'
   return person.role?.toUpperCase() || 'TEAM'
 }
 

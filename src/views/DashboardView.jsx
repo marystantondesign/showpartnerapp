@@ -7,9 +7,12 @@ import ManageAssignments from '../components/ManageAssignments'
 import BottomSheet from '../components/BottomSheet'
 import { useIsTablet } from '../hooks/useIsTablet'
 
+const SPEC_ICON = { hair: '✂', makeup: '💄', nails: '💅' }
+
 function specialtyLabel(artist) {
   if (!artist.specialty) return 'ARTIST'
-  return artist.specialty.toUpperCase()
+  const icon = SPEC_ICON[artist.specialty] || ''
+  return `${icon} ${artist.specialty.charAt(0).toUpperCase() + artist.specialty.slice(1)}`
 }
 
 // ─── Artist detail — bottom sheet (mobile) or right panel (tablet) ────────────

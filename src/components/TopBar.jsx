@@ -3,6 +3,19 @@ import { profiles } from '../data/mockData'
 import BottomSheet from './BottomSheet'
 import { useIsTablet } from '../hooks/useIsTablet'
 
+const SPEC_ICON = { hair: '✂', makeup: '💄', nails: '💅' }
+
+function profileSubLabel(p) {
+  if (p.specialty) {
+    const icon = SPEC_ICON[p.specialty] || ''
+    const spec = p.specialty.charAt(0).toUpperCase() + p.specialty.slice(1)
+    const role = p.role === 'artist' ? 'Artist' : 'Assistant'
+    return `${icon} ${spec} · ${role}`
+  }
+  if (p.role === 'lead') return 'Producer'
+  return p.role?.toUpperCase() || 'TEAM'
+}
+
 export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchProfile, notifications, onBell, onShowHistory }) {
   const [profileOpen, setProfileOpen] = useState(false)
   const unread   = notifications.filter(n => !n.read).length
@@ -84,7 +97,7 @@ export default function TopBar({ dark, onToggleDark, currentProfile, onSwitchPro
               <img src={p.avatar} alt={p.name} className="w-10 h-10 rounded-full object-cover" />
               <div className="flex flex-col items-start">
                 <span className="font-sans text-sm text-[#111] dark:text-[#F0EDE8]">{p.name}</span>
-                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">{p.role}</span>
+                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580]">{profileSubLabel(p)}</span>
               </div>
               {currentProfile.id === p.id && (
                 <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
