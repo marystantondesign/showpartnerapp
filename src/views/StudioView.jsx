@@ -133,27 +133,29 @@ function LookCard({ look }) {
       )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 16 }}>
         {photos.map((photo, slotIndex) => (
-          <div key={slotIndex} style={{ aspectRatio: '1 / 1', borderRadius: 8, overflow: 'hidden' }}>
-            {photo ? (
-              <button
-                onClick={() => handleRemovePhoto(slotIndex)}
-                style={{ width: '100%', height: '100%', padding: 0, border: 'none', cursor: 'pointer', background: 'none', display: 'block' }}
-              >
-                <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              </button>
-            ) : (
-              <label style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #C8C4BF', borderRadius: 8, cursor: 'pointer', background: 'rgba(255,255,255,0.4)' }}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={e => handlePhotoChange(e, slotIndex)}
-                />
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-[#888580]">
-                  <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
-                </svg>
-              </label>
-            )}
+          <div key={slotIndex} style={{ position: 'relative', paddingTop: '100%' }}>
+            <div style={{ position: 'absolute', inset: 0, borderRadius: 8, overflow: 'hidden' }}>
+              {photo ? (
+                <button
+                  onClick={() => handleRemovePhoto(slotIndex)}
+                  style={{ width: '100%', height: '100%', padding: 0, border: 'none', cursor: 'pointer', background: 'none', display: 'block' }}
+                >
+                  <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                </button>
+              ) : (
+                <label style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #C8C4BF', borderRadius: 8, cursor: 'pointer', background: 'rgba(255,255,255,0.4)' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={e => handlePhotoChange(e, slotIndex)}
+                  />
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" className="text-[#888580]">
+                    <line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/>
+                  </svg>
+                </label>
+              )}
+            </div>
           </div>
         ))}
       </div>

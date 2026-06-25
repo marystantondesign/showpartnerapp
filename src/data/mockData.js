@@ -13,34 +13,28 @@ export const profiles = [
   { id: 'p1',  name: 'Jen Z',       role: 'lead',      specialty: 'hair',   avatar: '/lead/Jen-Z.png',
     tags: ['Show direction', 'Team coordination', 'Hair + Beauty'] },
 
-  // Artists (10 total)
+  // Artists (2 total)
   { id: 'p2',  name: 'Marcus Lee',      role: 'artist',    specialty: 'makeup', avatar: '/artists/Marcus-Lee.png',
     tags: ['Editorial makeup', 'Special effects', 'Contouring', 'Avant-garde color', 'Skin prep'] },
   { id: 'p3',  name: 'Zoe Park',        role: 'artist',    specialty: 'makeup', avatar: '/artists/Zoe-Parker.png',
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
-  { id: 'p6',  name: 'David Kim',       role: 'artist',    specialty: 'hair',   avatar: '/artists/David-Kim.png',
-    tags: ['Hair extensions', 'Avant-garde styling', 'Braiding', 'Color work', 'Keratin'] },
-  { id: 'p7',  name: 'Priya Osei',      role: 'artist',    specialty: 'hair',   avatar: '/artists/Priya-Osei.png',
-    tags: ['Natural textures', 'Protective styles', 'Color correction', 'Precision cuts', 'Blowouts'] },
-  { id: 'p8',  name: 'Luna Torres',     role: 'artist',    specialty: 'makeup', avatar: '/artists/Luna-Tores.png',
-    tags: ['Eyebrow bleaching', 'Editorial makeup', 'Avant-garde color', 'Fantasy looks', 'Runway'] },
-  { id: 'p11', name: 'Kenji Watanabe',  role: 'artist',    specialty: 'hair',   avatar: '/artists/Kenji-Watanabe.png',
-    tags: ['Avant-garde cuts', 'Keratin treatments', 'Natural textures', 'Braiding', 'Ombré'] },
-  { id: 'p12', name: 'Sofia Reyes',     role: 'artist',    specialty: 'nails',  avatar: '/artists/Sofia-Reyes.png',
-    tags: ['Nail art', 'Gel extensions', 'Chrome powder', 'Hand painting', '3D nail art'] },
-  { id: 'p13', name: 'Aisha Johnson',   role: 'artist',    specialty: 'makeup', avatar: '/artists/Aisha-Johnson.png',
-    tags: ['Skin prep', 'Airbrush', 'Contouring', 'Lash application', 'Film & TV'] },
-  { id: 'p14', name: 'Lena Schmidt',    role: 'artist',    specialty: 'hair',   avatar: '/artists/Lena-Schmidt.png',
-    tags: ['Updos', 'Vintage styles', 'Extensions', 'Color correction', 'Scalp care'] },
-  { id: 'p15', name: 'Mira Patel',      role: 'artist',    specialty: 'nails',  avatar: '/artists/Mira-Patel.png',
-    tags: ['Nail extensions', 'Acrylic overlays', 'Chrome effects', 'Minimalist design', 'Nail repair'] },
 
-  // Assistants (5 total)
+  // Assistants (15 total)
   { id: 'p4',  name: 'Sophia Rivera',   role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Sophia-Rivera.png'  },
   { id: 'p5',  name: 'James Kim',       role: 'assistant', trackingState: 'lost', lastSeenMins: 12,  avatar: '/assistants/James-Kim.png' },
+  { id: 'p6',  name: 'David Kim',       role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/David-Kim.png' },
+  { id: 'p7',  name: 'Priya Osei',      role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Priya-Osei.png' },
+  { id: 'p8',  name: 'Luna Torres',     role: 'assistant', trackingState: 'lost', lastSeenMins: 5,  specialty: 'makeup', avatar: '/artists/Luna-Tores.png' },
   { id: 'p9',  name: 'Cleo Marsh',      role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Cleo-Marsh.png' },
   { id: 'p10', name: 'Benji Adams',     role: 'assistant', trackingState: 'lost', lastSeenMins: 8,   avatar: '/assistants/Benji-Adams.png' },
+  { id: 'p11', name: 'Kenji Watanabe',  role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Kenji-Watanabe.png' },
+  { id: 'p12', name: 'Sofia Reyes',     role: 'assistant', trackingState: 'active', specialty: 'nails',  avatar: '/artists/Sofia-Reyes.png' },
+  { id: 'p13', name: 'Aisha Johnson',   role: 'assistant', trackingState: 'lost', lastSeenMins: 3,  specialty: 'makeup', avatar: '/artists/Aisha-Johnson.png' },
+  { id: 'p14', name: 'Lena Schmidt',    role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Lena-Schmidt.png' },
+  { id: 'p15', name: 'Mira Patel',      role: 'assistant', trackingState: 'active', specialty: 'nails',  avatar: '/artists/Mira-Patel.png' },
   { id: 'p16', name: 'Nadia Faris',     role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Nadia-Faris.png' },
+  { id: 'p17', name: 'Riley Chen',      role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Cleo-Marsh.png' },
+  { id: 'p18', name: 'Morgan James',    role: 'assistant', trackingState: 'lost', lastSeenMins: 6,   avatar: '/assistants/Benji-Adams.png' },
 ]
 
 export const team = profiles

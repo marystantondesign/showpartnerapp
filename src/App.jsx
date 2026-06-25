@@ -162,7 +162,7 @@ export default function App() {
           {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} currentProfile={currentProfile} schedule={schedule} onScheduleChange={setSchedule} />}
         </div>
 
-        <BottomNav active={tab} onSelect={setTab} isArtist={currentProfile.role === 'artist'} />
+        <BottomNav active={tab} onSelect={setTab} role={currentProfile.role} />
       </div>
 
       {/* Show history full-screen overlay */}

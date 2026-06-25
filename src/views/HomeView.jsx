@@ -392,7 +392,6 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
   const [mapOpen, setMapOpen] = useState(false)
   const [contactPerson, setContactPerson] = useState(null)
   const [trackLocation, setTrackLocation] = useState(false)
-  const [stationLogged, setStationLogged] = useState(null)
 
   const liveModels = modelsProp || models
 
@@ -493,26 +492,16 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
             <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]" style={{ whiteSpace: 'normal', overflowWrap: 'break-word' }}>{show.address}</p>
           </div>
 
-          {/* Location / station — hidden for assistant role */}
+          {/* Location tracking — Artist and Producer only; hidden for Assistant */}
           {currentProfile.role !== 'assistant' && (
           <div className="px-6 py-4 flex items-center justify-between border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-            {currentProfile.role === 'artist' ? (
-              <div className="flex items-center gap-3 w-full">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">{stationLogged ? `Station logged at ${stationLogged}` : 'LOG MY STATION'}</span>
-                {!stationLogged && (
-                  <button onClick={() => { setStationLogged(formatTime(new Date())); onToast('Station logged') }} className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0">LOG</button>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 w-full">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">TRACK MY LOCATION</span>
-                <button onClick={() => setTrackLocation(s => !s)} className="flex-shrink-0 relative rounded-full outline-none" style={{ width: 40, height: 22, backgroundColor: trackLocation ? '#7A9E7E' : '#D0CCC7', transition: 'background-color 150ms ease' }}>
-                  <span style={{ position: 'absolute', top: 3, left: trackLocation ? 21 : 3, width: 16, height: 16, borderRadius: '50%', backgroundColor: 'white', transition: 'left 150ms ease', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-3 w-full">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">SHARE MY LOCATION</span>
+              <button onClick={() => setTrackLocation(s => !s)} className="flex-shrink-0 relative rounded-full outline-none" style={{ width: 40, height: 22, backgroundColor: trackLocation ? '#7A9E7E' : '#D0CCC7', transition: 'background-color 150ms ease' }}>
+                <span style={{ position: 'absolute', top: 3, left: trackLocation ? 21 : 3, width: 16, height: 16, borderRadius: '50%', backgroundColor: 'white', transition: 'left 150ms ease', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+              </button>
+            </div>
           </div>
           )}
 
@@ -726,58 +715,39 @@ export default function HomeView({ dark, currentProfile, onToast, models: models
         </div>
       </div>
 
-      {/* 3. Location / station — hidden for assistant role */}
+      {/* 3. Location tracking — Artist and Producer only; hidden for Assistant */}
       {currentProfile.role !== 'assistant' && (
       <div className="px-4 py-3 flex items-center justify-between border-b border-[#E0DDD8] dark:border-[#2E2B28]">
-        {currentProfile.role === 'artist' ? (
-          <div className="flex items-center gap-3 w-full">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">
-              {stationLogged ? `Station logged at ${stationLogged}` : 'LOG MY STATION'}
-            </span>
-            {!stationLogged && (
-              <button
-                onClick={() => { setStationLogged(formatTime(new Date())); onToast('Station logged') }}
-                className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0"
-              >
-                LOG
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 w-full">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">TRACK MY LOCATION</span>
-            <button
-              onClick={() => setTrackLocation(s => !s)}
-              className="flex-shrink-0 relative rounded-full outline-none"
+        <div className="flex items-center gap-3 w-full">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#888580] flex-shrink-0">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span className="text-[10px] tracking-widest uppercase font-sans text-[#888580] flex-1">SHARE MY LOCATION</span>
+          <button
+            onClick={() => setTrackLocation(s => !s)}
+            className="flex-shrink-0 relative rounded-full outline-none"
+            style={{
+              width: 40,
+              height: 22,
+              backgroundColor: trackLocation ? '#7A9E7E' : '#D0CCC7',
+              transition: 'background-color 150ms ease',
+            }}
+          >
+            <span
               style={{
-                width: 40,
-                height: 22,
-                backgroundColor: trackLocation ? '#7A9E7E' : '#D0CCC7',
-                transition: 'background-color 150ms ease',
+                position: 'absolute',
+                top: 3,
+                left: trackLocation ? 21 : 3,
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                backgroundColor: 'white',
+                transition: 'left 150ms ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
               }}
-            >
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 3,
-                  left: trackLocation ? 21 : 3,
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  backgroundColor: 'white',
-                  transition: 'left 150ms ease',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                }}
-              />
-            </button>
-          </div>
-        )}
+            />
+          </button>
+        </div>
       </div>
       )}
 

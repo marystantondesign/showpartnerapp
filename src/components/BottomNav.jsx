@@ -38,8 +38,8 @@ const ICONS = {
   ),
 }
 
-// Default tabs (Lead + Assistant)
-const TABS_DEFAULT = [
+// Producer/Lead tabs: includes ARTISTS dashboard
+const TABS_LEAD = [
   { id: 'home',      label: 'HOME'     },
   { id: 'dashboard', label: 'ARTISTS'  },
   { id: 'list',      label: 'MGMT'     },
@@ -47,8 +47,8 @@ const TABS_DEFAULT = [
   { id: 'settings',  label: 'SETTINGS' },
 ]
 
-// Artist-role tabs: replaces ARTISTS with STUDIO
-const TABS_ARTIST = [
+// Artist + Assistant tabs: includes STUDIO, no ARTISTS dashboard
+const TABS_STUDIO = [
   { id: 'home',     label: 'HOME'     },
   { id: 'list',     label: 'MGMT'     },
   { id: 'lineup',   label: 'LINEUP'   },
@@ -56,9 +56,9 @@ const TABS_ARTIST = [
   { id: 'settings', label: 'SETTINGS' },
 ]
 
-export default function BottomNav({ active, onSelect, isArtist }) {
+export default function BottomNav({ active, onSelect, role }) {
   const isTablet = useIsTablet()
-  const TABS = isArtist ? TABS_ARTIST : TABS_DEFAULT
+  const TABS = role === 'lead' ? TABS_LEAD : TABS_STUDIO
 
   return (
     <div className="flex items-stretch border-t border-[#E0DDD8] dark:border-[#2E2B28] bg-greige dark:bg-greige-dark flex-shrink-0">
