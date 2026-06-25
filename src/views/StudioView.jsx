@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { profiles } from '../data/mockData'
 
 // ─── Show looks ────────────────────────────────────────────────────────────────
 const SHOW_LOOKS = [
@@ -82,8 +83,9 @@ function lsSet(key, val) {
 function fmt(n) { return `$${Number(n).toLocaleString()}` }
 
 // ─── Look card ─────────────────────────────────────────────────────────────────
+const NAME_TO_AVATAR = Object.fromEntries(profiles.map(p => [p.name, p.avatar]))
+
 function LookCard({ look }) {
-  const [expanded, setExpanded] = useState(false)
   const [photos, setPhotos] = useState(() => lsGet(`showpartner_look_photos_${look.id}`, [null, null, null]))
 
   function handlePhotoChange(e, slotIndex) {
@@ -117,20 +119,6 @@ function LookCard({ look }) {
           </li>
         ))}
       </ol>
-      <button
-        onClick={() => setExpanded(e => !e)}
-        className="font-sans text-[#888580] bg-transparent border-none outline-none cursor-pointer p-0"
-        style={{ marginTop: 16, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
-      >
-        MODELS ASSIGNED {expanded ? '▴' : '▾'}
-      </button>
-      {expanded && (
-        <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
-          {look.models.map(name => (
-            <li key={name} className="font-sans text-[#111] dark:text-[#F0EDE8]" style={{ fontSize: 13, lineHeight: 1.6 }}>· {name}</li>
-          ))}
-        </ul>
-      )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 16 }}>
         {photos.map((photo, slotIndex) => (
           <div key={slotIndex} style={{ position: 'relative', paddingTop: '100%' }}>
@@ -158,6 +146,26 @@ function LookCard({ look }) {
             </div>
           </div>
         ))}
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <p className="text-[11px] tracking-widest uppercase font-sans text-[#888580]" style={{ marginBottom: 8 }}>MODELS ASSIGNED</p>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {look.models.map(name => {
+            const avatar = NAME_TO_AVATAR[name]
+            return (
+              <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                {avatar ? (
+                  <img src={avatar} alt={name} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: '#E0DDD8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span className="font-sans text-[#888580]" style={{ fontSize: 9 }}>{name.charAt(0)}</span>
+                  </div>
+                )}
+                <span className="font-sans text-[#888580]" style={{ fontSize: 13 }}>{name}</span>
+              </li>
+            )
+          })}
+        </ul>
       </div>
     </div>
   )
