@@ -172,7 +172,7 @@ function ArtistDetailSheet({ artist, models, open, onClose, currentProfile }) {
               <span className="font-medium">{pending.type}</span> — {pending.notes}
             </p>
             {!isLead && (
-              <p className="text-[11px] font-sans text-[#888580] mb-3">Only the Lead can edit this once submitted.</p>
+              <p className="text-[11px] font-sans text-[#888580] mb-3">Only the Producer can edit this once submitted.</p>
             )}
             <div className="flex gap-2 mt-3">
               <button onClick={handleConfirm} className="flex-1 py-2.5 text-[10px] tracking-widest uppercase font-sans text-white bg-[#C4614A] border-none rounded cursor-pointer outline-none font-semibold">
