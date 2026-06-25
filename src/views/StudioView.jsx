@@ -142,7 +142,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
         <div className="w-8 h-1 rounded-full bg-[#C8C4BF] dark:bg-[#3A3632] mx-auto mb-4" />
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-4">UPLOAD RECEIPT</p>
 
-        {/* File picker */}
         <label className="flex items-center gap-3 py-3 mb-4 border-b border-[#E0DDD8] dark:border-[#2E2B28] cursor-pointer">
           <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileChange} />
           {thumb ? (
@@ -157,7 +156,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           <span className="text-sm font-sans text-[#888580]">{thumb ? 'Photo attached' : 'Choose photo or file'}</span>
         </label>
 
-        {/* Merchant */}
         <input
           value={merchant}
           onChange={e => setMerchant(e.target.value)}
@@ -165,7 +163,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
 
-        {/* Amount */}
         <input
           value={amount}
           onChange={e => setAmount(e.target.value)}
@@ -175,7 +172,6 @@ function ReceiptUploadSheet({ onSave, onClose }) {
           className="w-full bg-transparent text-sm font-sans text-[#111] dark:text-[#F0EDE8] placeholder-[#B0ACA7] border-b border-[#E0DDD8] dark:border-[#2E2B28] outline-none pb-2 mb-4"
         />
 
-        {/* Category chips */}
         <div className="flex flex-wrap gap-2 mb-6">
           {CATEGORIES.map(cat => (
             <button
@@ -215,7 +211,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const artistId = currentProfile?.id || 'unknown'
   const artistName = currentProfile?.name || ''
 
-  // Inventory (localStorage → seeded defaults)
   const invKey = `showpartner_inventory_${artistId}`
   const [inventory, setInventory] = useState(() => {
     const saved = lsGet(invKey, null)
@@ -233,12 +228,10 @@ export default function StudioView({ currentProfile, models: allModels }) {
   const hasOverage = overages.length > 0
 
   function handleSubmit() {
-    // Persist final state and mark submitted
     lsSet(invKey, inventory)
     setSubmitted(true)
   }
 
-  // Receipts (localStorage → seeded defaults)
   const recKey = `showpartner_receipts_${artistId}`
   const [receipts, setReceipts] = useState(() => {
     const saved = lsGet(recKey, null)
@@ -255,7 +248,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Section toggle */}
       <div className="flex border-b border-[#E0DDD8] dark:border-[#2E2B28] px-4 flex-shrink-0">
         {['LOOKS', 'INVENTORY', 'RECEIPTS'].map(s => (
           <button
@@ -273,7 +265,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
         ))}
       </div>
 
-      {/* ── LOOKS ─────────────────────────────────────────────────────────── */}
       {section === 'LOOKS' && (
         <div className="flex-1 overflow-y-auto px-4 py-5">
           {SHOW_LOOKS.map(look => (
@@ -282,7 +273,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
         </div>
       )}
 
-      {/* ── INVENTORY ─────────────────────────────────────────────────────── */}
       {section === 'INVENTORY' && (
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {inventory.length === 0 && (
@@ -306,7 +296,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
                   </span>
                 </div>
 
-                {/* Stepper */}
                 <div className="flex items-center gap-3 mt-2">
                   <span className="text-[11px] font-sans text-[#888580]">Used:</span>
                   <div className="flex items-center gap-2">
@@ -327,7 +316,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
                   </div>
                 </div>
 
-                {/* Overage banner */}
                 {over && (
                   <div className="mt-3 px-3 py-2 rounded-lg text-[11px] font-sans" style={{ backgroundColor: '#C4614A22', color: '#C4614A' }}>
                     You've exceeded your allocation by {item.used - item.allocated} {item.unit}. This will be flagged for adjustment.
@@ -357,7 +345,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
         </div>
       )}
 
-      {/* ── RECEIPTS ──────────────────────────────────────────────────────── */}
       {section === 'RECEIPTS' && (
         <div className="flex-1 overflow-y-auto px-4 py-4 relative">
           {receipts.length === 0 && (
@@ -382,7 +369,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
             </div>
           ))}
 
-          {/* Floating upload button */}
           <button
             onClick={() => setShowUpload(true)}
             className="fixed bottom-24 right-4 w-12 h-12 rounded-full flex items-center justify-center outline-none border-none cursor-pointer shadow-lg z-10"
@@ -395,7 +381,6 @@ export default function StudioView({ currentProfile, models: allModels }) {
         </div>
       )}
 
-      {/* Receipt upload sheet */}
       {showUpload && (
         <ReceiptUploadSheet onSave={handleSaveReceipt} onClose={() => setShowUpload(false)} />
       )}
