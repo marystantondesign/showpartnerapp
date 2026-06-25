@@ -9,32 +9,35 @@ export const show = {
 }
 
 export const profiles = [
-  // Lead
-  { id: 'p1',  name: 'Jen Z',       role: 'lead',      specialty: 'hair',   avatar: '/lead/Jen-Z.png',
-    tags: ['Show direction', 'Team coordination', 'Hair + Beauty'] },
+  // Producer
+  { id: 'p1',  name: 'Jen Zambrano',   role: 'lead',      avatar: '/lead/Jen-Z.png',
+    tags: ['Show direction', 'Team coordination', 'Budget oversight'] },
 
   // Artists (2 total)
-  { id: 'p2',  name: 'Marcus Lee',      role: 'artist',    specialty: 'makeup', avatar: '/artists/Marcus-Lee.png',
-    tags: ['Editorial makeup', 'Special effects', 'Contouring', 'Avant-garde color', 'Skin prep'] },
-  { id: 'p3',  name: 'Zoe Park',        role: 'artist',    specialty: 'makeup', avatar: '/artists/Zoe-Parker.png',
+  { id: 'p2',  name: 'Marcus Lee',     role: 'artist',    specialty: 'hair',   avatar: '/artists/Marcus-Lee.png',
+    tags: ['Editorial styling', 'Hair extensions', 'Avant-garde cuts', 'Color work', 'Braiding'] },
+  { id: 'p3',  name: 'Zoe Park',       role: 'artist',    specialty: 'makeup', avatar: '/artists/Zoe-Parker.png',
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
 
-  // Assistants (15 total)
-  { id: 'p4',  name: 'Sophia Rivera',   role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Sophia-Rivera.png'  },
-  { id: 'p5',  name: 'James Kim',       role: 'assistant', trackingState: 'lost', lastSeenMins: 12,  avatar: '/assistants/James-Kim.png' },
-  { id: 'p6',  name: 'David Kim',       role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/David-Kim.png' },
-  { id: 'p7',  name: 'Priya Osei',      role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Priya-Osei.png' },
-  { id: 'p8',  name: 'Luna Torres',     role: 'assistant', trackingState: 'lost', lastSeenMins: 5,  specialty: 'makeup', avatar: '/artists/Luna-Tores.png' },
-  { id: 'p9',  name: 'Cleo Marsh',      role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Cleo-Marsh.png' },
-  { id: 'p10', name: 'Benji Adams',     role: 'assistant', trackingState: 'lost', lastSeenMins: 8,   avatar: '/assistants/Benji-Adams.png' },
-  { id: 'p11', name: 'Kenji Watanabe',  role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Kenji-Watanabe.png' },
-  { id: 'p12', name: 'Sofia Reyes',     role: 'assistant', trackingState: 'active', specialty: 'nails',  avatar: '/artists/Sofia-Reyes.png' },
-  { id: 'p13', name: 'Aisha Johnson',   role: 'assistant', trackingState: 'lost', lastSeenMins: 3,  specialty: 'makeup', avatar: '/artists/Aisha-Johnson.png' },
-  { id: 'p14', name: 'Lena Schmidt',    role: 'assistant', trackingState: 'active', specialty: 'hair',   avatar: '/artists/Lena-Schmidt.png' },
-  { id: 'p15', name: 'Mira Patel',      role: 'assistant', trackingState: 'active', specialty: 'nails',  avatar: '/artists/Mira-Patel.png' },
-  { id: 'p16', name: 'Nadia Faris',     role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Nadia-Faris.png' },
-  { id: 'p17', name: 'Riley Chen',      role: 'assistant', trackingState: 'active',                  avatar: '/assistants/Cleo-Marsh.png' },
-  { id: 'p18', name: 'Morgan James',    role: 'assistant', trackingState: 'lost', lastSeenMins: 6,   avatar: '/assistants/Benji-Adams.png' },
+  // Assistants — Hair (6)
+  { id: 'p4',  name: 'Sophia Rivera',  role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/assistants/Sophia-Rivera.png' },
+  { id: 'p5',  name: 'James Kim',      role: 'assistant', specialty: 'hair',   trackingState: 'lost', lastSeenMins: 12, avatar: '/assistants/James-Kim.png' },
+  { id: 'p6',  name: 'David Kim',      role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/artists/David-Kim.png' },
+  { id: 'p7',  name: 'Priya Osei',     role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/artists/Priya-Osei.png' },
+  { id: 'p8',  name: 'Luna Torres',    role: 'assistant', specialty: 'hair',   trackingState: 'lost', lastSeenMins: 5,  avatar: '/artists/Luna-Tores.png' },
+  { id: 'p9',  name: 'Cleo Marsh',     role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/assistants/Cleo-Marsh.png' },
+
+  // Assistants — Makeup (6)
+  { id: 'p10', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/Benji-Adams.png' },
+  { id: 'p11', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Kenji-Watanabe.png' },
+  { id: 'p12', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Sofia-Reyes.png' },
+  { id: 'p13', name: 'Aisha Johnson',  role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 3,  avatar: '/artists/Aisha-Johnson.png' },
+  { id: 'p14', name: 'Lena Schmidt',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Lena-Schmidt.png' },
+  { id: 'p15', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Mira-Patel.png' },
+
+  // Assistants — Nails (2)
+  { id: 'p16', name: 'Nadia Faris',    role: 'assistant', specialty: 'nails',  trackingState: 'active',               avatar: '/assistants/Nadia-Faris.png' },
+  { id: 'p17', name: 'Riley Chen',     role: 'assistant', specialty: 'nails',  trackingState: 'active',               avatar: '/assistants/Cleo-Marsh.png' },
 ]
 
 export const team = profiles
