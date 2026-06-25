@@ -141,7 +141,7 @@ export default function RoleSelect({ onSelect }) {
       {device === 'mobile' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 320 }}>
           {[
-            { role: 'lead',      name: 'Lead'      },
+            { role: 'lead',      name: 'Producer'  },
             { role: 'artist',    name: 'Artist'    },
             { role: 'assistant', name: 'Assistant' },
           ].map(({ role, name }) => (
@@ -157,7 +157,7 @@ export default function RoleSelect({ onSelect }) {
 
       {device === 'tablet' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', maxWidth: 540 }}>
-          <Card name="Lead"      descriptor="Show lead"          dark={dark} onClick={() => onSelect('lead')} />
+          <Card name="Producer"  descriptor="Show producer"       dark={dark} onClick={() => onSelect('lead')} />
           <Card name="Artist"    descriptor="Hair · Makeup · Nails" dark={dark} onClick={() => onSelect('artist')} />
           <Card name="Assistant" descriptor="On-site support"    dark={dark} onClick={() => onSelect('assistant')} />
           {/* Ghost cell — invisible spacer matching card size */}
@@ -175,7 +175,7 @@ export default function RoleSelect({ onSelect }) {
             onClick={() => onSelect('agent')}
           />
           <Card
-            name="Lead"
+            name="Producer"
             descriptor="Coming soon"
             disabled
             dark={dark}

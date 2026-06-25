@@ -3,14 +3,14 @@ import BottomSheet from './BottomSheet'
 import StatusChip from './StatusChip'
 import { STATUS_META, STATUS_ORDER, cycleStatus, modelHistory } from '../data/mockData'
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────────────────
 function formatPhotoTs(ts) {
   // Just show the timestamp as stored — seeded photos now use "Apr 12, 2026" format
   return ts || ''
 }
 
 function roleChip(authorRole, authorSpecialty) {
-  if (authorRole === 'lead') return 'LEAD'
+  if (authorRole === 'lead') return 'PRODUCER'
   if (authorRole === 'artist' && authorSpecialty) return authorSpecialty.toUpperCase()
   return authorRole?.toUpperCase() || 'TEAM'
 }
@@ -21,7 +21,7 @@ function fmtCreatedAt(iso) {
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main component ─────────────────────────────────────────────────────────────────────
 export default function ModelDetailSheet({ model, onClose, onStatusChange, onNote, currentProfile, panel }) {
   const [photos, setPhotos]               = useState(model?.photos || [])
   const [expandedPhoto, setExpandedPhoto] = useState(null)
@@ -51,7 +51,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
 
   const history = modelHistory?.[model.id] || []
 
-  // ── Photo helpers ────────────────────────────────────────────────────────
+  // ── Photo helpers ─────────────────────────────────────────────────────────────────────
   function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -84,7 +84,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
 
   const canDeletePhoto = (photo) => isLead || photo.uploaderId === currentProfile?.id
 
-  // ── Notes helpers ────────────────────────────────────────────────────────
+  // ── Notes helpers ───────────────────────────────────────────────────────────────────
   function openAddNote() { setNoteText(''); setEditingNote(null); setAddingNote(true) }
   function openEditNote(n) { setNoteText(n.text); setEditingNote(n); setAddingNote(true) }
   function cancelNote() { setAddingNote(false); setEditingNote(null); setNoteText('') }
@@ -117,7 +117,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     onNote && onNote(model.id, updated)
   }
 
-  // ── Hero photo ───────────────────────────────────────────────────────────
+  // ── Hero photo ──────────────────────────────────────────────────────────────────────
   const heroPhotos = photos.length >= 2 ? photos.slice(0, 3) : null
   const singleSrc  = photos[0]?.url || model.avatar
 
@@ -142,7 +142,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Photo strip ──────────────────────────────────────────────────────────
+  // ── Photo strip ──────────────────────────────────────────────────────────────────
   const photoStripJSX = (
     <div className="mb-5">
       <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-2">PHOTOS</p>
@@ -178,7 +178,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Notes section ────────────────────────────────────────────────────────
+  // ── Notes section ────────────────────────────────────────────────────────────────
   const notesSectionJSX = (
     <div>
       <div className="flex items-center justify-between mb-3">
@@ -213,7 +213,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── History section (Lead + Assistant only) ──────────────────────────────
+  // ── History section (Lead + Assistant only) ────────────────────────────────────────
   const historyJSX = (isLead || isAssistant) && history.length > 0 ? (
     <div className="mt-5">
       <button
@@ -246,7 +246,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   ) : null
 
-  // ── Expanded photo overlay ───────────────────────────────────────────────
+  // ── Expanded photo overlay ──────────────────────────────────────────────────────────────
   const expandedOverlayJSX = expandedPhoto && (
     <div className="absolute inset-0 z-50 flex flex-col bg-black" style={{ borderRadius: 'inherit' }}>
       <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
@@ -266,7 +266,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Photo delete confirm overlay ─────────────────────────────────────────
+  // ── Photo delete confirm overlay ──────────────────────────────────────────────────────
   const deletePhotoConfirmJSX = deletePhotoId && (
     <div className="absolute inset-0 z-50 flex items-end bg-black/40" style={{ borderRadius: 'inherit' }}>
       <div className="w-full bg-greige dark:bg-greige-dark rounded-t-2xl p-6">
@@ -280,7 +280,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Add/Edit note overlay ────────────────────────────────────────────────
+  // ── Add/Edit note overlay ───────────────────────────────────────────────────────────────
   const noteEditorJSX = addingNote && (
     <div className="absolute inset-0 z-50 flex flex-col bg-greige dark:bg-greige-dark" style={{ borderRadius: 'inherit' }}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] flex-shrink-0">
@@ -300,7 +300,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Shared content body ──────────────────────────────────────────────────
+  // ── Shared content body ─────────────────────────────────────────────────────────────────
   const bodyContent = (
     <div className="px-4 pt-4 pb-8">
       <div className="mb-4">
@@ -349,7 +349,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     </div>
   )
 
-  // ── Panel mode (tablet list view) ────────────────────────────────────────
+  // ── Panel mode (tablet list view) ─────────────────────────────────────────────────────
   if (panel) {
     return (
       <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} className="bg-greige dark:bg-greige-dark">
@@ -364,7 +364,7 @@ export default function ModelDetailSheet({ model, onClose, onStatusChange, onNot
     )
   }
 
-  // ── BottomSheet mode (mobile + tablet modal) ──────────────────────────────
+  // ── BottomSheet mode (mobile + tablet modal) ────────────────────────────────────────────
   return (
     <BottomSheet open onClose={onClose} height="88%" noPadding>
       {expandedOverlayJSX}
