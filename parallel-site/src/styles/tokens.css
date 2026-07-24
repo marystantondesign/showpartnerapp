@@ -1,0 +1,290 @@
+/* GENERATED FILE — do not hand-edit. Run `npm run tokens` (or `tokens:refresh`) to regenerate. */
+/* Source: Figma file wte8zqzyrBAkUi6a0Eb0ts, color mode "ERA", layout mode "ERA". Captured 2026-07-24. */
+
+:root {
+  --color-text-primary: #0a0a0a;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #79716b;
+  --color-text-inverse: #f0e7d6;
+  --color-bg-canvas: #f0e7d6;
+  --color-bg-subtle: #e8dfcb;
+  --color-bg-sunken: #ded3bb;
+  --color-bg-card: #ffffff;
+  --color-bg-inverse: #0a0a0a;
+  --color-border-default: #d6d3d1;
+  --color-border-strong: #b8b2ac;
+  --color-accent-default: #3868c6;
+  --color-accent-subtle: #dee4f4;
+  --color-brand-gold: #dba34e;
+  --color-brand-stone: #878286;
+  --color-brand-violet: #d88b33;
+  --color-brand-cyan: #fbf7ba;
+  --color-brand-midnight: #19120f;
+  --color-brand-relay-blue: #3868c6;
+  --color-signal-live: #3868c6;
+  --color-signal-degraded: #d88b33;
+  --color-signal-down: #6a2a11;
+  --color-signal-beta: #3868c6;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  --text-display-xl-font-family: var(--font-family-gilda-display);
+  --text-display-xl-font-weight: 400;
+  --text-display-xl-font-style: normal;
+  --text-display-xl-font-size: 76px;
+  --text-display-xl-line-height: 80px;
+  --text-display-xl-letter-spacing: -0.5px;
+  --text-display-l-font-family: var(--font-family-gilda-display);
+  --text-display-l-font-weight: 400;
+  --text-display-l-font-style: normal;
+  --text-display-l-font-size: 56px;
+  --text-display-l-line-height: 62px;
+  --text-display-l-letter-spacing: -0.5px;
+  --text-heading-1-font-family: var(--font-family-gilda-display);
+  --text-heading-1-font-weight: 400;
+  --text-heading-1-font-style: normal;
+  --text-heading-1-font-size: 40px;
+  --text-heading-1-line-height: 48px;
+  --text-heading-1-letter-spacing: 0px;
+  --text-heading-2-font-family: var(--font-family-gilda-display);
+  --text-heading-2-font-weight: 400;
+  --text-heading-2-font-style: normal;
+  --text-heading-2-font-size: 30px;
+  --text-heading-2-line-height: 38px;
+  --text-heading-2-letter-spacing: 0px;
+  --text-heading-3-font-family: var(--font-family-gilda-display);
+  --text-heading-3-font-weight: 400;
+  --text-heading-3-font-style: normal;
+  --text-heading-3-font-size: 26px;
+  --text-heading-3-line-height: 34px;
+  --text-heading-3-letter-spacing: 0px;
+  --text-heading-4-font-family: var(--font-family-public-sans);
+  --text-heading-4-font-weight: 600;
+  --text-heading-4-font-style: normal;
+  --text-heading-4-font-size: 16px;
+  --text-heading-4-line-height: 24px;
+  --text-heading-4-letter-spacing: 0px;
+  --text-body-large-font-family: var(--font-family-newsreader);
+  --text-body-large-font-weight: 400;
+  --text-body-large-font-style: normal;
+  --text-body-large-font-size: 20px;
+  --text-body-large-line-height: 32px;
+  --text-body-large-letter-spacing: 0px;
+  --text-body-default-font-family: var(--font-family-newsreader);
+  --text-body-default-font-weight: 400;
+  --text-body-default-font-style: normal;
+  --text-body-default-font-size: 17px;
+  --text-body-default-line-height: 27px;
+  --text-body-default-letter-spacing: 0px;
+  --text-body-small-font-family: var(--font-family-newsreader);
+  --text-body-small-font-weight: 400;
+  --text-body-small-font-style: normal;
+  --text-body-small-font-size: 15px;
+  --text-body-small-line-height: 24px;
+  --text-body-small-letter-spacing: 0px;
+  --text-editorial-lead-font-family: var(--font-family-newsreader);
+  --text-editorial-lead-font-weight: 400;
+  --text-editorial-lead-font-style: italic;
+  --text-editorial-lead-font-size: 24px;
+  --text-editorial-lead-line-height: 36px;
+  --text-editorial-lead-letter-spacing: 0px;
+  --text-editorial-body-font-family: var(--font-family-newsreader);
+  --text-editorial-body-font-weight: 400;
+  --text-editorial-body-font-style: normal;
+  --text-editorial-body-font-size: 18px;
+  --text-editorial-body-line-height: 30px;
+  --text-editorial-body-letter-spacing: 0px;
+  --text-editorial-quote-font-family: var(--font-family-newsreader);
+  --text-editorial-quote-font-weight: 400;
+  --text-editorial-quote-font-style: italic;
+  --text-editorial-quote-font-size: 26px;
+  --text-editorial-quote-line-height: 40px;
+  --text-editorial-quote-letter-spacing: 0px;
+  --text-ui-label-font-family: var(--font-family-public-sans);
+  --text-ui-label-font-weight: 600;
+  --text-ui-label-font-style: normal;
+  --text-ui-label-font-size: 16px;
+  --text-ui-label-line-height: 22px;
+  --text-ui-label-letter-spacing: 0px;
+  --text-ui-caption-font-family: var(--font-family-public-sans);
+  --text-ui-caption-font-weight: 400;
+  --text-ui-caption-font-style: normal;
+  --text-ui-caption-font-size: 14px;
+  --text-ui-caption-line-height: 20px;
+  --text-ui-caption-letter-spacing: 0px;
+  --text-ui-eyebrow-font-family: var(--font-family-jetbrains-mono);
+  --text-ui-eyebrow-font-weight: 400;
+  --text-ui-eyebrow-font-style: normal;
+  --text-ui-eyebrow-font-size: 13px;
+  --text-ui-eyebrow-line-height: 18px;
+  --text-ui-eyebrow-letter-spacing: 15px;
+  --text-mono-body-font-family: var(--font-family-jetbrains-mono);
+  --text-mono-body-font-weight: 400;
+  --text-mono-body-font-style: normal;
+  --text-mono-body-font-size: 14px;
+  --text-mono-body-line-height: 20px;
+  --text-mono-body-letter-spacing: 0px;
+  --text-mono-meta-font-family: var(--font-family-jetbrains-mono);
+  --text-mono-meta-font-weight: 400;
+  --text-mono-meta-font-style: normal;
+  --text-mono-meta-font-size: 12px;
+  --text-mono-meta-line-height: 16px;
+  --text-mono-meta-letter-spacing: 8px;
+}
+
+.text-display-xl {
+  font-family: var(--text-display-xl-font-family);
+  font-weight: var(--text-display-xl-font-weight);
+  font-style: var(--text-display-xl-font-style);
+  font-size: var(--text-display-xl-font-size);
+  line-height: var(--text-display-xl-line-height);
+  letter-spacing: var(--text-display-xl-letter-spacing);
+}
+
+.text-display-l {
+  font-family: var(--text-display-l-font-family);
+  font-weight: var(--text-display-l-font-weight);
+  font-style: var(--text-display-l-font-style);
+  font-size: var(--text-display-l-font-size);
+  line-height: var(--text-display-l-line-height);
+  letter-spacing: var(--text-display-l-letter-spacing);
+}
+
+.text-heading-1 {
+  font-family: var(--text-heading-1-font-family);
+  font-weight: var(--text-heading-1-font-weight);
+  font-style: var(--text-heading-1-font-style);
+  font-size: var(--text-heading-1-font-size);
+  line-height: var(--text-heading-1-line-height);
+  letter-spacing: var(--text-heading-1-letter-spacing);
+}
+
+.text-heading-2 {
+  font-family: var(--text-heading-2-font-family);
+  font-weight: var(--text-heading-2-font-weight);
+  font-style: var(--text-heading-2-font-style);
+  font-size: var(--text-heading-2-font-size);
+  line-height: var(--text-heading-2-line-height);
+  letter-spacing: var(--text-heading-2-letter-spacing);
+}
+
+.text-heading-3 {
+  font-family: var(--text-heading-3-font-family);
+  font-weight: var(--text-heading-3-font-weight);
+  font-style: var(--text-heading-3-font-style);
+  font-size: var(--text-heading-3-font-size);
+  line-height: var(--text-heading-3-line-height);
+  letter-spacing: var(--text-heading-3-letter-spacing);
+}
+
+.text-heading-4 {
+  font-family: var(--text-heading-4-font-family);
+  font-weight: var(--text-heading-4-font-weight);
+  font-style: var(--text-heading-4-font-style);
+  font-size: var(--text-heading-4-font-size);
+  line-height: var(--text-heading-4-line-height);
+  letter-spacing: var(--text-heading-4-letter-spacing);
+}
+
+.text-body-large {
+  font-family: var(--text-body-large-font-family);
+  font-weight: var(--text-body-large-font-weight);
+  font-style: var(--text-body-large-font-style);
+  font-size: var(--text-body-large-font-size);
+  line-height: var(--text-body-large-line-height);
+  letter-spacing: var(--text-body-large-letter-spacing);
+}
+
+.text-body-default {
+  font-family: var(--text-body-default-font-family);
+  font-weight: var(--text-body-default-font-weight);
+  font-style: var(--text-body-default-font-style);
+  font-size: var(--text-body-default-font-size);
+  line-height: var(--text-body-default-line-height);
+  letter-spacing: var(--text-body-default-letter-spacing);
+}
+
+.text-body-small {
+  font-family: var(--text-body-small-font-family);
+  font-weight: var(--text-body-small-font-weight);
+  font-style: var(--text-body-small-font-style);
+  font-size: var(--text-body-small-font-size);
+  line-height: var(--text-body-small-line-height);
+  letter-spacing: var(--text-body-small-letter-spacing);
+}
+
+.text-editorial-lead {
+  font-family: var(--text-editorial-lead-font-family);
+  font-weight: var(--text-editorial-lead-font-weight);
+  font-style: var(--text-editorial-lead-font-style);
+  font-size: var(--text-editorial-lead-font-size);
+  line-height: var(--text-editorial-lead-line-height);
+  letter-spacing: var(--text-editorial-lead-letter-spacing);
+}
+
+.text-editorial-body {
+  font-family: var(--text-editorial-body-font-family);
+  font-weight: var(--text-editorial-body-font-weight);
+  font-style: var(--text-editorial-body-font-style);
+  font-size: var(--text-editorial-body-font-size);
+  line-height: var(--text-editorial-body-line-height);
+  letter-spacing: var(--text-editorial-body-letter-spacing);
+}
+
+.text-editorial-quote {
+  font-family: var(--text-editorial-quote-font-family);
+  font-weight: var(--text-editorial-quote-font-weight);
+  font-style: var(--text-editorial-quote-font-style);
+  font-size: var(--text-editorial-quote-font-size);
+  line-height: var(--text-editorial-quote-line-height);
+  letter-spacing: var(--text-editorial-quote-letter-spacing);
+}
+
+.text-ui-label {
+  font-family: var(--text-ui-label-font-family);
+  font-weight: var(--text-ui-label-font-weight);
+  font-style: var(--text-ui-label-font-style);
+  font-size: var(--text-ui-label-font-size);
+  line-height: var(--text-ui-label-line-height);
+  letter-spacing: var(--text-ui-label-letter-spacing);
+}
+
+.text-ui-caption {
+  font-family: var(--text-ui-caption-font-family);
+  font-weight: var(--text-ui-caption-font-weight);
+  font-style: var(--text-ui-caption-font-style);
+  font-size: var(--text-ui-caption-font-size);
+  line-height: var(--text-ui-caption-line-height);
+  letter-spacing: var(--text-ui-caption-letter-spacing);
+}
+
+.text-ui-eyebrow {
+  font-family: var(--text-ui-eyebrow-font-family);
+  font-weight: var(--text-ui-eyebrow-font-weight);
+  font-style: var(--text-ui-eyebrow-font-style);
+  font-size: var(--text-ui-eyebrow-font-size);
+  line-height: var(--text-ui-eyebrow-line-height);
+  letter-spacing: var(--text-ui-eyebrow-letter-spacing);
+}
+
+.text-mono-body {
+  font-family: var(--text-mono-body-font-family);
+  font-weight: var(--text-mono-body-font-weight);
+  font-style: var(--text-mono-body-font-style);
+  font-size: var(--text-mono-body-font-size);
+  line-height: var(--text-mono-body-line-height);
+  letter-spacing: var(--text-mono-body-letter-spacing);
+}
+
+.text-mono-meta {
+  font-family: var(--text-mono-meta-font-family);
+  font-weight: var(--text-mono-meta-font-weight);
+  font-style: var(--text-mono-meta-font-style);
+  font-size: var(--text-mono-meta-font-size);
+  line-height: var(--text-mono-meta-line-height);
+  letter-spacing: var(--text-mono-meta-letter-spacing);
+}

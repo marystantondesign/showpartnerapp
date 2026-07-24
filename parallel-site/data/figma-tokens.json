@@ -1,0 +1,62 @@
+{
+  "source": {
+    "fileKey": "wte8zqzyrBAkUi6a0Eb0ts",
+    "colorMode": "ERA",
+    "layoutMode": "ERA",
+    "capturedAt": "2026-07-24",
+    "capturedVia": "get_variable_defs (MCP), sampled across nodes 56:837, 56:974, 56:1057, 56:1142, 56:1225, 56:1321, 56:1508",
+    "note": "No Figma personal access token was available in this environment, so this snapshot was hand-assembled from MCP tool responses rather than the variables/local REST endpoint. Re-run with --refresh and FIGMA_TOKEN set to pull authoritative values (all modes, not just ERA) directly from Figma.",
+    "unconfirmed": ["signal/beta — no ERA-mode-bound node referenced this variable in the sampled pages; value inferred from the Default-mode snapshot where signal/beta matched accent/default exactly, and carried forward as the same alias under ERA. Confirm directly in Figma before treating as final."]
+  },
+  "color": {
+    "text/primary": "#0a0a0a",
+    "text/secondary": "#57534e",
+    "text/muted": "#79716b",
+    "text/inverse": "#f0e7d6",
+    "bg/canvas": "#f0e7d6",
+    "bg/subtle": "#e8dfcb",
+    "bg/sunken": "#ded3bb",
+    "bg/card": "#ffffff",
+    "bg/inverse": "#0a0a0a",
+    "border/default": "#d6d3d1",
+    "border/strong": "#b8b2ac",
+    "accent/default": "#3868c6",
+    "accent/subtle": "#dee4f4",
+    "brand/gold": "#dba34e",
+    "brand/stone": "#878286",
+    "brand/violet": "#d88b33",
+    "brand/cyan": "#fbf7ba",
+    "brand/midnight": "#19120f",
+    "brand/relay-blue": "#3868c6",
+    "signal/live": "#3868c6",
+    "signal/degraded": "#d88b33",
+    "signal/down": "#6a2a11",
+    "signal/beta": "#3868c6"
+  },
+  "radius": {
+    "sm": 10,
+    "md": 14,
+    "lg": 20,
+    "xl": 26,
+    "full": 9999
+  },
+  "textStyles": {
+    "ERA/Display/XL": { "fontFamily": "Gilda Display", "fontStyle": "normal", "fontWeight": 400, "fontSize": 76, "lineHeight": 80, "letterSpacing": -0.5, "textCase": "none" },
+    "ERA/Display/L": { "fontFamily": "Gilda Display", "fontStyle": "normal", "fontWeight": 400, "fontSize": 56, "lineHeight": 62, "letterSpacing": -0.5, "textCase": "none" },
+    "ERA/Heading/1": { "fontFamily": "Gilda Display", "fontStyle": "normal", "fontWeight": 400, "fontSize": 40, "lineHeight": 48, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Heading/2": { "fontFamily": "Gilda Display", "fontStyle": "normal", "fontWeight": 400, "fontSize": 30, "lineHeight": 38, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Heading/3": { "fontFamily": "Gilda Display", "fontStyle": "normal", "fontWeight": 400, "fontSize": 26, "lineHeight": 34, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Heading/4": { "fontFamily": "Public Sans", "fontStyle": "normal", "fontWeight": 600, "fontSize": 16, "lineHeight": 24, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Body/Large": { "fontFamily": "Newsreader", "fontStyle": "normal", "fontWeight": 400, "fontSize": 20, "lineHeight": 32, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Body/Default": { "fontFamily": "Newsreader", "fontStyle": "normal", "fontWeight": 400, "fontSize": 17, "lineHeight": 27, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Body/Small": { "fontFamily": "Newsreader", "fontStyle": "normal", "fontWeight": 400, "fontSize": 15, "lineHeight": 24, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Editorial/Lead": { "fontFamily": "Newsreader", "fontStyle": "italic", "fontWeight": 400, "fontSize": 24, "lineHeight": 36, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Editorial/Body": { "fontFamily": "Newsreader", "fontStyle": "normal", "fontWeight": 400, "fontSize": 18, "lineHeight": 30, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Editorial/Quote": { "fontFamily": "Newsreader", "fontStyle": "italic", "fontWeight": 400, "fontSize": 26, "lineHeight": 40, "letterSpacing": 0, "textCase": "none" },
+    "ERA/UI/Label": { "fontFamily": "Public Sans", "fontStyle": "normal", "fontWeight": 600, "fontSize": 16, "lineHeight": 22, "letterSpacing": 0, "textCase": "none" },
+    "ERA/UI/Caption": { "fontFamily": "Public Sans", "fontStyle": "normal", "fontWeight": 400, "fontSize": 14, "lineHeight": 20, "letterSpacing": 0, "textCase": "none" },
+    "ERA/UI/Eyebrow": { "fontFamily": "JetBrains Mono", "fontStyle": "normal", "fontWeight": 400, "fontSize": 13, "lineHeight": 18, "letterSpacing": 15, "textCase": "none" },
+    "ERA/Mono/Body": { "fontFamily": "JetBrains Mono", "fontStyle": "normal", "fontWeight": 400, "fontSize": 14, "lineHeight": 20, "letterSpacing": 0, "textCase": "none" },
+    "ERA/Mono/Meta": { "fontFamily": "JetBrains Mono", "fontStyle": "normal", "fontWeight": 400, "fontSize": 12, "lineHeight": 16, "letterSpacing": 8, "textCase": "none" }
+  }
+}

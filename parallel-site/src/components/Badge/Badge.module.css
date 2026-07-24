@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-subtle);
+  font-family: var(--text-mono-meta-font-family);
+  font-weight: var(--text-mono-meta-font-weight);
+  font-size: var(--text-mono-meta-font-size);
+  line-height: var(--text-mono-meta-line-height);
+  letter-spacing: var(--text-mono-meta-letter-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.included {
+  color: var(--color-text-muted);
+}
+
+.publicBeta {
+  color: var(--color-accent-default);
+}
+
+.comingSoon {
+  color: var(--color-signal-beta);
+}

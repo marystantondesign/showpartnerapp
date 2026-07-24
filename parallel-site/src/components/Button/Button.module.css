@@ -1,0 +1,30 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--text-ui-label-font-family);
+  font-weight: var(--text-ui-label-font-weight);
+  font-size: var(--text-ui-label-font-size);
+  line-height: var(--text-ui-label-line-height);
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.accent {
+  background: var(--color-accent-default);
+  color: var(--color-text-inverse);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
+}

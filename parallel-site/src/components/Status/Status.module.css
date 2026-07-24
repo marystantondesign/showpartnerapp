@@ -1,0 +1,62 @@
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 520px;
+  max-width: 100%;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.operational {
+  background: var(--color-signal-live);
+}
+
+.degraded {
+  background: var(--color-signal-degraded);
+}
+
+.down {
+  background: var(--color-signal-down);
+}
+
+.label {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: var(--text-body-default-font-family);
+  font-size: var(--text-body-default-font-size);
+  line-height: var(--text-body-default-line-height);
+  color: var(--color-text-primary);
+}
+
+.state {
+  flex-shrink: 0;
+  font-family: var(--text-mono-meta-font-family);
+  font-weight: var(--text-mono-meta-font-weight);
+  font-size: var(--text-mono-meta-font-size);
+  line-height: var(--text-mono-meta-line-height);
+  letter-spacing: var(--text-mono-meta-letter-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stateOperational {
+  color: var(--color-text-muted);
+}
+
+.stateDegraded {
+  color: var(--color-signal-degraded);
+}
+
+.stateDown {
+  color: var(--color-signal-down);
+}
