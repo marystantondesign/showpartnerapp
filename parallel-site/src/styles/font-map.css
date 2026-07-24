@@ -1,9 +1,0 @@
-/* Maps the font-family names declared in Figma (see tokens.css) to the
-   font files loaded via next/font/google in src/lib/fonts.ts. */
-:root {
-  --font-family-fascinate: var(--font-fascinate), cursive;
-  --font-family-gilda-display: var(--font-gilda-display), Georgia, serif;
-  --font-family-newsreader: var(--font-newsreader), Georgia, serif;
-  --font-family-public-sans: var(--font-public-sans), -apple-system, sans-serif;
-  --font-family-jetbrains-mono: var(--font-jetbrains-mono), "Courier New", monospace;
-}
