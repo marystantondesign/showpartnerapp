@@ -588,7 +588,7 @@ function WrapDetail({ show, reviewArtists, receipts, dark }) {
               ))}
               {/* Lead review */}
               <div style={{ background:dark?'#2A2724':'#F9F7F5', borderRadius:8, padding:'14px 16px', marginTop:14 }}>
-                <p style={{ margin:'0 0 6px', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:'#D4A853' }}>LEAD REVIEW · JEN Z</p>
+                <p style={{ margin:'0 0 6px', fontFamily:'Inter,system-ui', fontSize:9, letterSpacing:'0.1em', textTransform:'uppercase', color:'#D4A853' }}>PRODUCER REVIEW · JEN Z</p>
                 <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
                   <Stars n={Math.round(artist.avgRating)} size={14} />
                   <span style={{ fontFamily:'Inter,system-ui', fontSize:11, color:muted }}>May 25, 2026</span>
@@ -1158,7 +1158,7 @@ export default function AgentDesktopView({ dark, onToggleDark, onLogOut }) {
           {nav==='emergency' && (
             <div>
               <p style={{ margin:'0 0 6px', fontFamily:'Georgia,serif', fontSize:28, color:text }}>Emergency Board</p>
-              <p style={{ margin:'0 0 24px', fontFamily:'Inter,system-ui', fontSize:12, color:muted }}>Incidents logged by the on-site Lead · read only</p>
+              <p style={{ margin:'0 0 24px', fontFamily:'Inter,system-ui', fontSize:12, color:muted }}>Incidents logged by the on-site Producer · read only</p>
               {incidents.length===0 ? (
                 <p style={{ fontFamily:'Inter,system-ui', fontSize:13, color:muted }}>No active incidents.</p>
               ) : incidents.map((inc,i)=>(
