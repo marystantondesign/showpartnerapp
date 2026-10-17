@@ -3,7 +3,9 @@ import { models as initModels, notifications as initNotifs, profiles, schedule a
 import RoleSelect from './components/RoleSelect'
 import ShowHistory from './components/ShowHistory'
 import AgentDesktopView from './views/AgentDesktopView'
+import ProducerIPadView from './views/ProducerIPadView'
 import { useIsDesktop } from './hooks/useIsDesktop'
+import { useIsTablet } from './hooks/useIsTablet'
 import TopBar from './components/TopBar'
 import BottomNav from './components/BottomNav'
 import Toast from './components/Toast'
@@ -65,6 +67,7 @@ function profileForRole(role) {
 
 export default function App() {
   const isDesktop = useIsDesktop()
+  const isTablet  = useIsTablet()
   const [selectedRole, setSelectedRole]     = useState(null)
   const [dark, setDark]                     = useState(false)
   const [tab, setTab]                       = useState('home')
@@ -127,6 +130,11 @@ export default function App() {
   // Agent on desktop → full separate layout
   if (selectedRole === 'agent' && isDesktop) {
     return <AgentDesktopView dark={dark} onToggleDark={toggleDark} onLogOut={handleLogOut} />
+  }
+
+  // Producer on tablet/desktop → full-screen iPad layout
+  if (selectedRole === 'lead' && isTablet) {
+    return <ProducerIPadView onLogOut={handleLogOut} />
   }
 
   return (
