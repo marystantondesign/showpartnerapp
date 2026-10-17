@@ -27,7 +27,7 @@ function useSystemDark() {
   return dark
 }
 
-function Card({ name, descriptor, disabled, agentBorder, onClick, dark }) {
+function Card({ name, descriptor, disabled, onClick, dark }) {
   const [hovered, setHovered] = useState(false)
 
   const cardBg    = dark ? '#242220' : '#FFFFFF'
@@ -42,7 +42,7 @@ function Card({ name, descriptor, disabled, agentBorder, onClick, dark }) {
       style={{
         background: cardBg,
         borderRadius: 10,
-        border: agentBorder ? '1.5px solid #8A9E89' : '1.5px solid transparent',
+        border: hovered && !disabled ? '1.5px solid #8A9E89' : '1.5px solid transparent',
         cursor: disabled ? 'default' : 'pointer',
         display: 'flex',
         flexDirection: 'column',
@@ -170,15 +170,14 @@ export default function RoleSelect({ onSelect }) {
           <Card
             name="Agent"
             descriptor="Off-site coordination"
-            agentBorder
             dark={dark}
             onClick={() => onSelect('agent')}
           />
           <Card
             name="Producer"
-            descriptor="Coming soon"
-            disabled
+            descriptor="On-site coordination"
             dark={dark}
+            onClick={() => onSelect('lead')}
           />
         </div>
       )}
