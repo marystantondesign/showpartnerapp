@@ -29,6 +29,11 @@ A coordination app for backstage beauty teams at fashion shows. The client is Je
 - Anyone can add photos or videos to a look, but specific assistants are given capture duty per look so it doesn't get messy.
 - The key artist or a lead assistant sets up looks and decides which model gets which look. When a look changes, assistants see a banner with what changed.
 - Show status link: aggregate numbers only, refreshable, expires when the show ends.
+- Arrivals: the producer checks models in from the iPad (Arrived or Running late with a new ETA and note). If a new ETA lands after the walkthrough starts, warn that the model goes straight to the walkthrough.
+- After Mark Done, the model goes into a shared "Ready to check" list seen by the producer, the lead assistants and the key artist. Whoever checks first clears it for everyone. Looks Good, or Touch-up (area plus a one-line fix) which goes back to the same assistant as a banner on their Working On screen.
+- The key artist barely uses the app. Their nav is Home, Studio, Settings. Most interaction is a lock-screen notification with On my way or "[Lead], your call".
+- Looks written by a lead assistant go to the key artist to approve before assistants see them. Looks written by the key artist go straight to assistants.
+- iPad layout: landscape uses a right panel the producer can drag wider or collapse to a rail. Portrait uses a bottom drawer with two stops. See prompt 08.
 
 ## Visual system (keep the app's existing language)
 Greige background #F5F2EE, borders #E0DDD8, text #111, secondary text #4A4743 and #6E6A64. Georgia for names and headings, Inter for UI. Status colors: not started #E8E4DF, in progress #D4A853, paused #8A9BB0, done #7A9E7E, flagged #C4614A. Line icons, no emoji. Touch targets 44px minimum except the deliberate small Hand Off button.
@@ -42,3 +47,5 @@ Greige background #F5F2EE, borders #E0DDD8, text #111, secondary text #4A4743 an
 - Do uploads appear for everyone right away, or does a lead or the artist approve them first?
 - Who assigns models to looks, and when?
 - Would a seat order on arrival help new assistants?
+- Should Fully Ready count once all services are done, or only after a check?
+- Does the key artist actually approve looks a lead writes, or should those go straight out too?

@@ -1,5 +1,7 @@
 # 06 · Studio authoring (key artist or lead assistant)
 
+Update: A2 now differs by role. A lead assistant sees "Send to Yadim to approve" (assistants see it once the artist approves). The key artist sees "Share with assistants" (goes straight out, no approval). See also screens/6-key-artist (K4, K5).
+
 Screens: design-handoff/screens/6-studio-authoring/ (A1 to A5 plus A3b), sources Author-Looks, Author-Look, Author-Area, Author-Inventory, Author-Assign, Author-Changed. Only roles artist and lead_assistant see these entry points.
 
 - A1 Set up looks: "How many makeup looks today?" segmented 1 to 4, name each look (optional nickname), Next: Write Look A.

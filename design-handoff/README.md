@@ -19,10 +19,16 @@ Live link: showpartnerapp.vercel.app. Do not touch main. Work on a branch called
 | 05-studio-assistant | Studio: looks, look detail, viewer, capture and upload |
 | 06-studio-authoring | Studio: set up looks, write areas, inventory products, assign looks |
 | 07-status-link | Read-only show status page for the overall producer |
+| 08-ipad-layout | Resizable and collapsible panel, portrait drawer, spacing fixes |
+| 09-arrivals-and-checking | Model check-in, running late, ready to check, touch-ups |
+| 10-key-artist | Key artist phone: second opinion, at the station, approving and writing looks |
+
+Already ran 00 to 07? Pull this updated folder into design-handoff/ (replace the old one) and continue from 08. Prompt 06 also changed slightly (see "Update" at its top).
 
 ## What's in here
 
 - context.md: personas, decisions, glossary, what not to build, open questions
 - screens/: 2x PNG renders of every approved screen, grouped by flow (see screens/INDEX.md)
 - design-source/: the HTML source of each screen, for exact spacing, colors and copy
+- screens/INDEX.md: every screen with its PNG and source file
 - parked/: the hand-off flow. Keep the small Hand Off button, but do not build this flow yet.
