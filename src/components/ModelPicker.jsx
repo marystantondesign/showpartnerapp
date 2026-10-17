@@ -8,9 +8,19 @@ export default function ModelPicker({ models, onSend, onClose }) {
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
   }
 
+  const footer = (
+    <button
+      disabled={selected.length === 0}
+      onClick={() => onSend(selected)}
+      className="w-full py-3 text-[11px] tracking-widest uppercase font-sans bg-[#111] dark:bg-[#F0EDE8] text-white dark:text-[#111] rounded disabled:opacity-30"
+    >
+      SEND PING
+    </button>
+  )
+
   return (
-    <BottomSheet open onClose={onClose} height="70%">
-      <div className="pb-2">
+    <BottomSheet open onClose={onClose} height="70%" footer={footer}>
+      <div>
         <p className="text-[10px] tracking-widest uppercase font-sans text-[#888580] mb-4">Select models</p>
         {models.map(m => (
           <label key={m.id} className="flex items-center gap-3 py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28] cursor-pointer">
@@ -24,13 +34,6 @@ export default function ModelPicker({ models, onSend, onClose }) {
             />
           </label>
         ))}
-        <button
-          disabled={selected.length === 0}
-          onClick={() => onSend(selected)}
-          className="mt-4 w-full py-3 text-[11px] tracking-widest uppercase font-sans bg-[#111] dark:bg-[#F0EDE8] text-white dark:text-[#111] rounded disabled:opacity-30"
-        >
-          SEND PING
-        </button>
       </div>
     </BottomSheet>
   )
