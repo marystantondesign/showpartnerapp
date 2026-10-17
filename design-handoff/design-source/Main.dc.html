@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Producer iPad, show at a glance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-family:Inter,system-ui,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A64;margin:0}
+.chip{font-family:Inter,system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:4px 8px;color:#111;white-space:nowrap;justify-self:start}
+.f{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #CFCAC4;background:transparent;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#111}
+.fon{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #111;background:#111;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#fff}
+.row{display:grid;grid-template-columns:28px 36px minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr);align-items:center;column-gap:10px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#E8E4DF}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; display: flex; flex-direction: column; background: #F5F2EE; font-family: Inter, system-ui, sans-serif; color: #111">
+  <div style="flex-shrink: 0; display: flex; align-items: center; gap: 20px; padding: 12px 24px; border-bottom: 1px solid #E0DDD8">
+    <span style="font-family: Georgia, serif; font-size: 26px">Valentino SS26</span>
+    <span style="font-size: 12px; color: #4A4743">Makeup · 3:45 PM</span>
+    <span style="flex: 1"></span>
+    <button style="min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #111; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .08em; color: #111; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" aria-hidden="true"><path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"></path></svg>SHARE STATUS LINK</button>
+    <img src="/_blob/0a3feb4a34854d1403d19aea4f3cb43c" alt="Jen Zambrano" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover">
+  </div>
+
+  <div style="flex: 1; min-height: 0; display: flex">
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 16px 20px 0">
+      <div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+        <div style="background: #111; color: #F5F2EE; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+          <p class="lbl" style="color: #C9C4BE">Fully ready</p>
+          <span style="font-family: Georgia, serif; font-size: 34px; line-height: 1">8<span style="font-size: 16px; color: #C9C4BE"> / 30</span></span>
+          <div class="bar" style="background: #3A3734"><span style="width: 26.7%; background: #7A9E7E"></span></div>
+          <span style="font-size: 11px; color: #C9C4BE">Hair, makeup and nails all done</span>
+        </div>
+        <sc-for list="{{ svc }}" as="s" hint-placeholder-count="3">
+          <div style="background: #fff; border: 1px solid #E0DDD8; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+            <p class="lbl">{{ s.name }}</p>
+            <span style="font-family: Georgia, serif; font-size: 34px; line-height: 1">{{ s.done }}<span style="font-size: 16px; color: #6E6A64"> / 30 done</span></span>
+            <div class="bar"><span style="width: {{ s.dw }}; background: #7A9E7E"></span><span style="width: {{ s.iw }}; background: #D4A853"></span><span style="width: {{ s.pw }}; background: #8A9BB0"></span></div>
+            <div style="display: flex; flex-wrap: wrap; column-gap: 12px; row-gap: 2px">
+              <sc-for list="{{ s.parts }}" as="p" hint-placeholder-count="2">
+                <span style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #4A4743"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{ p.c }}"></span>{{ p.t }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="flex-shrink: 0; display: flex; gap: 8px; padding: 14px 0 6px">
+        <button class="fon">All 30</button>
+        <button class="f">Needs attention 2</button>
+        <button class="f">Not arrived 3</button>
+        <button class="f">Not paired 1</button>
+        <button class="f">Ready 8</button>
+      </div>
+
+      <div style="flex: 1; min-height: 0; overflow-y: auto">
+        <div class="row" style="position: sticky; top: 0; background: #F5F2EE; padding: 8px 0; border-bottom: 1px solid #CFCAC4">
+          <span class="lbl">Look</span><span></span><span class="lbl">Model</span><span class="lbl">Hair</span><span class="lbl">Makeup</span><span class="lbl">Nails</span><span class="lbl">Makeup assistant</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+          <div class="row" style="width: 100%; min-height: 58px; padding: 0; border: 0; border-bottom: 1px solid #E0DDD8; background: transparent; text-align: left; font-family: Inter, system-ui, sans-serif; color: #111">
+            <span style="font-size: 12px; color: #4A4743">{{ r.look }}</span>
+            <sc-if value="{{ r.img }}" hint-placeholder-val="{{ true }}"><img src="{{ r.img }}" alt="" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"></sc-if>
+            <sc-if value="{{ r.noImg }}" hint-placeholder-val="{{ false }}"><span style="width: 36px; height: 36px; border-radius: 50%; background: #E0DDD8; display: flex; align-items: center; justify-content: center; font-size: 11px">{{ r.ini }}</span></sc-if>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-family: Georgia, serif; font-size: 15px">{{ r.name }}</span><span style="font-size: 11px; color: {{ r.nc }}">{{ r.note }}</span></span>
+            <span class="chip" style="background: {{ r.h.c }}">{{ r.h.t }}</span>
+            <span class="chip" style="background: {{ r.m.c }}">{{ r.m.t }}</span>
+            <span class="chip" style="background: {{ r.n.c }}">{{ r.n.t }}</span>
+            <sc-if value="{{ r.np }}" hint-placeholder-val="{{ true }}"><span style="font-size: 12px; color: #4A4743">{{ r.who }}</span></sc-if>
+            <sc-if value="{{ r.pair }}" hint-placeholder-val="{{ false }}"><button style="justify-self: start; min-height: 36px; padding: 0 14px 0 10px; border-radius: 999px; border: 0; background: #111; color: #fff; font-family: Inter, system-ui, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .1em; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>PAIR</button></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <aside style="width: 360px; flex-shrink: 0; border-left: 1px solid #E0DDD8; display: flex; flex-direction: column">
+      <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #E0DDD8">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px"><p class="lbl">Today</p><p class="lbl">Show in 2h 15m</p></div>
+        <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="5">
+          <div style="display: flex; align-items: center; gap: 12px; min-height: 36px; padding: 0 10px; margin: 0 -10px; border-radius: 8px; background: {{ t.bg }}">
+            <span style="width: 64px; font-size: 12px; color: {{ t.tc }}">{{ t.time }}</span>
+            <span style="flex: 1; font-size: 13px; font-weight: {{ t.w }}; color: {{ t.tc }}">{{ t.label }}</span>
+            <span style="font-size: 11px; color: {{ t.sc }}">{{ t.state }}</span>
+          </div>
+        </sc-for>
+        <button style="align-self: flex-start; margin-top: 6px; min-height: 32px; padding: 0; border: 0; background: none; font-family: Inter, system-ui, sans-serif; font-size: 11px; text-decoration: underline; color: #111">Push walkthrough time</button>
+      </div>
+
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+        <p class="lbl">Announcements</p>
+        <div style="background: #fff; border: 1px solid #E0DDD8; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between"><span style="font-size: 13px; font-weight: 600">Walkthrough in 15 minutes</span><span style="font-size: 11px; color: #4A4743">Auto · 3:45</span></div>
+          <span style="font-size: 12px; color: #4A4743">To all 26 assistants</span>
+          <div class="bar"><span style="width: 84.6%; background: #111"></span></div>
+          <span style="font-size: 12px">22 got it · 3 haven't opened · 1 not delivered</span>
+          
+        </div>
+        <div style="padding: 0 2px; display: flex; justify-content: space-between"><span style="font-size: 12px; color: #4A4743">Walkthrough in 30 minutes</span><span style="font-size: 11px; color: #4A4743">Auto · 3:30 · 26 got it</span></div>
+      </div>
+
+      <div style="flex-shrink: 0; padding: 12px 20px 16px; border-top: 1px solid #E0DDD8; display: flex; flex-direction: column; gap: 8px">
+        <button style="min-height: 52px; border-radius: 8px; border: 0; background: #111; color: #fff; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .12em">START WALKTHROUGH · PAUSE ALL WORK</button>
+        <button style="min-height: 44px; border-radius: 8px; border: 1px solid #CFCAC4; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; color: #111">NEW ANNOUNCEMENT</button>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const S = { ns:{c:'#E8E4DF',t:'Not started'}, ip:{c:'#D4A853',t:'In progress'}, pa:{c:'#8A9BB0',t:'Paused'}, nr:{c:'#C4614A',t:'Revisit'}, dn:{c:'#7A9E7E',t:'Done'} };
+    const pct = n => (n / 30 * 100).toFixed(1) + '%';
+    const svc = [['Hair',14,9,2],['Makeup',17,8,0],['Nails',9,6,0]].map(([name,done,ip,pa]) => ({ name, done, dw: pct(done), iw: pct(ip), pw: pct(pa), parts: [[ip,'in progress','#D4A853'],[pa,'paused','#8A9BB0'],[30-done-ip-pa,'not started','#CFCAC4']].filter(x => x[0] > 0).map(([n,l,c]) => ({ t: n + ' ' + l, c })) }));
+    const raw = [
+      ['01','Sofia Andersen','/_blob/1705ea7146c2879258c52a172e2bdcbe','Makeup flagged by Jen','dn','nr','ip','Ivana R'],
+      ['05','Aaliyah Jones','/_blob/25da83555fcf1ca7fad82ae9a74e05c8','Ready','dn','dn','dn','Sofia R'],
+      ['06','Mei Lin','/_blob/92535a459422f9a2aeb42fee5cce377d','Arrived 2:52','pa','ip','ns','Sofia R'],
+      ['09','Priya Sharma','/_blob/eb52f2831800e0153855e0ed84e447ed','Not arrived · ETA 3:55','ns','ns','ns','—'],
+      ['11','Amara Diallo','/_blob/2af75eeca89115daaf4090df5de1cc6c','Arrived 2:55','ip','ip','ns','Tomás V'],
+      ['13','Camille Dubois','/_blob/0145c19aa201167cced03e129ff8b0d5','Arrived 2:40','dn','ip','dn','Kenji W'],
+      ['14','Ingrid Strand','','Arrived 2:31','dn','dn','ip','Mira P'],
+      ['15','Yuki Nakamura','','Arrived 3:44','ns','ns','ns','Tap to pair']
+    ];
+    const rows = raw.map(([look,name,img,note,h,m,n,who]) => ({ look, name, img, noImg: !img, ini: name.split(' ').map(w=>w[0]).join(''), note, nc: note.startsWith('Makeup flagged') || note.startsWith('Not arrived') ? '#A33D28' : '#4A4743', h:S[h], m:S[m], n:S[n], who, pair: who === 'Tap to pair', np: who !== 'Tap to pair' }));
+    const tl = [
+      ['1:30 PM','Demo','Done','past'],
+      ['4:00 PM','Walkthrough','in 15 min','next'],
+      ['4:30 PM','Models back','','fut'],
+      ['5:00 PM','Dressing','','fut'],
+      ['6:00 PM','Show','','fut']
+    ];
+    const timeline = tl.map(([time,label,state,k]) => ({ time, label, state, bg: k==='next' ? '#111' : 'transparent', tc: k==='next' ? '#fff' : (k==='past' ? '#6E6A64' : '#111'), sc: k==='next' ? '#E8C77A' : '#6E6A64', w: k==='next' ? 600 : 400 }));
+    return { svc, rows, timeline };
+  }
+}
+</script>
+</body>
+</html>

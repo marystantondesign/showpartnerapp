@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio, looks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-family:Inter,system-ui,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A64;margin:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:10px;font-family:Inter,system-ui,sans-serif;font-size:9px;letter-spacing:.1em;color:#6E6A64;background:none;border:0}
+.tabb{flex:1;min-height:44px;border:0;border-bottom:2px solid transparent;background:none;font-family:Georgia,serif;font-size:16px;color:#6E6A64}
+.pill{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid #CFCAC4;background:transparent;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#111}
+.pillon{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid #111;background:#111;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#fff}
+.chipd{padding:5px 10px;border-radius:999px;background:rgba(17,17,17,.7);color:#F5F2EE;font-size:11px;font-family:Inter,system-ui,sans-serif}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #F5F2EE; font-family: Inter, system-ui, sans-serif; color: #111; overflow: hidden">
+  <div style="flex-shrink: 0; display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid #E0DDD8">
+    <span style="font-family: Georgia, serif; font-size: 24px">Studio</span>
+    <span style="font-size: 11px; color: #4A4743">Valentino SS26 · makeup</span>
+  </div>
+  <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+    
+    <p class="lbl">Looks</p>
+    <sc-for list="{{ looks }}" as="l" hint-placeholder-count="3">
+      <button style="display: flex; gap: 14px; padding: 12px; border-radius: 12px; border: {{ l.bd }}; background: #fff; text-align: left; font-family: Inter, system-ui, sans-serif; color: #111">
+        <span style="position: relative; width: 84px; height: 104px; flex-shrink: 0; border-radius: 8px; overflow: hidden; background: #E0DDD8; display: flex; align-items: center; justify-content: center">
+          <sc-if value="{{ l.img }}" hint-placeholder-val="{{ true }}"><img src="{{ l.img }}" alt="" style="width: 100%; height: 100%; object-fit: cover"></sc-if>
+          <sc-if value="{{ l.noImg }}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; color: #4A4743; text-align: center; padding: 6px">No demo yet</span></sc-if>
+        </span>
+        <span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <span style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: Georgia, serif; font-size: 20px">{{ l.name }}</span><span style="font-size: 11px; color: #4A4743">{{ l.models }}</span></span>
+          <span style="font-size: 12px; color: #2E2C29">{{ l.media }}</span>
+          <span style="font-size: 11px; color: #4A4743">{{ l.cap }}</span>
+        </span>
+      </button>
+    </sc-for>
+  </div>
+  <nav style="flex-shrink: 0; height: 72px; display: flex; border-top: 1px solid #E0DDD8; background: #F5F2EE; opacity: 1">
+    <button class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"></path></svg>HOME</button>
+    <button class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"></path></svg>MGMT</button>
+    <button class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="4" width="7" height="7"></rect><rect x="13" y="4" width="7" height="7"></rect><rect x="4" y="13" width="7" height="7"></rect><rect x="13" y="13" width="7" height="7"></rect></svg>LINEUP</button>
+    <button class="tab" style="color: #111111"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span style="color: #2e2c29">STUDIO</span></button>
+    <button class="tab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>SETTINGS</button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const looks = [
+      ['Look A','14 models','Demo + 5 photos · 2 clips','Capturing: you, Lena S','/_blob/1705ea7146c2879258c52a172e2bdcbe',true],
+      ['Look B','9 models','Demo + 4 photos · 1 clip','Capturing: Dara O','/_blob/0145c19aa201167cced03e129ff8b0d5',false],
+      ['Look C','7 models','Demo at 2:15 PM','Capturing: Tomás V','',false]
+    ].map(([name,models,media,cap,img,mine]) => ({ name, models, media, cap, img, noImg: !img, mine, bd: mine ? '1.5px solid #111' : '1px solid #E0DDD8' }));
+    return { looks };
+  }
+}
+</script>
+</body>
+</html>

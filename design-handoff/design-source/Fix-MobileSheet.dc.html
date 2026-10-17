@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Show status link</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-family:Inter,system-ui,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A64;margin:0}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:#E8E4DF;gap:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow-y: auto; background: #F5F2EE; font-family: Inter, system-ui, sans-serif; color: #111; display: flex; flex-direction: column">
+  <div style="padding: 24px 20px 8px; display: flex; flex-direction: column; gap: 6px">
+    <p class="lbl">Show Partner · backstage beauty</p>
+    <h1 style="margin: 0; font-family: Georgia, serif; font-size: 32px; font-weight: 400">Valentino SS26</h1>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4A4743">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #5E8A63"></span>Live · updated 3:45 PM
+      <span style="flex: 1"></span>
+      <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #CFCAC4; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 11px; color: #111">Refresh</button>
+    </div>
+  </div>
+
+  <div style="margin: 12px 20px 0; background: #fff; border: 1px solid #E0DDD8; border-radius: 18px; padding: 24px 20px; display: flex; align-items: center; gap: 20px">
+    <div style="position: relative; width: 150px; height: 150px; flex-shrink: 0">
+      <svg width="150" height="150" viewBox="0 0 180 180" aria-hidden="true"><circle cx="90" cy="90" r="78" fill="none" stroke="#E8E4DF" stroke-width="14"></circle><circle cx="90" cy="90" r="78" fill="none" stroke="#7A9E7E" stroke-width="14" stroke-linecap="round" stroke-dasharray="130.7 490.1" transform="rotate(-90 90 90)"></circle></svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-family: Georgia, serif; font-size: 40px; line-height: 1">27%</span><span style="font-size: 11px; color: #4A4743; margin-top: 4px">fully ready</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-direction: column; gap: 2px"><p class="lbl">Ready</p><span style="font-family: Georgia, serif; font-size: 24px">8 <span style="font-size: 14px; color: #6E6A64">of 30</span></span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><p class="lbl">Show in</p><span style="font-family: Georgia, serif; font-size: 24px">2h 15m</span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px"><p class="lbl">Not arrived</p><span style="font-family: Georgia, serif; font-size: 24px">3</span></div>
+    </div>
+  </div>
+
+  <div style="padding: 24px 20px 0; display: flex; flex-direction: column; gap: 18px">
+    <p class="lbl">By team</p>
+    <sc-for list="{{ teams }}" as="t" hint-placeholder-count="3">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: Georgia, serif; font-size: 18px">{{ t.name }}</span><span style="font-size: 12px; color: #4A4743">{{ t.done }} of 30 done</span></div>
+        <div class="bar"><span style="width: {{ t.dw }}; background: #7A9E7E"></span><span style="width: {{ t.iw }}; background: #D4A853"></span><span style="width: {{ t.pw }}; background: #8A9BB0"></span></div>
+        <span style="font-size: 11px; color: #4A4743">{{ t.detail }}</span>
+      </div>
+    </sc-for>
+    <div style="display: flex; gap: 14px; font-size: 11px; color: #4A4743">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #7A9E7E"></span>Done</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D4A853"></span>In progress</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #8A9BB0"></span>Paused</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #E8E4DF"></span>Not started</span>
+    </div>
+  </div>
+
+  <div style="padding: 24px 20px 0; display: flex; flex-direction: column">
+    <p class="lbl" style="margin-bottom: 4px">Next up</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 14px; font-weight: 600">Walkthrough</span><span style="font-size: 13px">4:00 PM · in 15 min</span></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 14px">Dressing</span><span style="font-size: 13px; color: #4A4743">5:00 PM</span></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 14px">Show</span><span style="font-size: 13px; color: #4A4743">6:00 PM</span></div>
+  </div>
+
+  <p style="margin: 0; padding: 24px 20px 32px; font-size: 11px; line-height: 1.6; color: #4A4743">Shared by Jen Zambrano, Makeup Producer. This link stops working when the show ends.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = n => (n / 30 * 100).toFixed(1) + '%';
+    const teams = [['Hair',14,9,2],['Makeup',17,8,0],['Nails',9,6,0]].map(([name,d,i,pa]) => ({ name, done: d, dw: p(d), iw: p(i), pw: p(pa), detail: `${i} in progress${pa ? ` · ${pa} paused` : ''} · ${30-d-i-pa} not started` }));
+    return { teams };
+  }
+}
+</script>
+</body>
+</html>
