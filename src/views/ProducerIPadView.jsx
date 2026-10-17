@@ -471,16 +471,18 @@ function ConfirmModal({ onConfirm, onCancel }) {
 }
 
 // ── ProducerIPadView ──────────────────────────────────────────────────────────
-export default function ProducerIPadView({ onLogOut }) {
-  const [models, setModels]           = useState(initModels)
+export default function ProducerIPadView({
+  models, setModels,
+  walkthroughPhase, setWalkthroughPhase,
+  announcements, setAnnouncements,
+  onLogOut,
+}) {
   const [panel, setPanel]             = useState('default')
   const [pairModel, setPairModel]     = useState(null)
   const [pairAssist, setPairAssist]   = useState(null)
-  const [wkPhase, setWkPhase]         = useState('upcoming') // 'upcoming' | 'in_progress'
   const [wkElapsed, setWkElapsed]     = useState(0)
   const [wkStartedAt, setWkStartedAt] = useState('')
   const [filter, setFilter]           = useState('all')
-  const [announcements, setAnnouncements] = useState(initAnnouncements)
   const [composeMsg, setComposeMsg]   = useState('')
   const [composeTo, setComposeTo]     = useState('all')
   const [currentTime, setCurrentTime] = useState(fmtNow)
@@ -491,12 +493,12 @@ export default function ProducerIPadView({ onLogOut }) {
   }, [])
 
   useEffect(() => {
-    if (wkPhase !== 'in_progress') return
+    if (walkthroughPhase !== 'in_progress') return
     const iv = setInterval(() => setWkElapsed(e => e + 1), 60000)
     return () => clearInterval(iv)
-  }, [wkPhase])
+  }, [walkthroughPhase])
 
-  const wkActive  = wkPhase === 'in_progress'
+  const wkActive  = walkthroughPhase === 'in_progress'
   const producer  = profiles.find(p => p.role === 'lead') || profiles[0]
 
   // ── Derived stats ──────────────────────────────────────────────────────────
@@ -574,20 +576,21 @@ export default function ProducerIPadView({ onLogOut }) {
 
   function handleStartWalkthrough() {
     const t = fmtNow()
-    setWkPhase('in_progress')
+    setWalkthroughPhase('in_progress')
     setWkElapsed(0)
     setWkStartedAt(t)
     setAnnouncements(prev => [{
       id: `ann-wk-${Date.now()}`,
       text: 'Walkthrough now · work paused',
       sentAt: t, sentBy: 'p1',
+      ackedBy: [],
       delivery: { got: 25, unopened: 1, undelivered: 0 },
     }, ...prev])
     setPanel('default')
   }
 
   function handleModelsBack() {
-    setWkPhase('upcoming')
+    setWalkthroughPhase('upcoming')
     setPanel('default')
   }
 

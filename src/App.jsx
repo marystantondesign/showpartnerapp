@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { models as initModels, notifications as initNotifs, profiles, schedule as initSchedule } from './data/mockData'
+import { models as initModels, notifications as initNotifs, profiles, schedule as initSchedule, announcements as initAnnouncements, timeline } from './data/mockData'
 import RoleSelect from './components/RoleSelect'
 import ShowHistory from './components/ShowHistory'
 import AgentDesktopView from './views/AgentDesktopView'
@@ -16,6 +16,7 @@ import LineupView from './views/LineupView'
 import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 import StudioView from './views/StudioView'
+import AssistantHomeView from './views/AssistantHomeView'
 
 // Default venue — Agger Fish Building, Brooklyn, NY
 // Zones have both a centroid (xPct/yPct) and a polygon array for proper SVG rendering
@@ -79,6 +80,9 @@ export default function App() {
   const [venue, setVenue]                   = useState(DEFAULT_VENUE)
   const [schedule, setSchedule]             = useState(initSchedule)
   const [showHistoryOpen, setShowHistoryOpen] = useState(false)
+  const [walkthroughPhase, setWalkthroughPhase] = useState('upcoming')
+  const [announcements, setAnnouncements]   = useState(() => initAnnouncements.map(a => ({ ...a, ackedBy: [] })))
+  const [leadChecks, setLeadChecks]         = useState([])
 
   function handleRoleSelect(role) {
     setCurrentProfile(profileForRole(role))
@@ -121,6 +125,43 @@ export default function App() {
     }))
   }
 
+  function handleAckAnnouncement(annId) {
+    setAnnouncements(prev => prev.map(a =>
+      a.id === annId ? { ...a, ackedBy: [...(a.ackedBy || []), currentProfile.id] } : a
+    ))
+  }
+
+  function handleLeadCheck(modelId, elapsed, look, modelName, specialty) {
+    const model = models.find(m => m.id === modelId)
+    setLeadChecks(prev => [...prev, {
+      id: `check-${Date.now()}`,
+      modelId,
+      modelName,
+      modelLook: look,
+      modelAvatar: model?.avatar || null,
+      assistantId: currentProfile.id,
+      assistantName: currentProfile.name,
+      assistantFirstName: currentProfile.name.split(' ')[0],
+      specialty,
+      elapsedMins: elapsed,
+      createdAt: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      claimedBy: null,
+      claimedAt: null,
+    }])
+  }
+
+  function handleClaimCheck(checkId) {
+    setLeadChecks(prev => prev.map(c =>
+      c.id === checkId
+        ? { ...c, claimedBy: currentProfile.id, claimedAt: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) }
+        : c
+    ))
+  }
+
+  function handleEscalateCheck(checkId) {
+    setLeadChecks(prev => prev.filter(c => c.id !== checkId))
+  }
+
   const showToast = useCallback((msg) => setToast(msg), [])
 
   if (!selectedRole) {
@@ -134,7 +175,14 @@ export default function App() {
 
   // Producer on tablet/desktop → full-screen iPad layout
   if (selectedRole === 'lead' && isTablet) {
-    return <ProducerIPadView onLogOut={handleLogOut} />
+    return (
+      <ProducerIPadView
+        models={models} setModels={setModels}
+        walkthroughPhase={walkthroughPhase} setWalkthroughPhase={setWalkthroughPhase}
+        announcements={announcements} setAnnouncements={setAnnouncements}
+        onLogOut={handleLogOut}
+      />
+    )
   }
 
   return (
@@ -151,7 +199,25 @@ export default function App() {
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
-          {tab === 'home'      && <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />}
+          {tab === 'home' && (currentProfile.role === 'assistant' || currentProfile.role === 'lead_assistant') && (
+            <AssistantHomeView
+              currentProfile={currentProfile}
+              models={models} setModels={setModels}
+              walkthroughPhase={walkthroughPhase}
+              announcements={announcements}
+              onAckAnnouncement={handleAckAnnouncement}
+              leadChecks={leadChecks}
+              onLeadCheck={handleLeadCheck}
+              onClaimCheck={handleClaimCheck}
+              onEscalateCheck={handleEscalateCheck}
+              onToast={showToast}
+              profiles={profiles}
+              timeline={timeline}
+            />
+          )}
+          {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && (
+            <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />
+          )}
           {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'dashboard' && (
