@@ -78,6 +78,24 @@ const MOCK_ROLL = [
   { id: 'r11',dataUrl: P.demoC, type: 'video', duration: '1:05' },
 ]
 
+// ─── Mock product inventory for authoring flow ───────────────────────────────
+const MOCK_PRODUCTS = [
+  { id: 'mp1',  name: 'Volumizing mascara',  shade: 'Blackest Black', sw: '#111',    stock: 'In kits · 6 left',             out: false, cat: 'Mascara' },
+  { id: 'mp2',  name: 'Lower lash mascara',  shade: 'Soft Black',     sw: '#2B2522', stock: 'Specialty · 2 left, ask Aimi', out: false, cat: 'Mascara' },
+  { id: 'mp3',  name: 'Lengthening mascara', shade: 'Black',          sw: '#1A1A1A', stock: 'In kits · 9 left',             out: false, cat: 'Mascara' },
+  { id: 'mp4',  name: 'Tubing mascara',      shade: 'Black',          sw: '#141414', stock: 'Out of stock',                 out: true,  cat: 'Mascara' },
+  { id: 'mp5',  name: 'Clear lash gel',      shade: 'Clear',          sw: '#EDEAE6', stock: 'In kits · 7 left',             out: false, cat: 'Lashes'  },
+  { id: 'mp6',  name: 'Eyeliner',            shade: 'Midnight',       sw: '#0A0808', stock: 'In kits · 8 left',             out: false, cat: 'Liner'   },
+  { id: 'mp7',  name: 'Eye shadow',          shade: 'Espresso',       sw: '#3B2A1A', stock: 'In kits · 3 left',             out: false, cat: 'Shadow'  },
+  { id: 'mp8',  name: 'Brow gel',            shade: 'Clear',          sw: '#C8C0B0', stock: 'In kits · 5 left',             out: false, cat: 'Brows'   },
+  { id: 'mp9',  name: 'Brow pencil',         shade: 'Taupe',          sw: '#8A7A6A', stock: 'In kits · 4 left',             out: false, cat: 'Brows'   },
+  { id: 'mp10', name: 'Foundation',          shade: '125 N',          sw: '#D4A87A', stock: 'In kits · 6 left',             out: false, cat: 'Skin'    },
+  { id: 'mp11', name: 'Setting powder',      shade: 'Translucent',    sw: '#F0EDE8', stock: 'In kits · 8 left',             out: false, cat: 'Skin'    },
+  { id: 'mp12', name: 'Blush',               shade: 'Coral Glow',     sw: '#D4826A', stock: 'In kits · 2 left',             out: false, cat: 'Lips'    },
+  { id: 'mp13', name: 'Lip stain',           shade: 'Sheer Red',      sw: '#C4524A', stock: 'In kits · 5 left',             out: false, cat: 'Lips'    },
+]
+const INV_CATS = ['All', 'Mascara', 'Liner', 'Shadow', 'Lashes', 'Brows', 'Skin', 'Lips']
+
 // ─── Media summary helper ─────────────────────────────────────────────────────
 function mediaSummary(items) {
   if (!items.length) return 'No media yet'
@@ -569,8 +587,9 @@ function TagScreen({ items, lookName, onBack, onAdd }) {
 }
 
 // ─── Look detail (S2) ─────────────────────────────────────────────────────────
-function LookDetailScreen({ look, media, myModelName, currentProfile, onBack, onMediaTap, onAdd, showToast }) {
+function LookDetailScreen({ look, media, myModelName, currentProfile, onBack, onMediaTap, onAdd, showToast, changeBanner }) {
   const [showAddSheet, setShowAddSheet] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
 
   const capturers = look.capturers
     .map(id => profiles.find(p => p.id === id)?.name?.split(' ')[0] || id)
@@ -581,7 +600,7 @@ function LookDetailScreen({ look, media, myModelName, currentProfile, onBack, on
 
   return (
     <>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
         {/* header */}
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px 0' }}>
           <button onClick={onBack} aria-label="Back to looks" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -589,10 +608,17 @@ function LookDetailScreen({ look, media, myModelName, currentProfile, onBack, on
           </button>
           <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 22 }}>{look.name}</span>
           <span style={{ fontSize: 11, color: '#4A4743', paddingRight: 8 }}>
-            {/* model count derived from models list could be complex - use a static count */}
             {look.modelCount || ''}
           </span>
         </div>
+        {/* A5 change banner */}
+        {changeBanner && !bannerDismissed && (
+          <div role="status" style={{ position: 'absolute', left: 12, right: 12, top: 96, background: '#111', color: '#F5F2EE', borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 6, boxShadow: '0 8px 24px rgba(0,0,0,.25)', zIndex: 10 }}>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>{changeBanner.title}</span>
+            <span style={{ fontSize: 12, lineHeight: 1.45, color: '#E0DDD8' }}>{changeBanner.description}</span>
+            <button onClick={() => setBannerDismissed(true)} style={{ alignSelf: 'flex-start', minHeight: 36, padding: 0, border: 0, background: 'none', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, textDecoration: 'underline', color: '#F5F2EE', cursor: 'pointer' }}>See what changed</button>
+          </div>
+        )}
 
         {/* subheader */}
         {myModelName && (
@@ -987,6 +1013,7 @@ function AssistantStudioFlow({ currentProfile, models }) {
           onBack={() => setScreen('looks')}
           onMediaTap={i => { setViewerIndex(i); setScreen('viewer') }}
           onAdd={source => setScreen(source === 'camera' ? 'camera' : 'roll')}
+          changeBanner={activeLook.id === 'A' ? { title: 'Look A updated · 2:48 PM', description: 'Aimi changed Lips: now a sheer red stain, tapped on with a finger.' } : null}
         />
       )}
 
