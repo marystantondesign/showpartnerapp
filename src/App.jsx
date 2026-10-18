@@ -17,6 +17,7 @@ import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 import StudioView from './views/StudioView'
 import AssistantHomeView from './views/AssistantHomeView'
+import StatusLinkView from './views/StatusLinkView'
 
 // Default venue — Agger Fish Building, Brooklyn, NY
 // Zones have both a centroid (xPct/yPct) and a polygon array for proper SVG rendering
@@ -66,7 +67,7 @@ function profileForRole(role) {
   return profiles.find(p => p.role === role) || profiles[0]
 }
 
-export default function App() {
+function AppInner() {
   const isDesktop = useIsDesktop()
   const isTablet  = useIsTablet()
   const [selectedRole, setSelectedRole]     = useState(null)
@@ -257,4 +258,9 @@ export default function App() {
       />
     </div>
   )
+}
+
+export default function App() {
+  if (/^\/status\//.test(window.location.pathname)) return <StatusLinkView />
+  return <AppInner />
 }

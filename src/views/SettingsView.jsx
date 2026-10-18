@@ -122,6 +122,26 @@ export default function SettingsView({ dark, onToggleDark, venue, onVenueChange,
                   EDIT
                 </button>
               </div>
+              {/* Share Status Link */}
+              <div className="flex items-center justify-between py-3 border-b border-[#E0DDD8] dark:border-[#2E2B28]">
+                <div>
+                  <p className="text-sm font-sans text-[#111] dark:text-[#F0EDE8]">Status link</p>
+                  <p className="text-[11px] font-sans text-[#888580] mt-0.5">Share a live read-only view with anyone</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/status/demo`
+                    if (navigator.share) {
+                      navigator.share({ title: 'Show status', url }).catch(() => {})
+                    } else {
+                      navigator.clipboard.writeText(url).then(() => {}).catch(() => {})
+                    }
+                  }}
+                  className="text-[10px] tracking-widest uppercase font-sans border border-[#C8C4BF] dark:border-[#3A3632] px-3 py-1.5 rounded text-[#111] dark:text-[#F0EDE8] flex-shrink-0"
+                >
+                  SHARE
+                </button>
+              </div>
             </div>
           </>
         )}
