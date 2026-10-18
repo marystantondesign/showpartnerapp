@@ -275,91 +275,186 @@ function ConfirmModal({ onConfirm, onCancel }) {
 }
 
 function CollapsedRail({ onExpand, onStartWalkthrough }) {
+  const tileStyle = { width: 56, minHeight: 64, border: 0, borderRadius: 12, background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }
   return (
-    <div style={{ width: 72, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '16px 0' }}>
-      <button onClick={onExpand} aria-label="Expand panel" style={{ width: 44, height: 44, borderRadius: 10, border: `1px solid ${DV}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <aside aria-label="Collapsed panel" style={{ width: 72, flexShrink: 0, borderLeft: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '10px 0 16px' }}>
+      <button onClick={onExpand} aria-label="Expand panel" style={{ width: 44, height: 44, borderRadius: 12, border: `1px solid ${BD}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
       </button>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: TX, borderRadius: 10, padding: '12px 0', width: 52 }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8C77A" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: '#fff', lineHeight: 1 }}>4:00</span>
-        <span style={{ fontSize: 9, color: '#E8C77A', fontWeight: 600, letterSpacing: '.06em' }}>15m</span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, lineHeight: 1 }}>22</span>
-        <span style={{ fontSize: 9, color: M2, letterSpacing: '.06em', textTransform: 'uppercase' }}>got it</span>
-      </div>
-      <button onClick={onStartWalkthrough} style={{ width: 44, height: 44, borderRadius: 10, border: 0, background: TX, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, writingMode: 'vertical-rl', textOrientation: 'mixed', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 8, fontWeight: 700, letterSpacing: '.12em' }}>START</button>
-    </div>
+      <div style={{ width: 40, height: 1, background: BD }} />
+      <button style={tileStyle}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span style={{ fontSize: 10, fontWeight: 600 }}>15m</span>
+        <span style={{ fontSize: 9, color: MT }}>walkthru</span>
+      </button>
+      <button style={tileStyle}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M17 9a4 4 0 010 6"/></svg>
+        <span style={{ fontSize: 10, fontWeight: 600 }}>22/26</span>
+        <span style={{ fontSize: 9, color: MT }}>got it</span>
+      </button>
+      <span style={{ flex: 1 }} />
+      <button onClick={onStartWalkthrough} style={{ ...tileStyle, background: TX, color: '#fff' }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none"><rect x="7" y="5" width="3.5" height="14" fill="currentColor"/><rect x="13.5" y="5" width="3.5" height="14" fill="currentColor"/></svg>
+        <span style={{ fontSize: 10, fontWeight: 600 }}>Start</span>
+        <span style={{ fontSize: 9, color: '#C9C4BE' }}>walkthru</span>
+      </button>
+    </aside>
   )
 }
 
 function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthrough, onCompose }) {
-  const drawerH = open ? 470 : 88
-  const firstAnn = announcements[0]
+  const COLLAPSED_H = 160
+  const EXPANDED_H  = 470
+
+  const [liveH, setLiveH]       = useState(() => open ? EXPANDED_H : COLLAPSED_H)
+  const [snapping, setSnapping] = useState(false)
+  const swipeRef        = useRef({ active: false, pending: false, startY: 0, startH: 0, lastY: 0, lastT: 0, velY: 0 })
+  const contentScrollRef = useRef(null)
+
+  useEffect(() => {
+    setSnapping(true)
+    setLiveH(open ? EXPANDED_H : COLLAPSED_H)
+  }, [open])
+
+  function handleDown(e) {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setSnapping(false)
+    swipeRef.current = { active: true, pending: false, startY: e.clientY, startH: liveH, lastY: e.clientY, lastT: performance.now(), velY: 0 }
+  }
+  function handleMove(e) {
+    const r = swipeRef.current
+    if (!r.active) return
+    const now = performance.now()
+    const dt  = now - r.lastT
+    if (dt > 0) r.velY = (r.lastY - e.clientY) / dt * 1000
+    r.lastY = e.clientY; r.lastT = now
+    setLiveH(Math.max(COLLAPSED_H, Math.min(EXPANDED_H, r.startH + (r.startY - e.clientY))))
+  }
+  function handleUp(e) {
+    const r = swipeRef.current
+    if (!r.active) return
+    r.active = false
+    const finalH = r.startH + (r.startY - e.clientY)
+    const flick  = Math.abs(r.velY) > 300
+    const target = flick
+      ? (r.velY > 0 ? EXPANDED_H : COLLAPSED_H)
+      : (finalH >= (COLLAPSED_H + EXPANDED_H) / 2 ? EXPANDED_H : COLLAPSED_H)
+    setSnapping(true)
+    setLiveH(target)
+    onToggle(target === EXPANDED_H)
+  }
+  function contentDown(e) {
+    const el = contentScrollRef.current
+    if (!el || el.scrollTop > 0) return
+    swipeRef.current = { active: false, pending: true, startY: e.clientY, startH: liveH, lastY: e.clientY, lastT: performance.now(), velY: 0 }
+  }
+  function contentMove(e) {
+    const r = swipeRef.current
+    if (!r.pending && !r.active) return
+    const dy = e.clientY - r.startY
+    if (r.pending) {
+      if (dy > 10)  { e.currentTarget.setPointerCapture(e.pointerId); r.active = true; r.pending = false }
+      else if (dy < -10) { r.pending = false }
+      return
+    }
+    handleMove(e)
+  }
+  function contentUp(e) {
+    const r = swipeRef.current
+    if (r.active) handleUp(e)
+    r.pending = false
+  }
+
   return (
-    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: drawerH, transition: 'height 0.25s ease', background: '#fff', borderTop: `1px solid ${BD}`, boxShadow: '0 -6px 18px rgba(0,0,0,.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 5 }}>
-      <button onClick={onToggle} style={{ flexShrink: 0, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 0, background: 'none', cursor: 'pointer', padding: 0 }} aria-label={open ? 'Collapse' : 'Expand'}>
+    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: liveH, transition: snapping ? 'height 0.25s ease-out' : 'none', background: '#fff', borderTop: `1px solid ${BD}`, boxShadow: '0 -6px 18px rgba(0,0,0,.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 5 }}>
+
+      {/* Grab handle */}
+      <div
+        onPointerDown={handleDown} onPointerMove={handleMove} onPointerUp={handleUp} onPointerCancel={handleUp}
+        role="separator" aria-orientation="horizontal" aria-label="Drag to resize panel"
+        style={{ flexShrink: 0, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'row-resize', touchAction: 'none', userSelect: 'none' }}
+      >
         <span style={{ width: 44, height: 5, borderRadius: 3, background: '#B9B4AE' }} />
-      </button>
+      </div>
+
+      {/* Collapsed: two-row layout */}
       {!open && (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 48, padding: '0 14px', borderRadius: 10, background: TX, color: '#fff', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8C77A" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <span style={{ fontSize: 13, fontWeight: 600 }}>Walkthrough 4:00</span>
-            <span style={{ fontSize: 12, color: '#E8C77A' }}>in 15 min</span>
-          </div>
-          {firstAnn && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>15 min warning sent</span>
-              <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>22 got it · 4 waiting</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '0 24px 20px', marginTop: -10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+              <span style={{ width: 44, height: 44, borderRadius: 12, background: TX, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8C77A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </span>
+              <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap' }}>Walkthrough at 4:00</span>
+                <span style={{ fontSize: 12, color: '#A0761D', whiteSpace: 'nowrap' }}>in 15 min</span>
+              </span>
             </div>
-          )}
-          <span style={{ flex: 1 }} />
-          <button onClick={onCompose} style={{ flexShrink: 0, minHeight: 48, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>ANNOUNCE</button>
-          <button onClick={onStartWalkthrough} style={{ flexShrink: 0, minHeight: 48, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>START WALKTHROUGH</button>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexShrink: 0 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>15 min warning sent</span>
+              <span style={{ fontSize: 13, color: MT, whiteSpace: 'nowrap' }}>22 got it · 4 waiting</span>
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
+            <button onClick={onCompose} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>NEW ANNOUNCEMENT</button>
+          </div>
         </div>
       )}
+
+      {/* Expanded: 2-col grid + footer */}
       {open && (
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', padding: '0 24px 16px' }}>
-          <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, overflow: 'hidden' }}>
-            <div style={{ overflowY: 'auto', paddingTop: 4 }}>
-              <Lbl s={{ marginBottom: 8 }}>Today</Lbl>
+        <>
+          <div
+            ref={contentScrollRef}
+            onPointerDown={contentDown} onPointerMove={contentMove} onPointerUp={contentUp} onPointerCancel={contentUp}
+            style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 24px 12px', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 24, alignContent: 'start', touchAction: 'pan-y' }}
+          >
+            {/* Timeline column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+              <Lbl s={{ marginBottom: 8 }}>Today · show in 2h 15m</Lbl>
               {tlItems.map(t => (
-                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 34, padding: '0 8px', margin: '0 -8px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
-                  <span style={{ width: 56, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
-                  <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.label}</span>
+                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 44, padding: '0 14px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
+                  <span style={{ width: 72, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
+                  <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
                   <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#E8C77A' : M2 }}>{t.state}</span>
                 </div>
               ))}
+              <button onClick={() => {}} style={{ alignSelf: 'flex-start', marginLeft: 14, marginTop: 6, minHeight: 32, padding: 0, border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Push walkthrough time</button>
             </div>
-            <div style={{ overflowY: 'auto', paddingTop: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Announcements column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
               <Lbl>Announcements</Lbl>
               {announcements.slice(0, 3).map((ann, i) => {
-                const { got, unopened } = ann.delivery
-                const total = got + unopened + (ann.delivery.undelivered || 0)
-                const gotPct = total > 0 ? (got / total * 100).toFixed(0) + '%' : '0%'
+                const { got, unopened, undelivered = 0 } = ann.delivery
+                const total  = got + unopened + undelivered
+                const gotPct = total > 0 ? (got / total * 100).toFixed(0) + '%' : '85%'
                 if (i === 0) return (
-                  <div key={ann.id} style={{ background: BG, border: `1px solid ${BD}`, borderRadius: 10, padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600 }}>{ann.text}</span>
+                  <div key={ann.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600 }}>{ann.text}</span>
+                      <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>Auto · {ann.sentAt}</span>
+                    </div>
+                    <span style={{ fontSize: 12, color: MT }}>To all 26 assistants</span>
                     <Bar segments={[{ w: gotPct, c: TX }]} />
-                    <span style={{ fontSize: 11 }}>{got} got it · {unopened} waiting</span>
+                    <span style={{ fontSize: 12 }}>{got} got it · {unopened} haven't opened · {undelivered} not delivered</span>
                   </div>
                 )
                 return (
-                  <div key={ann.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                  <div key={ann.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '0 2px' }}>
                     <span style={{ fontSize: 12, color: MT }}>{ann.text}</span>
-                    <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>{ann.delivery.got} got it</span>
+                    <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>{ann.sentAt} · {ann.delivery.got} got it</span>
                   </div>
                 )
               })}
             </div>
           </div>
-          <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, paddingTop: 12 }}>
-            <button onClick={onCompose} style={{ minHeight: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>ANNOUNCE</button>
-            <button onClick={onStartWalkthrough} style={{ minHeight: 48, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>START WALKTHROUGH</button>
+          {/* Footer outside scroll */}
+          <div style={{ flexShrink: 0, padding: '12px 24px 20px', borderTop: `1px solid ${BD}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
+            <button onClick={onCompose} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>NEW ANNOUNCEMENT</button>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
@@ -418,7 +513,7 @@ export default function ProducerIPadView({
   const mainWidth       = windowSize.w - effectivePanelW
   const narrowMain      = mainWidth < 720
   const widePanel       = !panelCollapsed && panelWidth >= 480
-  const drawerHeight    = drawerOpen ? 470 : 88
+  const drawerHeight    = drawerOpen ? 470 : 160
 
   const readyCount      = models.filter(m => m.services.hair.status === 'done' && m.services.makeup.status === 'done' && m.services.nails.status === 'done').length
   const notArrivedCount = models.filter(m => !m.arrived).length
@@ -677,7 +772,7 @@ export default function ProducerIPadView({
 
         {/* Portrait drawer */}
         {isPortrait && (
-          <PortraitDrawer open={drawerOpen} onToggle={() => setDrawerOpen(o => !o)} tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
+          <PortraitDrawer open={drawerOpen} onToggle={setDrawerOpen} tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
         )}
 
         {/* Confirm modal */}
