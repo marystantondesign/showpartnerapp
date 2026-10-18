@@ -7,6 +7,7 @@ const CHIP_STATUS = {
   in_progress: { c: '#D4A853', t: 'In progress' },
   paused:      { c: '#8A9BB0', t: 'Paused'      },
   not_started: { c: '#E8E4DF', t: 'Not started' },
+  to_check:    { c: '#DCE8DD', t: 'To check'    },
 }
 
 function Avatar({ src, name, size = 36 }) {
@@ -99,6 +100,11 @@ export default function AssistantHomeView({
   onToast,
   profiles,
   timeline,
+  toCheckQueue,
+  touchupNotes,
+  onMarkDoneToCheck,
+  onLooksGood,
+  onSendTouchup,
 }) {
   const specialty = currentProfile.specialty
   const profileId = currentProfile.id
@@ -157,12 +163,14 @@ export default function AssistantHomeView({
 
   function handleMarkDone() {
     if (!activeModel) return
+    const firstName = activeModel.name.split(' ')[0]
     setModels(prev => prev.map(m =>
       m.id === activeModel.id
-        ? { ...m, services: { ...m.services, [specialty]: { ...m.services[specialty], status: 'done', elapsedMins: elapsed } } }
+        ? { ...m, services: { ...m.services, [specialty]: { ...m.services[specialty], status: 'to_check', elapsedMins: elapsed } } }
         : m
     ))
-    onToast?.(`${activeModel.name.split(' ')[0]} marked done`)
+    onMarkDoneToCheck?.(activeModel.id, elapsed, specialty)
+    onToast?.(`${firstName} ready to check`)
   }
 
   function handlePause() {
@@ -197,10 +205,58 @@ export default function AssistantHomeView({
       m.services[specialty]?.assistantId === profileId &&
       m.services[specialty]?.status === 'in_progress'
     )
+    const pendingChecks = (toCheckQueue || []).filter(c => c.specialty === specialty)
+
+    const [touchupCheckId, setTouchupCheckId] = useState(null)
+    const touchupTarget = touchupCheckId ? pendingChecks.find(c => c.id === touchupCheckId) : null
+    const WHERE_OPTIONS_LA = ['Eyes', 'Brows', 'Skin', 'Lips', 'Other']
+    const [touchupAreas, setTouchupAreas] = useState([])
+    const [touchupNote, setTouchupNote] = useState('')
+
+    function sendTouchupLA() {
+      if (!touchupCheckId) return
+      onSendTouchup?.(touchupCheckId, touchupAreas, touchupNote)
+      setTouchupCheckId(null); setTouchupAreas([]); setTouchupNote('')
+    }
 
     return (
       <div style={{ flex: 1, overflowY: 'auto', background: BG, padding: '0 16px 24px' }}>
         <div style={{ paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          {/* D4: Ready to check section */}
+          {pendingChecks.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Ready to check</div>
+                <Lbl>{pendingChecks.length} waiting</Lbl>
+              </div>
+              {pendingChecks.map(check => (
+                <div key={check.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <Avatar src={check.modelAvatar} name={check.modelName} size={56} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>{check.assistantName.split(' ')[0]} · {check.modelName}</div>
+                      <div style={{ fontSize: 12, color: MT }}>Look {check.modelLook} · done {check.doneAt}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <button
+                      onClick={() => onLooksGood?.(check.id)}
+                      style={{ minHeight: 48, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}
+                    >
+                      LOOKS GOOD
+                    </button>
+                    <button
+                      onClick={() => { setTouchupCheckId(check.id); setTouchupAreas([]); setTouchupNote('') }}
+                      style={{ minHeight: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}
+                    >
+                      TOUCH-UP
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Incoming lead check cards */}
           {myChecks.map(check => (
@@ -281,6 +337,44 @@ export default function AssistantHomeView({
             </div>
           )}
         </div>
+
+        {/* D2/D3 touch-up sheet for lead assistant */}
+        {touchupTarget && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'flex-end', zIndex: 40 }}>
+            <div style={{ width: '100%', background: BG, borderRadius: '16px 16px 0 0', paddingBottom: 32 }}>
+              <div style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ width: 44, height: 5, borderRadius: 3, background: DV }} />
+              </div>
+              <div style={{ padding: '0 20px 16px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Avatar src={touchupTarget.modelAvatar} name={touchupTarget.modelName} size={40} />
+                <div style={{ flex: 1 }}>
+                  <Lbl>Back to {touchupTarget.assistantName.split(' ')[0]}</Lbl>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>Touch-up for {touchupTarget.modelName.split(' ')[0]}</div>
+                </div>
+                <button onClick={() => setTouchupCheckId(null)} style={{ border: 0, background: 'none', fontSize: 18, color: M2, cursor: 'pointer', lineHeight: 1, padding: 4 }}>×</button>
+              </div>
+              <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <Lbl style={{ marginBottom: 8 }}>Where</Lbl>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {WHERE_OPTIONS_LA.map(a => (
+                      <button key={a} onClick={() => setTouchupAreas(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])} style={{ height: 36, padding: '0 16px', borderRadius: 999, border: touchupAreas.includes(a) ? 0 : `1px solid ${DV}`, background: touchupAreas.includes(a) ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: touchupAreas.includes(a) ? '#fff' : TX, cursor: 'pointer' }}>
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Lbl style={{ marginBottom: 8 }}>What to fix</Lbl>
+                  <input value={touchupNote} onChange={e => setTouchupNote(e.target.value)} placeholder="Describe what needs adjusting" style={{ width: '100%', boxSizing: 'border-box', height: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 15, padding: '0 14px', color: TX, outline: 'none' }} />
+                </div>
+                <button onClick={sendTouchupLA} disabled={touchupAreas.length === 0 && !touchupNote.trim()} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: (touchupAreas.length > 0 || touchupNote.trim()) ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: (touchupAreas.length > 0 || touchupNote.trim()) ? 'pointer' : 'default' }}>
+                  SEND TO {touchupTarget.assistantName.split(' ')[0].toUpperCase()}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -389,6 +483,20 @@ export default function AssistantHomeView({
 
         {activeModel ? (
           <>
+            {/* D3: Touch-up banner */}
+            {(() => {
+              const tp = (touchupNotes || []).find(n => n.modelId === activeModel.id && n.assistantId === profileId)
+              if (!tp) return null
+              return (
+                <div style={{ background: TX, color: '#F5F2EE', borderRadius: 14, padding: '14px 16px', marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: '#C9C4BE', marginBottom: 6 }}>
+                    Touch-up{tp.areas?.length > 0 ? ` · ${tp.areas.join(', ')}` : ''} · {tp.sentAt}
+                  </div>
+                  <div style={{ fontSize: 15, lineHeight: 1.35 }}>{tp.note || 'Please adjust and recheck.'}</div>
+                </div>
+              )
+            })()}
+
             {/* Working on card */}
             <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, padding: '20px 16px', marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
@@ -397,7 +505,9 @@ export default function AssistantHomeView({
                   <Lbl style={{ marginBottom: 4 }}>Now working on · Look {activeModel.look}</Lbl>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: 22, marginBottom: 6 }}>{activeModel.name}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <Chip c='#D4A853' t={`${specialtyLabel} in progress`} />
+                    {(touchupNotes || []).some(n => n.modelId === activeModel.id && n.assistantId === profileId)
+                      ? <Chip c='#D4A853' t='Touch-up' />
+                      : <Chip c='#D4A853' t={`${specialtyLabel} in progress`} />}
                     <span style={{ fontSize: 11, color: MT }}>{elapsed} min</span>
                   </div>
                 </div>

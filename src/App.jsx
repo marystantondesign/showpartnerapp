@@ -17,6 +17,7 @@ import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 import StudioView from './views/StudioView'
 import AssistantHomeView from './views/AssistantHomeView'
+import ArtistHomeView from './views/ArtistHomeView'
 import StatusLinkView from './views/StatusLinkView'
 
 // Default venue — Agger Fish Building, Brooklyn, NY
@@ -67,6 +68,10 @@ function profileForRole(role) {
   return profiles.find(p => p.role === role) || profiles[0]
 }
 
+function fmtNow() {
+  return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
+
 function AppInner() {
   const isDesktop = useIsDesktop()
   const isTablet  = useIsTablet()
@@ -84,6 +89,10 @@ function AppInner() {
   const [walkthroughPhase, setWalkthroughPhase] = useState('upcoming')
   const [announcements, setAnnouncements]   = useState(() => initAnnouncements.map(a => ({ ...a, ackedBy: [] })))
   const [leadChecks, setLeadChecks]         = useState([])
+  const [toCheckQueue, setToCheckQueue]     = useState([])
+  const [touchupNotes, setTouchupNotes]     = useState([])
+  const [runningLates, setRunningLates]     = useState({})
+  const [recentArrivals, setRecentArrivals] = useState([])
 
   function handleRoleSelect(role) {
     setCurrentProfile(profileForRole(role))
@@ -163,6 +172,71 @@ function AppInner() {
     setLeadChecks(prev => prev.filter(c => c.id !== checkId))
   }
 
+  function handleMarkDoneToCheck(modelId, elapsed, specialty) {
+    const model = models.find(m => m.id === modelId)
+    if (!model) return
+    setToCheckQueue(prev => [...prev, {
+      id: `tc-${Date.now()}`,
+      modelId,
+      modelName: model.name,
+      modelLook: model.look,
+      modelAvatar: model.avatar || null,
+      specialty,
+      assistantId: currentProfile.id,
+      assistantName: currentProfile.name,
+      doneAt: fmtNow(),
+    }])
+  }
+
+  function handleLooksGood(checkId) {
+    const check = toCheckQueue.find(c => c.id === checkId)
+    if (!check) return
+    setModels(prev => prev.map(m =>
+      m.id === check.modelId
+        ? { ...m, services: { ...m.services, [check.specialty]: { ...m.services[check.specialty], status: 'done' } } }
+        : m
+    ))
+    setToCheckQueue(prev => prev.filter(c => c.id !== checkId))
+  }
+
+  function handleSendTouchup(checkId, areas, note) {
+    const check = toCheckQueue.find(c => c.id === checkId)
+    if (!check) return
+    const now = fmtNow()
+    setTouchupNotes(prev => [...prev, {
+      id: `tp-${Date.now()}`,
+      checkId,
+      modelId: check.modelId,
+      assistantId: check.assistantId,
+      areas,
+      note,
+      sentAt: now,
+    }])
+    setModels(prev => prev.map(m =>
+      m.id === check.modelId
+        ? { ...m, services: { ...m.services, [check.specialty]: { ...m.services[check.specialty], status: 'in_progress' } } }
+        : m
+    ))
+    setToCheckQueue(prev => prev.filter(c => c.id !== checkId))
+  }
+
+  function handleArrived(modelId) {
+    const model = models.find(m => m.id === modelId)
+    if (!model) return
+    const now = fmtNow()
+    setModels(prev => prev.map(m =>
+      m.id === modelId ? { ...m, arrived: true, arrivedAt: now } : m
+    ))
+    setRecentArrivals(prev => [...prev, { id: `arr-${Date.now()}`, modelId, modelName: model.name, arrivedAt: now }])
+  }
+
+  function handleRunningLate(modelId, newEta) {
+    setModels(prev => prev.map(m =>
+      m.id === modelId ? { ...m, eta: newEta } : m
+    ))
+    setRunningLates(prev => ({ ...prev, [modelId]: { eta: newEta } }))
+  }
+
   const showToast = useCallback((msg) => setToast(msg), [])
 
   if (!selectedRole) {
@@ -181,6 +255,14 @@ function AppInner() {
         models={models} setModels={setModels}
         walkthroughPhase={walkthroughPhase} setWalkthroughPhase={setWalkthroughPhase}
         announcements={announcements} setAnnouncements={setAnnouncements}
+        toCheckQueue={toCheckQueue}
+        touchupNotes={touchupNotes}
+        runningLates={runningLates}
+        recentArrivals={recentArrivals}
+        onLooksGood={handleLooksGood}
+        onSendTouchup={handleSendTouchup}
+        onArrived={handleArrived}
+        onRunningLate={handleRunningLate}
         onLogOut={handleLogOut}
       />
     )
@@ -214,6 +296,11 @@ function AppInner() {
               onToast={showToast}
               profiles={profiles}
               timeline={timeline}
+              toCheckQueue={toCheckQueue}
+              touchupNotes={touchupNotes}
+              onMarkDoneToCheck={handleMarkDoneToCheck}
+              onLooksGood={handleLooksGood}
+              onSendTouchup={handleSendTouchup}
             />
           )}
           {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && (

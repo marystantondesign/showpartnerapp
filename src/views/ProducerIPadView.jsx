@@ -16,6 +16,7 @@ const CHIP_STATUS = {
   in_progress: { c: '#D4A853', t: 'In progress' },
   paused:      { c: '#8A9BB0', t: 'Paused'      },
   not_started: { c: '#E8E4DF', t: 'Not started' },
+  to_check:    { c: '#DCE8DD', t: 'To check'    },
 }
 
 const DS = {
@@ -274,6 +275,225 @@ function ConfirmModal({ onConfirm, onCancel }) {
   )
 }
 
+function ArrivalsPanel({ models, recentArrivals, onArrived, onOpenRunningLate, onClose, onPair }) {
+  const [search, setSearch] = useState('')
+  const notArrived = models.filter(m => !m.arrived)
+  const filtered = notArrived.filter(m =>
+    !search ||
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    String(m.look).toLowerCase().includes(search.toLowerCase())
+  )
+  return (
+    <>
+      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <Lbl>Arrivals</Lbl>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 20, marginTop: 2 }}>{models.filter(m => m.arrived).length} of {models.length} here</div>
+        </div>
+        <button onClick={onClose} style={{ border: 0, background: 'none', fontSize: 20, color: M2, cursor: 'pointer', lineHeight: 1, padding: '4px 4px 0' }}>×</button>
+      </div>
+      <div style={{ padding: '10px 20px', borderBottom: `1px solid ${BD}` }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Check in by name or look" style={{ width: '100%', boxSizing: 'border-box', height: 40, borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, padding: '0 16px', color: TX, outline: 'none' }} />
+      </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px' }}>
+        {filtered.length > 0 && <Lbl s={{ marginBottom: 10 }}>Still expected · by ETA</Lbl>}
+        {filtered.map(m => (
+          <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BD}` }}>
+            <Avatar src={m.avatar} name={m.name} size={40} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+              <div style={{ fontSize: 11, color: MT }}>Look {m.look} · ETA {m.eta || 'TBD'}</div>
+            </div>
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+              <button onClick={() => onArrived(m.id)} style={{ height: 40, padding: '0 12px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>ARRIVED</button>
+              <button onClick={() => onOpenRunningLate(m.id)} style={{ height: 40, padding: '0 10px', borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>RUNNING LATE</button>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && notArrived.length === 0 && (
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: M2, paddingTop: 12 }}>All models checked in</div>
+        )}
+        {recentArrivals.length > 0 && (
+          <>
+            <Lbl s={{ marginTop: 20, marginBottom: 10 }}>Just arrived</Lbl>
+            {[...recentArrivals].reverse().slice(0, 6).map(arr => {
+              const m = models.find(x => x.id === arr.modelId)
+              if (!m) return null
+              const needsPair = m.arrived && !m.services[SVC].assistantId
+              return (
+                <div key={arr.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BD}` }}>
+                  <Avatar src={m.avatar} name={m.name} size={40} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+                    <div style={{ fontSize: 11, color: MT }}>Look {m.look} · arrived {arr.arrivedAt}</div>
+                  </div>
+                  {needsPair && (
+                    <button onClick={() => { onPair?.(m); onClose() }} style={{ height: 40, padding: '0 12px 0 8px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                      PAIR
+                    </button>
+                  )}
+                </div>
+              )
+            })}
+          </>
+        )}
+      </div>
+    </>
+  )
+}
+
+function RunningLateModal({ model, onSave, onCancel }) {
+  const [preset, setPreset] = useState(null)
+  const [note, setNote] = useState('')
+  const WALKTHROUGH_H = 16
+
+  function parseEta(s) {
+    if (!s) return null
+    const parts = s.trim().split(' ')
+    if (parts.length < 2) return null
+    const [time, period] = parts
+    const [h, m] = time.split(':').map(Number)
+    let hrs = h
+    if (period === 'PM' && hrs !== 12) hrs += 12
+    if (period === 'AM' && hrs === 12) hrs = 0
+    return { h: hrs, m }
+  }
+  function formatEta(h, m) {
+    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
+    const period = h >= 12 ? 'PM' : 'AM'
+    return `${h12}:${m.toString().padStart(2, '0')} ${period}`
+  }
+
+  const currentEta = model.eta || '5:00 PM'
+  const parsed = parseEta(currentEta)
+  let newEtaStr = currentEta
+  if (preset && preset !== 'pick' && parsed) {
+    const total = parsed.h * 60 + parsed.m + preset
+    newEtaStr = formatEta(Math.floor(total / 60) % 24, total % 60)
+  }
+  const parsedNew = parseEta(newEtaStr)
+  const afterWalkthrough = parsedNew && parsedNew.h >= WALKTHROUGH_H
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 20 }}>
+      <div role="dialog" aria-label={`${model.name} is running late`} style={{ width: 460, maxWidth: 'calc(100vw - 32px)', background: BG, borderRadius: 16, padding: 28, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Avatar src={model.avatar} name={model.name} size={48} />
+          <div>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>{model.name} is running late</div>
+            <div style={{ fontSize: 12, color: MT }}>Current ETA: {currentEta}</div>
+          </div>
+        </div>
+        <div>
+          <Lbl s={{ marginBottom: 8 }}>New ETA</Lbl>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[10, 20, 30].map(n => (
+              <button key={n} onClick={() => setPreset(n)} style={{ flex: 1, minHeight: 44, borderRadius: 8, border: preset === n ? `1.5px solid ${TX}` : `1px solid ${DV}`, background: preset === n ? '#F0EDE8' : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, cursor: 'pointer' }}>+{n} min</button>
+            ))}
+            <button onClick={() => setPreset('pick')} style={{ flex: 1, minHeight: 44, borderRadius: 8, border: preset === 'pick' ? `1.5px solid ${TX}` : `1px solid ${DV}`, background: preset === 'pick' ? '#F0EDE8' : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, cursor: 'pointer' }}>Pick time</button>
+          </div>
+          {preset && preset !== 'pick' && (
+            <div style={{ marginTop: 8, fontSize: 13, color: MT }}>New ETA: {newEtaStr}</div>
+          )}
+        </div>
+        <div>
+          <Lbl s={{ marginBottom: 8 }}>Note (optional)</Lbl>
+          <input value={note} onChange={e => setNote(e.target.value)} placeholder="Add a note for the team" style={{ width: '100%', boxSizing: 'border-box', height: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none' }} />
+        </div>
+        {afterWalkthrough && preset !== null && preset !== 'pick' && (
+          <div style={{ background: '#F6E3DE', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#6B2A1A', lineHeight: 1.5 }}>
+            This ETA is after the walkthrough at 4:00 PM. The team will need to prep this look after the walkthrough.
+          </div>
+        )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 10 }}>
+          <button onClick={onCancel} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>CANCEL</button>
+          <button onClick={() => onSave(newEtaStr, note)} disabled={!preset || preset === 'pick'} style={{ minHeight: 52, borderRadius: 8, border: 0, background: (preset && preset !== 'pick') ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: (preset && preset !== 'pick') ? 'pointer' : 'default' }}>SAVE NEW ETA</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ToCheckPanel({ toCheckQueue, profiles, onLooksGood, onOpenTouchup, onClose }) {
+  return (
+    <>
+      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <Lbl>Ready to check</Lbl>
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 20, marginTop: 2 }}>{toCheckQueue.length} waiting</div>
+        </div>
+        <button onClick={onClose} style={{ border: 0, background: 'none', fontSize: 20, color: M2, cursor: 'pointer', lineHeight: 1, padding: '4px 4px 0' }}>×</button>
+      </div>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {toCheckQueue.length === 0 && (
+          <div style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: M2, paddingTop: 8 }}>No checks pending</div>
+        )}
+        {toCheckQueue.map(check => (
+          <div key={check.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <Avatar src={check.modelAvatar} name={check.modelName} size={48} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{check.modelName}</div>
+                <div style={{ fontSize: 11, color: MT }}>Look {check.modelLook} · {check.specialty} by {check.assistantName.split(' ')[0]} · done {check.doneAt}</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button onClick={() => onLooksGood(check.id)} style={{ minHeight: 44, borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>LOOKS GOOD</button>
+              <button onClick={() => onOpenTouchup(check.id)} style={{ minHeight: 44, borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>TOUCH-UP</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ flexShrink: 0, padding: '10px 20px 16px', borderTop: `1px solid ${BD}` }}>
+        <p style={{ fontSize: 11, color: M2, margin: 0, lineHeight: 1.5 }}>Tap "Looks good" to finish the model or "Touch-up" to send notes back to the assistant.</p>
+      </div>
+    </>
+  )
+}
+
+function TouchupSheet({ check, onSend, onClose }) {
+  const [areas, setAreas] = useState([])
+  const [note, setNote] = useState('')
+  const WHERE_OPTIONS = ['Eyes', 'Brows', 'Skin', 'Lips', 'Other']
+  function toggleArea(a) { setAreas(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]) }
+  const canSend = areas.length > 0 || note.trim().length > 0
+  return (
+    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'flex-end', zIndex: 20 }}>
+      <div style={{ width: '100%', background: BG, borderRadius: '16px 16px 0 0', paddingBottom: 28 }}>
+        <div style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ width: 44, height: 5, borderRadius: 3, background: DV }} />
+        </div>
+        <div style={{ padding: '0 20px 16px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Avatar src={check.modelAvatar} name={check.modelName} size={40} />
+          <div style={{ flex: 1 }}>
+            <Lbl s={{}}>Back to {check.assistantName.split(' ')[0]}</Lbl>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>Touch-up for {check.modelName.split(' ')[0]}</div>
+          </div>
+          <button onClick={onClose} style={{ border: 0, background: 'none', fontSize: 20, color: M2, cursor: 'pointer', lineHeight: 1, padding: '0 0 0 8px' }}>×</button>
+        </div>
+        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <Lbl s={{ marginBottom: 8 }}>Where</Lbl>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {WHERE_OPTIONS.map(a => (
+                <button key={a} onClick={() => toggleArea(a)} style={{ height: 36, padding: '0 16px', borderRadius: 999, border: areas.includes(a) ? 0 : `1px solid ${DV}`, background: areas.includes(a) ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: areas.includes(a) ? '#fff' : TX, cursor: 'pointer' }}>{a}</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Lbl s={{ marginBottom: 8 }}>What to fix</Lbl>
+            <input value={note} onChange={e => setNote(e.target.value)} placeholder="Describe what needs adjusting" style={{ width: '100%', boxSizing: 'border-box', height: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 15, padding: '0 14px', color: TX, outline: 'none' }} />
+          </div>
+          <button onClick={() => onSend(areas, note)} disabled={!canSend} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: canSend ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: canSend ? 'pointer' : 'default' }}>
+            SEND TO {check.assistantName.split(' ')[0].toUpperCase()}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CollapsedRail({ onExpand, onStartWalkthrough }) {
   const tileStyle = { width: 56, minHeight: 64, border: 0, borderRadius: 12, background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }
   return (
@@ -464,6 +684,14 @@ export default function ProducerIPadView({
   models, setModels,
   walkthroughPhase, setWalkthroughPhase,
   announcements, setAnnouncements,
+  toCheckQueue = [],
+  touchupNotes = [],
+  runningLates = {},
+  recentArrivals = [],
+  onLooksGood,
+  onSendTouchup,
+  onArrived,
+  onRunningLate,
   onLogOut,
 }) {
   const [panel, setPanel]           = useState('default')
@@ -477,6 +705,8 @@ export default function ProducerIPadView({
   const [currentTime, setCurrentTime] = useState(fmtNow)
   const [windowSize, setWindowSize] = useState(winSize)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [lateModalId, setLateModalId] = useState(null)
+  const [touchupCheckId, setTouchupCheckId] = useState(null)
 
   const [panelWidth, setPanelWidthRaw] = useState(() => {
     const s = parseInt(localStorage.getItem('sp_panelWidth'), 10)
@@ -519,6 +749,7 @@ export default function ProducerIPadView({
   const notArrivedCount = models.filter(m => !m.arrived).length
   const notPairedCount  = models.filter(m => m.arrived && !m.services[SVC].assistantId).length
   const needsCount      = models.filter(m => m.flagged).length
+  const toCheckCount    = toCheckQueue.length
 
   const filtered = models.filter(m => {
     switch (filter) {
@@ -526,6 +757,7 @@ export default function ProducerIPadView({
       case 'not_arrived':     return !m.arrived
       case 'not_paired':      return m.arrived && !m.services[SVC].assistantId
       case 'ready':           return m.services.hair.status === 'done' && m.services.makeup.status === 'done' && m.services.nails.status === 'done'
+      case 'to_check':        return toCheckQueue.some(c => c.modelId === m.id)
       default:                return true
     }
   })
@@ -576,6 +808,23 @@ export default function ProducerIPadView({
   function expandPanel() { setPanelCollapsedRaw(false); localStorage.setItem('sp_panelCollapsed', 'false') }
   function collapsePanel() { setPanelCollapsedRaw(true); localStorage.setItem('sp_panelCollapsed', 'true') }
 
+  function handleArrivedLocal(modelId) {
+    onArrived?.(modelId)
+  }
+  function handleRunningLateLocal(newEta, noteText) {
+    if (!lateModalId) return
+    onRunningLate?.(lateModalId, newEta)
+    setLateModalId(null)
+  }
+  function handleOpenTouchup(checkId) {
+    setTouchupCheckId(checkId)
+  }
+  function handleSendTouchupLocal(areas, note) {
+    if (!touchupCheckId) return
+    onSendTouchup?.(touchupCheckId, areas, note)
+    setTouchupCheckId(null)
+  }
+
   function onHandlePointerDown(e) {
     e.currentTarget.setPointerCapture(e.pointerId)
     dragRef.current = { active: true, startX: e.clientX, startW: panelWidth }
@@ -603,7 +852,7 @@ export default function ProducerIPadView({
   const colsWide   = '40px 40px minmax(0,1fr) 104px 104px 104px minmax(0,0.8fr)'
   const colsNarrow = '40px 40px minmax(0,1fr) 104px 104px 104px'
   const gridCols   = narrowMain ? colsNarrow : colsWide
-  const showRight  = panel === 'default' || panel === 'confirm'
+  const showRight  = panel === 'default' || panel === 'confirm' || panel === 'arrivals' || panel === 'to_check'
 
   const svcCards = [
     { svc: 'hair',   label: 'Hair',   ...DS.hair   },
@@ -667,16 +916,21 @@ export default function ProducerIPadView({
           {/* Filter chips */}
           <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '14px 0 6px', overflowX: 'auto', flexWrap: 'nowrap' }}>
             {[
-              { id: 'all',             label: `All ${models.length}`           },
-              { id: 'needs_attention', label: `Needs attention ${needsCount}`  },
-              { id: 'not_arrived',     label: `Not arrived ${notArrivedCount}` },
-              { id: 'not_paired',      label: `Not paired ${notPairedCount}`   },
-              { id: 'ready',           label: `Ready ${readyCount}`            },
-            ].map(f => (
-              <button key={f.id} onClick={() => setFilter(f.id)} style={{ flexShrink: 0, minHeight: 36, padding: '0 14px', borderRadius: 999, cursor: 'pointer', border: filter === f.id ? `1px solid ${TX}` : `1px solid ${DV}`, background: filter === f.id ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: filter === f.id ? '#fff' : TX, whiteSpace: 'nowrap' }}>
-                {f.label}
-              </button>
-            ))}
+              { id: 'all',             label: `All ${models.length}`,               panel: null           },
+              { id: 'needs_attention', label: `Needs attention ${needsCount}`,       panel: null           },
+              { id: 'not_arrived',     label: `Not arrived ${notArrivedCount}`,      panel: null           },
+              { id: 'arrivals',        label: `Arrivals`,                            panel: 'arrivals'     },
+              { id: 'not_paired',      label: `Not paired ${notPairedCount}`,        panel: null           },
+              { id: 'to_check',        label: `To check ${toCheckCount}`,            panel: 'to_check'     },
+              { id: 'ready',           label: `Ready ${readyCount}`,                 panel: null           },
+            ].map(f => {
+              const isActive = filter === f.id || (f.panel && panel === f.panel && filter !== 'all')
+              return (
+                <button key={f.id} onClick={() => { setFilter(f.id); if (f.panel) setPanel(f.panel) }} style={{ flexShrink: 0, minHeight: 36, padding: '0 14px', borderRadius: 999, cursor: 'pointer', border: isActive ? `1px solid ${TX}` : `1px solid ${DV}`, background: isActive ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: isActive ? '#fff' : TX, whiteSpace: 'nowrap' }}>
+                  {f.label}
+                </button>
+              )
+            })}
           </div>
 
           {/* Model table */}
@@ -756,7 +1010,13 @@ export default function ProducerIPadView({
                     {panel === 'compose' && (
                       <ComposePanel msg={composeMsg} onMsg={setComposeMsg} to={composeTo} onTo={setComposeTo} onSend={handleSend} onClose={() => setPanel('default')} />
                     )}
-                    {showRight && (
+                    {panel === 'arrivals' && (
+                      <ArrivalsPanel models={models} recentArrivals={recentArrivals} onArrived={handleArrivedLocal} onOpenRunningLate={(id) => setLateModalId(id)} onClose={() => setPanel('default')} onPair={(m) => { setPairModel(m); setPairAssist(null); setPanel('pairing') }} />
+                    )}
+                    {panel === 'to_check' && (
+                      <ToCheckPanel toCheckQueue={toCheckQueue} profiles={profiles} onLooksGood={(id) => onLooksGood?.(id)} onOpenTouchup={handleOpenTouchup} onClose={() => setPanel('default')} />
+                    )}
+                    {(panel === 'default' || panel === 'confirm') && (
                       wkActive ? (
                         <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} wide={widePanel} />
                       ) : (
@@ -779,6 +1039,18 @@ export default function ProducerIPadView({
         {panel === 'confirm' && (
           <ConfirmModal onConfirm={handleStartWalkthrough} onCancel={() => setPanel('default')} />
         )}
+
+        {/* Running late modal */}
+        {lateModalId && (() => {
+          const m = models.find(x => x.id === lateModalId)
+          return m ? <RunningLateModal model={m} onSave={handleRunningLateLocal} onCancel={() => setLateModalId(null)} /> : null
+        })()}
+
+        {/* Touch-up sheet */}
+        {touchupCheckId && (() => {
+          const check = toCheckQueue.find(c => c.id === touchupCheckId)
+          return check ? <TouchupSheet check={check} onSend={handleSendTouchupLocal} onClose={() => setTouchupCheckId(null)} /> : null
+        })()}
       </div>
     </div>
   )
