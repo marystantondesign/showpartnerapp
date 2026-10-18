@@ -1044,10 +1044,22 @@ function getDefaultAuthorData() {
     pendingApproval: false,
     changes: [],
   })
+  const seededB = {
+    areas: {
+      Eyes:   { notes: 'Smoky liner extended 3mm past the outer corner. Build in two passes.', products: [], refs: [] },
+      Brows:  { notes: 'Feathered with clear gel, no fill.', products: [], refs: [] },
+      Skin:   { notes: 'Dewy base, minimal powder only on T-zone.', products: [], refs: [] },
+      Cheeks: { notes: '', products: [], refs: [] },
+      Lips:   { notes: 'Nude gloss, center placement only.', products: [], refs: [] },
+    },
+    shared: false,
+    pendingApproval: true,
+    changes: [],
+  }
   return {
     lookCount: 3,
     lookNames: { A: 'Look A', B: 'Look B', C: 'Look C', D: 'Look D' },
-    looks: { A: mkLook(), B: mkLook(), C: mkLook(), D: mkLook() },
+    looks: { A: mkLook(), B: seededB, C: mkLook(), D: mkLook() },
     assignments: {},
   }
 }
@@ -1172,7 +1184,9 @@ function AuthoringFlow({ currentProfile, models }) {
     const ctaLabel = isLeadAssistant ? 'SEND TO YADIM TO APPROVE' : 'SHARE WITH ASSISTANTS'
     const ctaSubtext = isLeadAssistant
       ? 'Assistants see it once Yadim approves. Empty areas stay hidden.'
-      : 'Empty areas stay hidden.'
+      : role === 'artist'
+        ? 'Goes straight to all assistants. No approval needed.'
+        : 'Empty areas stay hidden.'
 
     function handleShare() {
       const next = {
@@ -1802,6 +1816,78 @@ function ReceiptUploadSheet({ onSave, onClose }) {
   )
 }
 
+// ─── K4 — approve a look ──────────────────────────────────────────────────────
+function ApproveScreen({ lookId, lookName, data, onApprove, onSuggestChange, onBack }) {
+  const lookData = data?.looks?.[lookId] || { areas: {} }
+  const areaNames = Object.keys(lookData.areas || {})
+  const writtenAreas = areaNames.filter(a => lookData.areas[a]?.notes?.trim())
+  const lookMedia = SEEDED_LOOK_MEDIA[lookId] || []
+  const coverMedia = lookMedia[0]
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#F5F2EE', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif', color: '#111' }}>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', borderBottom: '1px solid #E0DDD8' }}>
+        <button onClick={onBack} aria-label="Back" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <ChevronLeft />
+        </button>
+        <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 20 }}>{lookName}</span>
+      </div>
+
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 16px 24px' }}>
+        {/* Header */}
+        <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Waiting on you</p>
+        <p style={{ margin: '0 0 6px', fontFamily: 'Georgia, serif', fontSize: 26, color: '#111' }}>{lookName}</p>
+        <p style={{ margin: '0 0 16px', fontSize: 12, color: '#4A4743' }}>
+          Written by Iona · {writtenAreas.length} area{writtenAreas.length !== 1 ? 's' : ''} · {lookMedia.filter(m => m.type === 'photo').length + lookMedia.filter(m => m.type === 'video').length} media
+        </p>
+
+        {/* Cover image */}
+        <div style={{ height: 180, borderRadius: 12, overflow: 'hidden', background: '#2E2C29', marginBottom: 16 }}>
+          {coverMedia
+            ? <img src={coverMedia.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }} />
+            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 12, color: '#8A8480' }}>No demo yet</span></div>
+          }
+        </div>
+
+        {/* Areas */}
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 24 }}>
+          {writtenAreas.map(aName => {
+            const aData = lookData.areas[aName]
+            return (
+              <div key={aName} style={{ padding: '12px 0', borderBottom: '1px solid #E0DDD8' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{aName}</span>
+                  <span style={{ fontSize: 11, color: '#4A4743' }}>Iona · 2:18 PM</span>
+                </div>
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: '#2E2C29' }}>{aData.notes}</p>
+              </div>
+            )
+          })}
+          {writtenAreas.length === 0 && (
+            <p style={{ fontSize: 13, color: '#888580', fontStyle: 'italic', padding: '12px 0' }}>No areas written yet.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div style={{ flexShrink: 0, padding: '12px 16px 28px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <button
+          onClick={onApprove}
+          style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.1em', fontWeight: 600, cursor: 'pointer' }}
+        >
+          APPROVE · SHARE WITH ASSISTANTS
+        </button>
+        <button
+          onClick={onSuggestChange}
+          style={{ width: '100%', minHeight: 48, borderRadius: 8, border: '1px solid #CFCAC4', background: 'transparent', color: '#111', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.08em', cursor: 'pointer' }}
+        >
+          SUGGEST A CHANGE
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Artist / lead studio view ────────────────────────────────────────────────
 function ArtistStudioView({ currentProfile }) {
   const isArtist = currentProfile?.role === 'artist'
@@ -1809,6 +1895,7 @@ function ArtistStudioView({ currentProfile }) {
   const [section, setSection] = useState('LOOKS')
   const [showUpload, setShowUpload] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [approveScreenLookId, setApproveScreenLookId] = useState(null)
 
   const studioTabs = isArtist ? ['LOOKS', 'INVENTORY', 'RECEIPTS'] : ['LOOKS', 'INVENTORY']
 
@@ -1850,6 +1937,52 @@ function ArtistStudioView({ currentProfile }) {
     setShowUpload(false)
   }
 
+  const [authorData, setAuthorData] = useState(() => lsGet(AUTHOR_KEY, getDefaultAuthorData()))
+
+  const pendingApprovalLooks = isArtist
+    ? ['A', 'B', 'C', 'D'].filter(id => authorData?.looks?.[id]?.pendingApproval)
+    : []
+
+  function handleApprove(lookId) {
+    const next = {
+      ...authorData,
+      looks: {
+        ...authorData.looks,
+        [lookId]: { ...authorData.looks[lookId], pendingApproval: false, shared: true },
+      },
+    }
+    setAuthorData(next)
+    lsSet(AUTHOR_KEY, next)
+    setApproveScreenLookId(null)
+  }
+
+  function handleSuggestChange(lookId) {
+    const next = {
+      ...authorData,
+      looks: {
+        ...authorData.looks,
+        [lookId]: { ...authorData.looks[lookId], pendingApproval: false },
+      },
+    }
+    setAuthorData(next)
+    lsSet(AUTHOR_KEY, next)
+    setApproveScreenLookId(null)
+  }
+
+  if (approveScreenLookId) {
+    const lName = authorData?.lookNames?.[approveScreenLookId] || `Look ${approveScreenLookId}`
+    return (
+      <ApproveScreen
+        lookId={approveScreenLookId}
+        lookName={lName}
+        data={authorData}
+        onApprove={() => handleApprove(approveScreenLookId)}
+        onSuggestChange={() => handleSuggestChange(approveScreenLookId)}
+        onBack={() => setApproveScreenLookId(null)}
+      />
+    )
+  }
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="flex border-b border-[#E0DDD8] px-4 flex-shrink-0">
@@ -1865,6 +1998,27 @@ function ArtistStudioView({ currentProfile }) {
         ))}
       </div>
 
+      {section === 'LOOKS' && pendingApprovalLooks.length > 0 && (
+        <div style={{ flexShrink: 0, borderBottom: '1px solid #E0DDD8', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Waiting on you</p>
+          {pendingApprovalLooks.map(id => {
+            const lName = authorData?.lookNames?.[id] || `Look ${id}`
+            return (
+              <button
+                key={id}
+                onClick={() => setApproveScreenLookId(id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, border: '1.5px solid #D4A853', background: '#FFFBF2', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+              >
+                <span style={{ flex: 1 }}>
+                  <span style={{ display: 'block', fontFamily: 'Georgia, serif', fontSize: 18 }}>{lName}</span>
+                  <span style={{ display: 'block', fontSize: 11, color: '#4A4743', marginTop: 2 }}>Written by Iona · approve to share with assistants</span>
+                </span>
+                <ChevronRight />
+              </button>
+            )
+          })}
+        </div>
+      )}
       {section === 'LOOKS' && (
         <AuthoringFlow currentProfile={currentProfile} models={[]} />
       )}

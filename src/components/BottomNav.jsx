@@ -47,14 +47,11 @@ const TABS_LEAD = [
   { id: 'settings',  label: 'SETTINGS'   },
 ]
 
-// Artist: ASSISTANTS + STUDIO (6 tabs)
+// Artist: HOME + STUDIO + SETTINGS only (3 tabs)
 const TABS_ARTIST = [
-  { id: 'home',      label: 'HOME'       },
-  { id: 'dashboard', label: 'ASSISTANTS' },
-  { id: 'list',      label: 'MGMT'       },
-  { id: 'lineup',    label: 'LINEUP'     },
-  { id: 'studio',    label: 'STUDIO'     },
-  { id: 'settings',  label: 'SETTINGS'   },
+  { id: 'home',     label: 'HOME'     },
+  { id: 'studio',   label: 'STUDIO'   },
+  { id: 'settings', label: 'SETTINGS' },
 ]
 
 // Assistant: no ASSISTANTS tab

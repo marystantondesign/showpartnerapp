@@ -89,6 +89,25 @@ function AppInner() {
   const [walkthroughPhase, setWalkthroughPhase] = useState('upcoming')
   const [announcements, setAnnouncements]   = useState(() => initAnnouncements.map(a => ({ ...a, ackedBy: [] })))
   const [leadChecks, setLeadChecks]         = useState([])
+  const [secondOpinionRequests, setSecondOpinionRequests] = useState([
+    {
+      id: 'sor-seed-1',
+      modelId: 'm17',
+      modelName: 'Sana Park',
+      modelLook: 'A',
+      modelArea: 'Eyes',
+      modelAvatar: null,
+      assistantId: 'p17',
+      assistantName: 'Sofia Reyes',
+      assistantFirstName: 'Sofia',
+      leadId: 'p5',
+      leadName: 'Iona',
+      leadFirstName: 'Iona',
+      leadNote: 'Third coat on lower lashes. Not sure if this reads from runway.',
+      createdAt: '2:45 PM',
+      status: 'pending',
+    },
+  ])
   const [toCheckQueue, setToCheckQueue]     = useState([])
   const [touchupNotes, setTouchupNotes]     = useState([])
   const [runningLates, setRunningLates]     = useState({})
@@ -169,7 +188,42 @@ function AppInner() {
   }
 
   function handleEscalateCheck(checkId) {
+    const check = leadChecks.find(c => c.id === checkId)
+    if (check) {
+      const model = models.find(m => m.id === check.modelId)
+      setSecondOpinionRequests(prev => [...prev, {
+        id: `sor-${Date.now()}`,
+        modelId: check.modelId,
+        modelName: check.modelName,
+        modelLook: check.modelLook,
+        modelArea: check.specialty || 'Makeup',
+        modelAvatar: model?.avatar || null,
+        assistantId: check.assistantId,
+        assistantName: check.assistantName,
+        assistantFirstName: check.assistantFirstName || check.assistantName?.split(' ')[0],
+        leadId: currentProfile.id,
+        leadName: currentProfile.name,
+        leadFirstName: currentProfile.name.split(' ')[0],
+        leadNote: check.note || '',
+        createdAt: fmtNow(),
+        status: 'pending',
+      }])
+    }
     setLeadChecks(prev => prev.filter(c => c.id !== checkId))
+  }
+
+  function handleAcceptSecondOpinion(reqId) {
+    setSecondOpinionRequests(prev => prev.map(r =>
+      r.id === reqId ? { ...r, status: 'on_my_way' } : r
+    ))
+  }
+
+  function handleDismissSecondOpinion(reqId) {
+    setSecondOpinionRequests(prev => prev.filter(r => r.id !== reqId))
+  }
+
+  function handleLooksGoodArtist(reqId) {
+    setSecondOpinionRequests(prev => prev.filter(r => r.id !== reqId))
   }
 
   function handleMarkDoneToCheck(modelId, elapsed, specialty) {
@@ -303,7 +357,19 @@ function AppInner() {
               onSendTouchup={handleSendTouchup}
             />
           )}
-          {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && (
+          {tab === 'home' && currentProfile.role === 'artist' && (
+            <ArtistHomeView
+              currentProfile={currentProfile}
+              models={models}
+              secondOpinionRequests={secondOpinionRequests}
+              onAcceptRequest={handleAcceptSecondOpinion}
+              onDismissRequest={handleDismissSecondOpinion}
+              onLooksGood={handleLooksGoodArtist}
+              onSuggestChange={handleDismissSecondOpinion}
+              onToast={showToast}
+            />
+          )}
+          {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && currentProfile.role !== 'artist' && (
             <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />
           )}
           {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
