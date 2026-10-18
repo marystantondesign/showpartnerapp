@@ -1006,6 +1006,615 @@ function AssistantStudioFlow({ currentProfile, models }) {
 // Artist / existing studio (unchanged below)
 // ══════════════════════════════════════════════════════════════════════════════
 
+// ─── Authoring flow (A1-A5) ───────────────────────────────────────────────────
+const DEFAULT_AREAS = ['Eyes', 'Brows', 'Skin', 'Cheeks', 'Lips']
+const AUTHOR_KEY = 'showpartner_author_v1'
+
+function getDefaultAuthorData() {
+  const mkLook = () => ({
+    areas: Object.fromEntries(DEFAULT_AREAS.map(a => [a, { notes: '', products: [], refs: [] }])),
+    shared: false,
+    pendingApproval: false,
+    changes: [],
+  })
+  return {
+    lookCount: 3,
+    lookNames: { A: 'Look A', B: 'Look B', C: 'Look C', D: 'Look D' },
+    looks: { A: mkLook(), B: mkLook(), C: mkLook(), D: mkLook() },
+    assignments: {},
+  }
+}
+
+function AuthoringFlow({ currentProfile, models }) {
+  const role = currentProfile?.role
+  const [screen, setScreen] = useState('list')
+  const [activeLookId, setActiveLookId] = useState('A')
+  const [activeAreaName, setActiveAreaName] = useState(null)
+  const [showInventoryPicker, setShowInventoryPicker] = useState(false)
+  const [invSearch, setInvSearch] = useState('')
+  const [invCat, setInvCat] = useState('All')
+  const [invSelected, setInvSelected] = useState([])
+  const [addAreaPrompt, setAddAreaPrompt] = useState(false)
+  const [localAssign, setLocalAssign] = useState({})
+  const [filterLook, setFilterLook] = useState(null)
+  const [newAreaName, setNewAreaName] = useState('')
+  const [listenActive, setListenActive] = useState(false)
+  const recogRef = useRef(null)
+
+  const [data, setData] = useState(() => lsGet(AUTHOR_KEY, getDefaultAuthorData()))
+  function save(next) { setData(next); lsSet(AUTHOR_KEY, next) }
+
+  const hasSpeech = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)
+
+  function startListen(areaName) {
+    if (!hasSpeech) return
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+    const r = new SR()
+    r.continuous = true
+    r.interimResults = false
+    r.onresult = e => {
+      const transcript = Array.from(e.results).map(res => res[0].transcript).join(' ')
+      save({
+        ...data,
+        looks: {
+          ...data.looks,
+          [activeLookId]: {
+            ...data.looks[activeLookId],
+            areas: {
+              ...data.looks[activeLookId].areas,
+              [areaName]: {
+                ...data.looks[activeLookId].areas[areaName],
+                notes: (data.looks[activeLookId].areas[areaName]?.notes || '') + ' ' + transcript,
+              }
+            }
+          }
+        }
+      })
+    }
+    r.onend = () => setListenActive(false)
+    r.start()
+    recogRef.current = r
+    setListenActive(true)
+  }
+
+  function stopListen() {
+    recogRef.current?.stop()
+    setListenActive(false)
+  }
+
+  const lookIds = ['A', 'B', 'C', 'D'].slice(0, data.lookCount)
+
+  // A1 - Set up looks
+  if (screen === 'setup') {
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#F5F2EE', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif', color: '#111' }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', borderBottom: '1px solid #E0DDD8' }}>
+          <button onClick={() => setScreen('list')} aria-label="Back" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <ChevronLeft />
+          </button>
+          <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 20 }}>Set up looks</span>
+          <span style={{ fontSize: 11, color: '#4A4743', paddingRight: 8 }}>{currentProfile?.name?.split(' ')[0]} · {role}</span>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>How many makeup looks today?</span>
+            <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 10, background: '#E8E4DF' }}>
+              {[1, 2, 3, 4].map(n => (
+                <button key={n} onClick={() => save({ ...data, lookCount: n })} style={{ flex: 1, minHeight: 44, border: 0, borderRadius: 8, background: data.lookCount === n ? '#111' : 'transparent', color: data.lookCount === n ? '#fff' : '#111', fontFamily: 'Georgia, serif', fontSize: 18, cursor: 'pointer' }}>{n}</button>
+              ))}
+            </div>
+            <span style={{ fontSize: 12, color: '#4A4743' }}>You can add or remove one later.</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <p style={{ margin: '0 0 4px', fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Name them</p>
+            {['A', 'B', 'C', 'D'].slice(0, data.lookCount).map(id => (
+              <label key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8' }}>
+                <span style={{ width: 24, fontFamily: 'Georgia, serif', fontSize: 18 }}>{id}</span>
+                <input
+                  value={data.lookNames[id] || ''}
+                  onChange={e => save({ ...data, lookNames: { ...data.lookNames, [id]: e.target.value } })}
+                  placeholder={`Look ${id}`}
+                  style={{ flex: 1, height: 44, padding: '0 12px', border: '1px solid #CFCAC4', borderRadius: 10, background: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, outline: 'none' }}
+                />
+              </label>
+            ))}
+          </div>
+        </div>
+        <div style={{ flexShrink: 0, padding: '12px 16px 16px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button onClick={() => { setActiveLookId('A'); setScreen('look') }} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}>
+            NEXT: WRITE LOOK A
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // A2 - Write a look
+  if (screen === 'look') {
+    const lookData = data.looks[activeLookId] || { areas: {}, shared: false, pendingApproval: false }
+    const areaNames = Object.keys(lookData.areas)
+    const writtenCount = areaNames.filter(a => lookData.areas[a]?.notes?.trim()).length
+    const lookMedia = SEEDED_LOOK_MEDIA[activeLookId] || []
+    const capturers = (SHOW_LOOKS.find(l => l.id === activeLookId)?.capturers || [])
+      .map(id => profiles.find(p => p.id === id)?.name?.split(' ')[0]).filter(Boolean)
+    const modelAssignedCount = Object.values(data.assignments).filter(v => v === activeLookId).length
+    const allModelsCount = models?.length || 0
+    const lookName = data.lookNames[activeLookId] || `Look ${activeLookId}`
+
+    const isLeadAssistant = role === 'lead_assistant'
+    const ctaLabel = isLeadAssistant ? 'SEND TO YADIM TO APPROVE' : 'SHARE WITH ASSISTANTS'
+    const ctaSubtext = isLeadAssistant
+      ? 'Assistants see it once Yadim approves. Empty areas stay hidden.'
+      : 'Empty areas stay hidden.'
+
+    function handleShare() {
+      const next = {
+        ...data,
+        looks: {
+          ...data.looks,
+          [activeLookId]: {
+            ...lookData,
+            shared: !isLeadAssistant,
+            pendingApproval: isLeadAssistant,
+          }
+        }
+      }
+      save(next)
+      setScreen('list')
+    }
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#F5F2EE', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif', color: '#111' }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', borderBottom: '1px solid #E0DDD8' }}>
+          <button onClick={() => setScreen('list')} aria-label="Back" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <ChevronLeft />
+          </button>
+          <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 20 }}>{lookName}</span>
+          <span style={{ fontSize: 11, color: '#4A4743', paddingRight: 8 }}>{currentProfile?.name?.split(' ')[0]} · {role}</span>
+        </div>
+
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Media card */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', padding: 12, borderRadius: 12, background: '#fff', border: '1px solid #E0DDD8' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 8, background: '#E0DDD8', flexShrink: 0, overflow: 'hidden' }}>
+              {lookMedia[0] && <img src={lookMedia[0].dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+            </div>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 13, fontWeight: 500 }}>{lookMedia.length ? `Demo video and ${lookMedia.filter(m => m.type === 'photo').length} photos` : 'No media yet'}</span>
+              {capturers.length > 0 && <span style={{ fontSize: 11, color: '#4A4743' }}>Captured by {capturers.join(', ')}</span>}
+            </span>
+            <ChevronRight />
+          </div>
+
+          {/* Areas */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Areas</p>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>{writtenCount} of {areaNames.length} written</p>
+            </div>
+            {areaNames.map(aname => {
+              const aData = lookData.areas[aname] || { notes: '', products: [], refs: [] }
+              const refCount = aData.refs?.length || 0
+              return (
+                <button
+                  key={aname}
+                  onClick={() => { setActiveAreaName(aname); setScreen('area') }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8', width: '100%', padding: 0, borderLeft: 0, borderRight: 0, borderTop: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+                >
+                  <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, padding: '10px 0' }}>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{aname}</span>
+                    {aData.notes?.trim()
+                      ? <span style={{ fontSize: 12, color: '#2E2C29' }}>{aData.notes.slice(0, 80)}{aData.notes.length > 80 ? '...' : ''}</span>
+                      : <span style={{ fontSize: 12, color: '#A33D28' }}>No notes yet</span>
+                    }
+                    {refCount > 0 && <span style={{ fontSize: 11, color: '#4A4743' }}>{refCount} reference{refCount !== 1 ? 's' : ''}</span>}
+                  </span>
+                  <ChevronRight />
+                </button>
+              )
+            })}
+            {addAreaPrompt ? (
+              <div style={{ display: 'flex', gap: 8, padding: '8px 0', alignItems: 'center' }}>
+                <input
+                  autoFocus
+                  value={newAreaName}
+                  onChange={e => setNewAreaName(e.target.value)}
+                  placeholder="e.g. Lashes, Liner"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newAreaName.trim()) {
+                      const aName = newAreaName.trim()
+                      const newLookData = { ...lookData, areas: { ...lookData.areas, [aName]: { notes: '', products: [], refs: [] } } }
+                      save({ ...data, looks: { ...data.looks, [activeLookId]: newLookData } })
+                      setNewAreaName('')
+                      setAddAreaPrompt(false)
+                    }
+                    if (e.key === 'Escape') { setAddAreaPrompt(false); setNewAreaName('') }
+                  }}
+                  style={{ flex: 1, height: 40, padding: '0 10px', border: '1px solid #CFCAC4', borderRadius: 8, fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, outline: 'none' }}
+                />
+                <button onClick={() => { setAddAreaPrompt(false); setNewAreaName('') }} style={{ border: 0, background: 'none', cursor: 'pointer', fontSize: 13, color: '#4A4743' }}>Cancel</button>
+              </div>
+            ) : (
+              <button onClick={() => setAddAreaPrompt(true)} style={{ alignSelf: 'flex-start', minHeight: 44, padding: 0, border: 0, background: 'none', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 13, textDecoration: 'underline', color: '#111', cursor: 'pointer' }}>
+                + Add an area (lashes, liner...)
+              </button>
+            )}
+          </div>
+
+          {/* Models row */}
+          <button
+            onClick={() => { setLocalAssign({ ...data.assignments }); setFilterLook(null); setScreen('assign') }}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8', width: '100%', padding: 0, borderLeft: 0, borderRight: 0, borderTop: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+          >
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, padding: '10px 0' }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>Models getting {lookName}</span>
+              <span style={{ fontSize: 12, color: '#4A4743' }}>{modelAssignedCount || (allModelsCount ? `${allModelsCount} models` : 'None assigned')}</span>
+            </span>
+            <ChevronRight />
+          </button>
+        </div>
+
+        <div style={{ flexShrink: 0, padding: '12px 16px 16px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button onClick={handleShare} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}>
+            {ctaLabel}
+          </button>
+          <span style={{ fontSize: 11, color: '#4A4743', textAlign: 'center' }}>{ctaSubtext}</span>
+        </div>
+      </div>
+    )
+  }
+
+  // A3 - Write one area
+  if (screen === 'area' && activeAreaName) {
+    const lookData = data.looks[activeLookId] || { areas: {} }
+    const aData = lookData.areas[activeAreaName] || { notes: '', products: [], refs: [] }
+    const lookName = data.lookNames[activeLookId] || `Look ${activeLookId}`
+    const lookMedia = SEEDED_LOOK_MEDIA[activeLookId] || []
+    const sortedMedia = [...lookMedia.filter(m => m.areaTag === activeAreaName), ...lookMedia.filter(m => m.areaTag !== activeAreaName)]
+
+    function updateAreaField(field, val) {
+      save({
+        ...data,
+        looks: {
+          ...data.looks,
+          [activeLookId]: {
+            ...lookData,
+            areas: { ...lookData.areas, [activeAreaName]: { ...aData, [field]: val } }
+          }
+        }
+      })
+    }
+
+    const productsInArea = MOCK_PRODUCTS.filter(p => aData.products.includes(p.id))
+
+    function removeProduct(pid) {
+      updateAreaField('products', aData.products.filter(id => id !== pid))
+    }
+
+    function toggleRef(mediaId) {
+      const refs = aData.refs || []
+      updateAreaField('refs', refs.includes(mediaId) ? refs.filter(id => id !== mediaId) : [...refs, mediaId])
+    }
+
+    function handleSave() {
+      setScreen('look')
+    }
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#F5F2EE', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif', color: '#111' }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', borderBottom: '1px solid #E0DDD8' }}>
+          <button onClick={() => setScreen('look')} aria-label="Back" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <ChevronLeft />
+          </button>
+          <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 20 }}>{activeAreaName} · {lookName}</span>
+        </div>
+
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {/* Notes */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>How it is done</p>
+            <div style={{ position: 'relative' }}>
+              <textarea
+                rows={6}
+                value={aData.notes}
+                onChange={e => updateAreaField('notes', e.target.value)}
+                placeholder={`Notes for ${activeAreaName}...`}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 12px 48px', border: '1px solid #111', borderRadius: 10, background: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 15, lineHeight: 1.5, resize: 'none', color: '#111', outline: 'none' }}
+              />
+              {hasSpeech && (
+                <button
+                  aria-label={listenActive ? 'Stop dictation' : 'Start dictation'}
+                  onClick={() => listenActive ? stopListen() : startListen(activeAreaName)}
+                  style={{ position: 'absolute', right: 8, bottom: 8, width: 40, height: 40, borderRadius: '50%', border: 0, background: listenActive ? '#A33D28' : '#E8E4DF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={listenActive ? '#fff' : '#111'} strokeWidth="1.8" aria-hidden="true">
+                    <rect x="9" y="3" width="6" height="11" rx="3"/>
+                    <path d="M5 11a7 7 0 0014 0M12 18v3"/>
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Products */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Products (optional)</p>
+            {productsInArea.map(prod => (
+              <div key={prod.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, padding: '0 8px 0 12px', border: '1px solid #E0DDD8', borderRadius: 10, background: '#fff' }}>
+                <span style={{ width: 32, height: 32, borderRadius: '50%', background: prod.sw, border: '2px solid #E0DDD8', flexShrink: 0 }} />
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>{prod.name}</span>
+                  <span style={{ fontSize: 11, color: '#4A4743' }}>Shade: {prod.shade} · {prod.stock}</span>
+                </span>
+                <button onClick={() => removeProduct(prod.id)} aria-label="Remove product" style={{ width: 40, height: 40, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4A4743" strokeWidth="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => { setInvSelected(aData.products || []); setInvSearch(''); setInvCat('All'); setShowInventoryPicker(true) }}
+              style={{ minHeight: 44, borderRadius: 10, border: '1px dashed #8A8580', background: 'transparent', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, color: '#111', cursor: 'pointer' }}
+            >
+              + Add from inventory
+            </button>
+          </div>
+
+          {/* References */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>References</p>
+              <span style={{ fontSize: 11, color: '#4A4743' }}>From {lookName}'s photos and clips</span>
+            </div>
+            {sortedMedia.length === 0
+              ? <span style={{ fontSize: 12, color: '#4A4743' }}>No media captured for {lookName} yet.</span>
+              : (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6 }}>
+                    {sortedMedia.map(item => {
+                      const selected = (aData.refs || []).includes(item.id)
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => toggleRef(item.id)}
+                          style={{ position: 'relative', aspectRatio: '1', padding: 0, borderRadius: 8, overflow: 'hidden', border: 0, background: '#E0DDD8', cursor: 'pointer' }}
+                        >
+                          <img src={item.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: selected ? 1 : 0.85 }} />
+                          <span style={{ position: 'absolute', right: 4, top: 4, width: 20, height: 20, borderRadius: '50%', border: '2px solid #fff', background: selected ? '#111' : 'rgba(17,17,17,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {selected && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>}
+                          </span>
+                          {item.areaTag && <span style={{ position: 'absolute', left: 4, bottom: 4, padding: '1px 5px', borderRadius: 4, background: 'rgba(17,17,17,.75)', color: '#fff', fontSize: 9 }}>{item.areaTag}</span>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <span style={{ fontSize: 12, color: '#4A4743' }}>Photos tagged {activeAreaName} are suggested first.</span>
+                </>
+              )
+            }
+          </div>
+        </div>
+
+        <div style={{ flexShrink: 0, padding: '12px 16px 16px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button onClick={handleSave} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}>
+            SAVE {activeAreaName.toUpperCase()}
+          </button>
+        </div>
+
+        {/* A3b - Inventory picker sheet */}
+        {showInventoryPicker && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,.35)' }} onClick={() => setShowInventoryPicker(false)}>
+            <div role="dialog" aria-label="Add from inventory" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 760, background: '#F5F2EE', borderRadius: '16px 16px 0 0', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
+              <button aria-label="Close" style={{ flexShrink: 0, height: 28, background: 'none', border: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <span style={{ width: 40, height: 5, borderRadius: 3, background: '#B9B4AE' }} />
+              </button>
+              <div style={{ flexShrink: 0, padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: 12, borderBottom: '1px solid #E0DDD8' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Add from inventory</span>
+                  <span style={{ fontSize: 11, color: '#4A4743' }}>for {activeAreaName} · {data.lookNames[activeLookId] || `Look ${activeLookId}`}</span>
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 14px', background: '#fff', border: '1px solid #E0DDD8', borderRadius: 10 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6A64" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                  <input
+                    value={invSearch}
+                    onChange={e => setInvSearch(e.target.value)}
+                    placeholder="Search product or shade"
+                    style={{ flex: 1, border: 0, outline: 'none', background: 'transparent', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14 }}
+                  />
+                </label>
+                <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
+                  {INV_CATS.map(cat => (
+                    <button key={cat} onClick={() => setInvCat(cat)} style={{ flexShrink: 0, minHeight: 40, padding: '0 14px', borderRadius: 999, border: invCat === cat ? '1px solid #111' : '1px solid #CFCAC4', background: invCat === cat ? '#111' : 'transparent', color: invCat === cat ? '#fff' : '#111', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, cursor: 'pointer' }}>
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 16px' }}>
+                {MOCK_PRODUCTS
+                  .filter(p => (invCat === 'All' || p.cat === invCat) && (!invSearch || p.name.toLowerCase().includes(invSearch.toLowerCase()) || p.shade.toLowerCase().includes(invSearch.toLowerCase())))
+                  .map(prod => (
+                    <label key={prod.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 68, borderBottom: '1px solid #E0DDD8', cursor: 'pointer' }}>
+                      <span style={{ width: 36, height: 36, borderRadius: '50%', background: prod.sw, border: '2px solid #E0DDD8', flexShrink: 0 }} />
+                      <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                        <span style={{ fontSize: 14, fontWeight: 500 }}>{prod.name}</span>
+                        <span style={{ fontSize: 12, color: '#2E2C29' }}>Shade: {prod.shade}</span>
+                        <span style={{ fontSize: 11, color: prod.out ? '#A33D28' : '#4A4743' }}>{prod.stock}</span>
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={invSelected.includes(prod.id)}
+                        onChange={() => setInvSelected(prev => prev.includes(prod.id) ? prev.filter(id => id !== prod.id) : [...prev, prod.id])}
+                        style={{ width: 22, height: 22, accentColor: '#111', cursor: 'pointer' }}
+                      />
+                    </label>
+                  ))
+                }
+              </div>
+              <div style={{ flexShrink: 0, padding: '12px 16px 28px', borderTop: '1px solid #E0DDD8' }}>
+                <button
+                  onClick={() => {
+                    updateAreaField('products', invSelected)
+                    setShowInventoryPicker(false)
+                  }}
+                  style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}
+                >
+                  ADD {invSelected.length} TO {activeAreaName.toUpperCase()}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // A4 - Assign models
+  if (screen === 'assign') {
+    const lookName = data.lookNames[activeLookId] || `Look ${activeLookId}`
+    const allIds = ['A', 'B', 'C', 'D'].slice(0, data.lookCount)
+
+    const counts = {}
+    allIds.forEach(id => { counts[id] = Object.values(localAssign).filter(v => v === id).length })
+    const notSet = (models?.length || 0) - Object.values(localAssign).filter(v => allIds.includes(v)).length
+    const displayModels = models?.length
+      ? (filterLook === 'NOT_SET'
+          ? models.filter(m => !localAssign[m.id] || !allIds.includes(localAssign[m.id]))
+          : filterLook
+            ? models.filter(m => localAssign[m.id] === filterLook)
+            : models)
+      : []
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#F5F2EE', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif', color: '#111' }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', borderBottom: '1px solid #E0DDD8' }}>
+          <button onClick={() => setScreen('look')} aria-label="Back" style={{ width: 44, height: 44, border: 0, background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <ChevronLeft />
+          </button>
+          <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 20 }}>Who gets which look</span>
+          <span style={{ fontSize: 11, color: '#4A4743', paddingRight: 8 }}>{models?.length || 0} models</span>
+        </div>
+        <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '12px 16px', overflowX: 'auto' }}>
+          {allIds.map(id => (
+            <button key={id} onClick={() => setFilterLook(filterLook === id ? null : id)} style={{ flexShrink: 0, padding: '8px 12px', borderRadius: 999, border: filterLook === id ? '1px solid #111' : '1px solid #CFCAC4', background: filterLook === id ? '#111' : 'transparent', color: filterLook === id ? '#fff' : '#111', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, system-ui, sans-serif' }}>
+              {id} · {counts[id] || 0}
+            </button>
+          ))}
+          {notSet > 0 && (
+            <button onClick={() => setFilterLook(filterLook === 'NOT_SET' ? null : 'NOT_SET')} style={{ flexShrink: 0, padding: '8px 12px', borderRadius: 999, border: filterLook === 'NOT_SET' ? '1px solid #A33D28' : '1px solid #A33D28', background: filterLook === 'NOT_SET' ? '#A33D28' : 'transparent', color: filterLook === 'NOT_SET' ? '#fff' : '#A33D28', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, system-ui, sans-serif' }}>
+              Not set · {notSet}
+            </button>
+          )}
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px' }}>
+          {displayModels.length === 0 && (
+            <p style={{ padding: '16px 0', fontSize: 13, color: '#4A4743' }}>No models in the lineup yet.</p>
+          )}
+          {displayModels.map(model => {
+            const assigned = localAssign[model.id]
+            const initials = model.name?.split(' ').map(w => w[0]).join('') || '?'
+            return (
+              <div key={model.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8' }}>
+                {model.avatar
+                  ? <img src={model.avatar} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  : <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#E0DDD8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>{initials}</span>
+                }
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 15 }}>{model.name}</span>
+                  <span style={{ fontSize: 11, color: assigned ? '#4A4743' : '#A33D28' }}>{assigned ? `Look ${assigned}` : 'not set'}</span>
+                </span>
+                <div style={{ display: 'flex', gap: 2, padding: 3, borderRadius: 8, background: '#E8E4DF' }}>
+                  {allIds.map(id => (
+                    <button
+                      key={id}
+                      onClick={() => setLocalAssign(prev => ({ ...prev, [model.id]: id }))}
+                      style={{ width: 36, height: 36, border: 0, borderRadius: 6, background: assigned === id ? '#111' : 'transparent', color: assigned === id ? '#fff' : '#111', fontFamily: 'Georgia, serif', fontSize: 15, cursor: 'pointer' }}
+                    >
+                      {id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div style={{ flexShrink: 0, padding: '12px 16px 16px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button
+            onClick={() => { save({ ...data, assignments: localAssign }); setScreen('look') }}
+            style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}
+          >
+            SAVE · ASSISTANTS SEE IT ON THEIR MODEL
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // List screen (default)
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+        <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Looks</p>
+        <button onClick={() => setScreen('setup')} style={{ border: 0, background: 'none', fontSize: 12, color: '#111', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: 'Inter, system-ui, sans-serif' }}>Set up</button>
+      </div>
+      {lookIds.map(id => {
+        const lookData = data.looks[id] || { areas: {} }
+        const areaNames = Object.keys(lookData.areas)
+        const writtenCount = areaNames.filter(a => lookData.areas[a]?.notes?.trim()).length
+        const lookName = data.lookNames[id] || `Look ${id}`
+        return (
+          <button
+            key={id}
+            onClick={() => { setActiveLookId(id); setScreen('look') }}
+            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 14, borderRadius: 12, border: '1px solid #E0DDD8', background: '#fff', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+          >
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 28, color: '#6E6A64', width: 28, flexShrink: 0 }}>{id}</span>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{lookName}</span>
+              <span style={{ fontSize: 12, color: writtenCount > 0 ? '#4A4743' : '#A33D28' }}>
+                {writtenCount} of {areaNames.length} area{areaNames.length !== 1 ? 's' : ''} written
+              </span>
+            </span>
+            <ChevronRight />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ─── Lead assistant: LOOKS + MY WORK tabs ────────────────────────────────────
+function LeadAssistantStudioView({ currentProfile, models }) {
+  const [tab, setTab] = useState('LOOKS')
+
+  function TabBar() {
+    return (
+      <div className="flex border-b border-[#E0DDD8] px-4 flex-shrink-0">
+        {['LOOKS', 'MY WORK'].map(t => (
+          <button key={t} onClick={() => setTab(t)} className="flex-1 py-3 text-[10px] tracking-widest uppercase font-sans outline-none border-none bg-transparent cursor-pointer" style={{ color: tab === t ? '#111' : '#888580', borderBottom: tab === t ? '1.5px solid #111' : '1.5px solid transparent', fontWeight: tab === t ? 600 : 400 }}>
+            {t}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  if (tab === 'MY WORK') {
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TabBar />
+        <AssistantStudioFlow currentProfile={currentProfile} models={models} />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <TabBar />
+      <AuthoringFlow currentProfile={currentProfile} models={models} />
+    </div>
+  )
+}
+
 const SHOW_INVENTORY = [
   { id: 'si-1',  item: 'Hair Extensions (clip-in sets)',    unit: 'sets',    allocated: 12, used: 0 },
   { id: 'si-2',  item: 'Hairspray (travel size)',           unit: 'cans',    allocated: 24, used: 0 },
@@ -1230,9 +1839,7 @@ function ArtistStudioView({ currentProfile }) {
       </div>
 
       {section === 'LOOKS' && (
-        <div className="flex-1 overflow-y-auto px-4 py-5">
-          {SHOW_LOOKS.map(look => <LookCard key={look.id} look={look} />)}
-        </div>
+        <AuthoringFlow currentProfile={currentProfile} models={[]} />
       )}
 
       {section === 'INVENTORY' && (
@@ -1308,8 +1915,8 @@ function ArtistStudioView({ currentProfile }) {
 
 // ─── Main StudioView ───────────────────────────────────────────────────────────
 export default function StudioView({ currentProfile, models: allModels }) {
-  const isAssistant = currentProfile?.role === 'assistant' || currentProfile?.role === 'lead_assistant'
-  return isAssistant
-    ? <AssistantStudioFlow currentProfile={currentProfile} models={allModels} />
-    : <ArtistStudioView currentProfile={currentProfile} />
+  const role = currentProfile?.role
+  if (role === 'lead_assistant') return <LeadAssistantStudioView currentProfile={currentProfile} models={allModels} />
+  if (role === 'assistant') return <AssistantStudioFlow currentProfile={currentProfile} models={allModels} />
+  return <ArtistStudioView currentProfile={currentProfile} />
 }
