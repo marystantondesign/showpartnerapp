@@ -6,6 +6,7 @@ import {
   announcements as initAnnouncements,
   show,
 } from '../data/mockData'
+import ModelDetailSheet from '../components/ModelDetailSheet'
 
 const SVC       = 'makeup'
 const SVC_LABEL = 'Makeup'
@@ -707,6 +708,7 @@ export default function ProducerIPadView({
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [lateModalId, setLateModalId] = useState(null)
   const [touchupCheckId, setTouchupCheckId] = useState(null)
+  const [activeModel, setActiveModel] = useState(null)
 
   const [panelWidth, setPanelWidthRaw] = useState(() => {
     const s = parseInt(localStorage.getItem('sp_panelWidth'), 10)
@@ -946,7 +948,7 @@ export default function ProducerIPadView({
               const aName     = getAssistantName(m.services[SVC].assistantId)
               const needsPair = m.arrived && !m.services[SVC].assistantId
               return (
-                <div key={m.id} style={{ display: 'grid', gridTemplateColumns: gridCols, alignItems: 'center', columnGap: 10, minHeight: 58, borderBottom: `1px solid ${BD}` }}>
+                <div key={m.id} onClick={() => setActiveModel(m)} style={{ display: 'grid', gridTemplateColumns: gridCols, alignItems: 'center', columnGap: 10, minHeight: 58, borderBottom: `1px solid ${BD}`, cursor: 'pointer' }}>
                   <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{m.look}</span>
                   <Avatar src={m.avatar} name={m.name} size={36} />
                   <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
@@ -1051,6 +1053,28 @@ export default function ProducerIPadView({
           const check = toCheckQueue.find(c => c.id === touchupCheckId)
           return check ? <TouchupSheet check={check} onSend={handleSendTouchupLocal} onClose={() => setTouchupCheckId(null)} /> : null
         })()}
+
+        {/* Model detail sheet */}
+        {activeModel && (
+          <ModelDetailSheet
+            model={models.find(m => m.id === activeModel.id) || activeModel}
+            onClose={() => setActiveModel(null)}
+            onStatusChange={(modelId, newStatus) => {
+              setModels(prev => prev.map(m => {
+                if (m.id !== modelId) return m
+                return {
+                  ...m,
+                  status: newStatus,
+                  statusLog: [...(m.statusLog || []), { status: newStatus, timestamp: fmtNow(), updatedBy: producer?.name || 'Producer' }],
+                }
+              }))
+            }}
+            onNote={(modelId, newNotesArray) => {
+              setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: newNotesArray } : m))
+            }}
+            currentProfile={producer}
+          />
+        )}
       </div>
     </div>
   )
