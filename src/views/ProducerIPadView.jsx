@@ -7,6 +7,7 @@ import {
   show,
 } from '../data/mockData'
 import ModelDetailSheet from '../components/ModelDetailSheet'
+import StatusLinkView from './StatusLinkView'
 
 const SVC       = 'makeup'
 const SVC_LABEL = 'Makeup'
@@ -694,6 +695,8 @@ export default function ProducerIPadView({
   onArrived,
   onRunningLate,
   onLogOut,
+  dark = false,
+  onToggleDark,
 }) {
   const [panel, setPanel]           = useState('default')
   const [pairModel, setPairModel]   = useState(null)
@@ -709,6 +712,8 @@ export default function ProducerIPadView({
   const [lateModalId, setLateModalId] = useState(null)
   const [touchupCheckId, setTouchupCheckId] = useState(null)
   const [activeModel, setActiveModel] = useState(null)
+  const [statusLinkOpen, setStatusLinkOpen] = useState(false)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
 
   const [panelWidth, setPanelWidthRaw] = useState(() => {
     const s = parseInt(localStorage.getItem('sp_panelWidth'), 10)
@@ -870,11 +875,32 @@ export default function ProducerIPadView({
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 26, whiteSpace: 'nowrap' }}>{show.name}</span>
         <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{SVC_LABEL} · {currentTime}</span>
         <span style={{ flex: 1 }} />
-        <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 999, border: `1px solid ${TX}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', color: TX, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        <button onClick={() => setStatusLinkOpen(true)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 999, border: `1px solid ${TX}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', color: TX, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2"><path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"/></svg>
           SHARE STATUS LINK
         </button>
-        <Avatar src={producer.avatar} name={producer.name} size={36} />
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setProfileMenuOpen(o => !o)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', borderRadius: '50%' }}>
+            <Avatar src={producer.avatar} name={producer.name} size={36} />
+          </button>
+          {profileMenuOpen && (
+            <div style={{ position: 'absolute', top: 44, right: 0, background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.12)', minWidth: 200, zIndex: 200, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${BD}` }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TX }}>{producer.name}</div>
+                <div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{producer.role === 'lead' ? 'Lead Producer' : producer.role}</div>
+              </div>
+              <button onClick={() => { onToggleDark?.(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>
+                <span>Dark mode</span>
+                <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? TX : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms' }}>
+                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                </span>
+              </button>
+              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', borderTop: `1px solid ${BD}`, cursor: 'pointer', fontSize: 13, color: '#C4614A', fontWeight: 500 }}>
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Body */}
@@ -1053,6 +1079,20 @@ export default function ProducerIPadView({
           const check = toCheckQueue.find(c => c.id === touchupCheckId)
           return check ? <TouchupSheet check={check} onSend={handleSendTouchupLocal} onClose={() => setTouchupCheckId(null)} /> : null
         })()}
+
+        {/* Status link overlay */}
+        {statusLinkOpen && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '12px 20px', background: BG, borderBottom: `1px solid ${BD}` }}>
+              <span style={{ fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', color: MT }}>Status link preview</span>
+              <span style={{ flex: 1 }} />
+              <button onClick={() => setStatusLinkOpen(false)} style={{ height: 36, padding: '0 16px', borderRadius: 999, border: `1px solid ${BD}`, background: 'transparent', fontSize: 12, color: TX, cursor: 'pointer' }}>Close</button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', background: BG }}>
+              <StatusLinkView />
+            </div>
+          </div>
+        )}
 
         {/* Model detail sheet */}
         {activeModel && (

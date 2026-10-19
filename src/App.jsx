@@ -318,6 +318,8 @@ function AppInner() {
         onArrived={handleArrived}
         onRunningLate={handleRunningLate}
         onLogOut={handleLogOut}
+        dark={dark}
+        onToggleDark={toggleDark}
       />
     )
   }
