@@ -682,6 +682,525 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
   )
 }
 
+const AUTHOR_KEY = 'showpartner_author_v1'
+function lsGet(key, fb) { try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fb } catch { return fb } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)) } catch {} }
+
+const IPAD_SECTIONS = [
+  { id: 'home',       label: 'Home'       },
+  { id: 'assistants', label: 'Assistants' },
+  { id: 'lineup',     label: 'Lineup'     },
+  { id: 'studio',     label: 'Studio'     },
+  { id: 'settings',   label: 'Settings'   },
+]
+
+const IPAD_NOTIFS = [
+  { id: 'n1', title: 'Lead check escalated', subtitle: 'Aimi asked Yadim about Sofia R · Mei Lin', time: '3:44', dot: '#111' },
+  { id: 'n2', title: 'Ready to check',       subtitle: 'Kenji W · Camille Dubois, makeup done',   time: '3:43', dot: '#7A9E7E' },
+  { id: 'n3', title: 'Running late',          subtitle: 'Priya Sharma, new ETA 3:55',              time: '3:40', dot: '#C4614A' },
+  { id: 'n4', title: 'Arrived',               subtitle: 'Yuki Nakamura checked in, not paired',    time: '3:44', dot: '#D4A853' },
+  { id: 'n5', title: 'Touch-up sent',         subtitle: 'Aimi to Ivana R · Sofia Andersen, lips',  time: '3:31', dot: '#C8C4BF' },
+]
+
+const STATUS_META_LINEUP = {
+  not_started:   { color: '#C8C4BF', label: 'Not started'   },
+  in_progress:   { color: '#D4A853', label: 'In progress'   },
+  paused:        { color: '#8A9BB0', label: 'Paused'        },
+  needs_revisit: { color: '#C4614A', label: 'Needs revisit' },
+  done:          { color: '#7A9E7E', label: 'Done'          },
+}
+
+function NavIcon({ id, active }) {
+  const c = active ? '#fff' : TX
+  const s = { fill: 'none', stroke: c, strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }
+  if (id === 'home')       return <svg width="20" height="20" viewBox="0 0 24 24" style={s}><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+  if (id === 'assistants') return <svg width="20" height="20" viewBox="0 0 24 24" style={s}><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75M22 21v-2a4 4 0 00-3-3.87"/></svg>
+  if (id === 'lineup')     return <svg width="20" height="20" viewBox="0 0 24 24" style={s}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+  if (id === 'studio')     return <svg width="20" height="20" viewBox="0 0 24 24" style={s}><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M8 6l2-3h4l2 3"/></svg>
+  if (id === 'settings')   return <svg width="20" height="20" viewBox="0 0 24 24" style={s}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+  return null
+}
+
+function ShareStatusModal({ onClose }) {
+  const [copied, setCopied] = useState(false)
+  const [phone, setPhone]   = useState('')
+  const [sent, setSent]     = useState(false)
+  const url = 'showpartner.app/s/abc123'
+  function handleCopy() {
+    try { navigator.clipboard.writeText('https://' + url) } catch {}
+    setCopied(true); setTimeout(() => setCopied(false), 2000)
+  }
+  function handleSend() {
+    if (!phone.trim()) return
+    setSent(true); setPhone(''); setTimeout(() => setSent(false), 3000)
+  }
+  const alreadyHas = [
+    { name: 'Aimi K.',  time: '3:31 PM' },
+    { name: 'Iona M.',  time: '3:29 PM' },
+    { name: 'Kenji W.', time: '3:28 PM' },
+  ]
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 840, background: BG, borderRadius: 20, overflow: 'hidden', display: 'flex', maxHeight: 'calc(100vh - 48px)' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: `1px solid ${BD}` }}>
+          <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>Share status link</span>
+            <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontSize: 20, color: M2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div>
+              <Lbl s={{ marginBottom: 8 }}>Link</Lbl>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: '#fff', display: 'flex', alignItems: 'center', padding: '0 14px', fontSize: 13, color: MT, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{url}</div>
+                <button onClick={handleCopy} style={{ height: 44, padding: '0 18px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{copied ? 'COPIED' : 'COPY'}</button>
+              </div>
+            </div>
+            <div>
+              <Lbl s={{ marginBottom: 8 }}>Text it to someone</Lbl>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number" style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none', boxSizing: 'border-box' }} />
+                <button onClick={handleSend} disabled={!phone.trim()} style={{ height: 44, padding: '0 18px', borderRadius: 8, border: 0, background: phone.trim() ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.08em', cursor: phone.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>{sent ? 'SENT' : 'SEND'}</button>
+              </div>
+            </div>
+            <div>
+              <Lbl s={{ marginBottom: 10 }}>Already has it</Lbl>
+              {alreadyHas.map((p, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: i < alreadyHas.length - 1 ? `1px solid ${BD}` : 'none' }}>
+                  <span style={{ fontSize: 13, fontFamily: 'Georgia, serif' }}>{p.name}</span>
+                  <span style={{ fontSize: 11, color: MT }}>{p.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ width: 260, flexShrink: 0, background: '#ECE8E3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ width: 190, background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,.12)', border: `1px solid ${BD}` }}>
+            <div style={{ background: TX, padding: '14px 16px 12px' }}>
+              <Lbl s={{ color: '#C9C4BE', marginBottom: 4 }}>Live status</Lbl>
+              <div style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: '#fff' }}>{show.name}</div>
+              <div style={{ fontSize: 10, color: '#C9C4BE', marginTop: 2 }}>{SVC_LABEL} · Updated just now</div>
+            </div>
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {[['Done','17/30'],['In progress','8'],['Walkthrough','4:00 PM']].map(([k,v]) => (
+                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: MT }}>
+                  <span>{k}</span><span style={{ fontWeight: 600, color: TX }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p style={{ marginTop: 16, fontSize: 11, color: M2, textAlign: 'center', lineHeight: 1.5 }}>What others see when they open the link.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const INCIDENT_TYPES_IPAD = ['Late Arrival', 'Left Early', 'No Show', 'Medical', 'Other']
+
+function IPadAssistantsSection({ models, profiles: profs }) {
+  const [chip, setChip]         = useState('all')
+  const [selId, setSelId]       = useState(null)
+  const [stars, setStars]       = useState(0)
+  const [note, setNote]         = useState('')
+  const [incidents, setIncidents] = useState([])
+  const [showForm, setShowForm] = useState(false)
+  const [incForm, setIncForm]   = useState({ type: 'Late Arrival', notes: '' })
+  const [pending, setPending]   = useState(null)
+
+  const assistants = profs.filter(p => p.role === 'assistant' || p.role === 'lead_assistant')
+  const SPEC_ORDER = ['hair', 'makeup', 'nails']
+
+  function getStatus(a) {
+    const busy = models.some(m =>
+      (m.services?.hair?.assistantId === a.id   && m.services.hair.status   === 'in_progress') ||
+      (m.services?.makeup?.assistantId === a.id && m.services.makeup.status === 'in_progress') ||
+      (m.services?.nails?.assistantId === a.id  && m.services.nails.status  === 'in_progress')
+    )
+    return busy ? 'working' : 'free'
+  }
+
+  const filtered = assistants.filter(a => {
+    if (chip === 'all')     return true
+    if (chip === 'working') return getStatus(a) === 'working'
+    if (chip === 'free')    return getStatus(a) === 'free'
+    if (chip === 'leads')   return a.role === 'lead_assistant'
+    return true
+  })
+
+  const grouped = SPEC_ORDER.map(k => ({
+    key: k,
+    label: k.charAt(0).toUpperCase() + k.slice(1),
+    people: filtered.filter(a => a.specialty === k),
+  })).filter(g => g.people.length > 0)
+
+  const selA = selId ? profs.find(p => p.id === selId) : null
+  const assigned = selA ? models.filter(m =>
+    m.services?.hair?.assistantId   === selA.id ||
+    m.services?.makeup?.assistantId === selA.id ||
+    m.services?.nails?.assistantId  === selA.id
+  ) : []
+
+  function submitInc() {
+    const inc = { id: Date.now(), type: incForm.type, notes: incForm.notes, time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) }
+    setPending(inc); setShowForm(false); setIncForm({ type: 'Late Arrival', notes: '' })
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ width: 280, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 20px 12px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 12px' }}>Team</p>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['all','working','free','leads'].map(c => (
+              <button key={c} onClick={() => setChip(c)} style={{ height: 30, padding: '0 12px', borderRadius: 999, border: chip === c ? `1px solid ${TX}` : `1px solid ${DV}`, background: chip === c ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: chip === c ? '#fff' : TX, cursor: 'pointer', textTransform: 'capitalize' }}>{c}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+          {grouped.map(g => (
+            <div key={g.key}>
+              <Lbl s={{ padding: '0 20px', marginTop: 10, marginBottom: 4 }}>{g.label}</Lbl>
+              {g.people.map(a => {
+                const st = getStatus(a)
+                const isSel = selId === a.id
+                return (
+                  <button key={a.id} onClick={() => { setSelId(a.id); setStars(0); setNote(''); setIncidents([]); setShowForm(false); setPending(null) }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', background: isSel ? '#E8E4DF' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <Avatar src={a.avatar} name={a.name} size={36} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: TX }}>{a.name}</div>
+                      <div style={{ fontSize: 11, color: st === 'working' ? '#A0761D' : '#7A9E7E', marginTop: 1 }}>{st === 'working' ? 'Working' : 'Free'}</div>
+                    </div>
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={M2} strokeWidth="1.5" strokeLinecap="round"><polyline points="3 2 7 5 3 8"/></svg>
+                  </button>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
+        {!selA ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: M2 }}>Select a team member</p>
+          </div>
+        ) : (
+          <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Avatar src={selA.avatar} name={selA.name} size={56} />
+              <div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>{selA.name}</div>
+                <div style={{ fontSize: 11, color: MT, letterSpacing: '.08em', textTransform: 'uppercase', marginTop: 2 }}>{(selA.specialty || selA.role).charAt(0).toUpperCase() + (selA.specialty || selA.role).slice(1)}</div>
+              </div>
+            </div>
+            <div>
+              <Lbl s={{ marginBottom: 10 }}>Today's models</Lbl>
+              {assigned.length === 0 ? <p style={{ fontSize: 13, color: MT }}>No models assigned.</p> : assigned.map(m => (
+                <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: `1px solid ${BD}` }}>
+                  <Avatar src={m.avatar} name={m.name} size={32} />
+                  <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 14 }}>{m.name}</span>
+                  <span style={{ fontSize: 11, color: MT }}>Look {m.look || m.lookNumber}</span>
+                </div>
+              ))}
+            </div>
+            <div>
+              <Lbl s={{ marginBottom: 8 }}>Rate (private)</Lbl>
+              <div style={{ display: 'flex', gap: 2 }}>
+                {[1,2,3,4,5].map(n => <button key={n} onClick={() => setStars(stars === n ? 0 : n)} style={{ fontSize: 28, color: n <= stars ? '#D4A853' : '#D0CCC7', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 3px', lineHeight: 1 }}>★</button>)}
+              </div>
+            </div>
+            <div>
+              <Lbl s={{ marginBottom: 8 }}>Notes (private)</Lbl>
+              <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Performance notes for post-show review..." rows={3} style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, resize: 'none', outline: 'none' }} />
+            </div>
+            {showForm && (
+              <div style={{ border: `1px solid ${BD}`, borderRadius: 12, padding: 16 }}>
+                <Lbl s={{ marginBottom: 10 }}>Flag an incident</Lbl>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                  {INCIDENT_TYPES_IPAD.map(t => <button key={t} onClick={() => setIncForm(f => ({ ...f, type: t }))} style={{ height: 30, padding: '0 12px', borderRadius: 999, border: incForm.type === t ? `1px solid ${TX}` : `1px solid ${DV}`, background: incForm.type === t ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: incForm.type === t ? '#fff' : TX, cursor: 'pointer' }}>{t}</button>)}
+                </div>
+                <textarea value={incForm.notes} onChange={e => setIncForm(f => ({ ...f, notes: e.target.value }))} placeholder="What happened?" rows={3} style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, resize: 'none', outline: 'none', marginBottom: 10 }} />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={submitInc} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: '#D4A853', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>CONTINUE</button>
+                  <button onClick={() => { setShowForm(false); setIncForm({ type: 'Late Arrival', notes: '' }) }} style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>CANCEL</button>
+                </div>
+              </div>
+            )}
+            {pending && (
+              <div style={{ border: '1px solid #C4614A', borderRadius: 12, padding: 16 }}>
+                <Lbl s={{ color: '#C4614A', marginBottom: 8 }}>Confirm incident</Lbl>
+                <p style={{ fontSize: 13, color: TX, margin: '0 0 12px' }}><strong>{pending.type}</strong>{pending.notes ? ` — ${pending.notes}` : ''}</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => { setIncidents(p => [...p, pending]); setPending(null) }} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: '#C4614A', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>YES, SUBMIT</button>
+                  <button onClick={() => setPending(null)} style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>GO BACK</button>
+                </div>
+              </div>
+            )}
+            {incidents.length > 0 && (
+              <div>
+                <Lbl s={{ marginBottom: 8 }}>Incident log</Lbl>
+                {incidents.map(inc => (
+                  <div key={inc.id} style={{ display: 'flex', gap: 8, padding: '8px 0 8px 10px', borderLeft: '2px solid #C4614A', marginLeft: -12, borderBottom: `1px solid ${BD}` }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 11, color: '#C4614A', fontWeight: 600, margin: 0 }}>{inc.type}</p>
+                      <p style={{ fontSize: 12, color: MT, margin: '2px 0 0' }}>{inc.notes}</p>
+                      <p style={{ fontSize: 10, color: M2, margin: '2px 0 0' }}>{inc.time}</p>
+                    </div>
+                    <button onClick={() => setIncidents(p => p.filter(i => i.id !== inc.id))} style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: '#C4614A', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>DELETE</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!showForm && !pending && (
+              <button onClick={() => setShowForm(true)} style={{ width: '100%', height: 48, borderRadius: 10, border: '1px solid #C4614A', background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: '#C4614A', letterSpacing: '.1em', cursor: 'pointer' }}>FLAG AN INCIDENT</button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function IPadLineupSection({ models }) {
+  const [selModel, setSelModel] = useState(null)
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+      <div style={{ padding: '12px 24px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+        <Lbl>Show order — {models.length} looks</Lbl>
+      </div>
+      <div style={{ padding: '10px 20px', borderBottom: `1px solid ${BD}`, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 14, overflowX: 'auto' }}>
+        {Object.entries(STATUS_META_LINEUP).map(([key, meta]) => (
+          <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: meta.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: M2, whiteSpace: 'nowrap' }}>{meta.label}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, minmax(0,1fr))', gap: 8 }}>
+          {models.map(m => {
+            const borderColor = STATUS_META_LINEUP[m.status]?.color
+            const isNs = !m.status || m.status === 'not_started'
+            return (
+              <button key={m.id} onClick={() => setSelModel(m)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <span style={{ position: 'absolute', top: 3, left: 3, zIndex: 1, fontSize: 10, fontWeight: 600, color: '#111', background: 'white', padding: '1px 3px', borderRadius: 2 }}>{m.lookNumber || m.look}</span>
+                  <img src={m.avatar} alt={m.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block', border: isNs ? '3px solid transparent' : `3px solid ${borderColor}` }} />
+                </div>
+                <span style={{ marginTop: 3, fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: TX, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', textAlign: 'center' }}>{m.name.split(' ')[0]}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      {selModel && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end' }}>
+          <div style={{ width: '100%', background: BG, borderRadius: '16px 16px 0 0', padding: 24, maxHeight: '60vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+              <img src={selModel.avatar} alt={selModel.name} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>{selModel.name}</div>
+                <div style={{ fontSize: 11, color: MT, marginTop: 2 }}>Look {selModel.lookNumber || selModel.look}</div>
+              </div>
+              <button onClick={() => setSelModel(null)} style={{ border: 0, background: 'none', fontSize: 22, color: M2, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+              {['hair','makeup','nails'].map(svc => {
+                const st = selModel.services?.[svc]?.status || 'not_started'
+                return (
+                  <div key={svc} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 8, padding: '10px 12px' }}>
+                    <Lbl s={{ marginBottom: 6 }}>{svc}</Lbl>
+                    <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: STATUS_META_LINEUP[st]?.color || '#C8C4BF', fontSize: 10, fontWeight: 600, lineHeight: '22px', color: TX }}>{STATUS_META_LINEUP[st]?.label}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const LOOK_AREAS = ['Eyes','Brows','Skin','Cheeks','Lips']
+
+function IPadStudioSection() {
+  const DEFAULT_DATA = {
+    lookCount: 3,
+    lookNames: { A: 'Look A', B: 'Look B', C: 'Look C' },
+    looks: {
+      A: { areas: { Eyes: { notes: '', products: '', refs: '' }, Brows: { notes: '', products: '', refs: '' }, Skin: { notes: 'Dewy base, focus on glow', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: '', products: '', refs: '' } }, shared: false, pendingApproval: false },
+      B: { areas: { Eyes: { notes: 'Smoky liner, deep shadow', products: '', refs: '' }, Brows: { notes: 'Feathered brow', products: '', refs: '' }, Skin: { notes: '', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: 'Nude gloss', products: '', refs: '' } }, shared: false, pendingApproval: true },
+      C: { areas: { Eyes: { notes: '', products: '', refs: '' }, Brows: { notes: '', products: '', refs: '' }, Skin: { notes: '', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: '', products: '', refs: '' } }, shared: false, pendingApproval: false },
+    },
+    assignments: {},
+  }
+  const [data, setData]     = useState(() => lsGet(AUTHOR_KEY, DEFAULT_DATA))
+  const [selLook, setSelLook] = useState('A')
+  const [selArea, setSelArea] = useState('Eyes')
+
+  const lookKeys = data.lookNames ? Object.keys(data.lookNames).slice(0, data.lookCount || 3) : ['A','B','C']
+
+  function updateArea(lookKey, area, field, value) {
+    setData(prev => {
+      const next = { ...prev, looks: { ...prev.looks, [lookKey]: { ...prev.looks?.[lookKey], areas: { ...(prev.looks?.[lookKey]?.areas || {}), [area]: { ...(prev.looks?.[lookKey]?.areas?.[area] || {}), [field]: value } } } } }
+      lsSet(AUTHOR_KEY, next); return next
+    })
+  }
+  function toggleLookFlag(lookKey, flag) {
+    setData(prev => { const next = { ...prev, looks: { ...prev.looks, [lookKey]: { ...prev.looks?.[lookKey], [flag]: !prev.looks?.[lookKey]?.[flag] } } }; lsSet(AUTHOR_KEY, next); return next })
+  }
+
+  const curLook = data.looks?.[selLook] || { areas: {} }
+  const curArea = curLook.areas?.[selArea] || { notes: '', products: '', refs: '' }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}><Lbl>Studio</Lbl></div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+          {lookKeys.map(key => {
+            const look = data.looks?.[key]
+            const name = data.lookNames?.[key] || `Look ${key}`
+            const isActive = selLook === key
+            return (
+              <button key={key} onClick={() => { setSelLook(key); setSelArea('Eyes') }} style={{ width: '100%', padding: '12px 20px', background: isActive ? '#E8E4DF' : 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <span style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: TX }}>{name}</span>
+                {look?.pendingApproval && <span style={{ fontSize: 10, color: '#D4A853', letterSpacing: '.06em' }}>Pending approval</span>}
+                {look?.shared && <span style={{ fontSize: 10, color: '#7A9E7E', letterSpacing: '.06em' }}>Shared</span>}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 24px', borderBottom: `1px solid ${BD}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>{data.lookNames?.[selLook] || `Look ${selLook}`}</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => toggleLookFlag(selLook, 'pendingApproval')} style={{ height: 36, padding: '0 14px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>{curLook.pendingApproval ? 'REVOKE REQUEST' : 'REQUEST APPROVAL'}</button>
+            <button onClick={() => toggleLookFlag(selLook, 'shared')} style={{ height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, cursor: 'pointer' }}>{curLook.shared ? 'UNSHARE' : 'SHARE'}</button>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 0, borderBottom: `1px solid ${BD}`, flexShrink: 0, padding: '0 24px', overflowX: 'auto' }}>
+          {LOOK_AREAS.map(area => (
+            <button key={area} onClick={() => setSelArea(area)} style={{ height: 40, padding: '0 14px', background: 'transparent', border: 'none', borderBottom: selArea === area ? `2px solid ${TX}` : '2px solid transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: selArea === area ? TX : MT, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>{area}</button>
+          ))}
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {[['notes','Notes','Describe the look...'],['products','Products','List products used...'],['refs','References','Reference photos or links...']].map(([field, label, ph]) => (
+            <div key={field}>
+              <Lbl s={{ marginBottom: 6 }}>{label}</Lbl>
+              <textarea value={curArea[field] || ''} onChange={e => updateArea(selLook, selArea, field, e.target.value)} rows={field === 'notes' ? 4 : 2} placeholder={ph} style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, resize: 'none', outline: 'none' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const SETTINGS_ITEMS = [
+  { id: 'schedule',      label: 'Schedule',      group: 'show'  },
+  { id: 'venue',         label: 'Venue',          group: 'show'  },
+  { id: 'models',        label: 'Models',         group: 'show'  },
+  { id: 'team',          label: 'Team',           group: 'show'  },
+  { id: 'notifications', label: 'Notifications',  group: 'prefs' },
+  { id: 'appearance',    label: 'Appearance',     group: 'prefs' },
+  { id: 'about',         label: 'About',          group: 'prefs' },
+]
+
+function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, venue, modelCount }) {
+  const [active, setActive]         = useState('schedule')
+  const [rows, setRows]             = useState(() => schedule || [])
+  const [localVenue, setLocalVenue] = useState(venue || '')
+
+  function changeRow(idx, field, value) {
+    setRows(prev => { const n = prev.map((r, i) => i === idx ? { ...r, [field]: value } : r); onScheduleChange?.(n); return n })
+  }
+  function addRow()      { setRows(prev => { const n = [...prev, { time: '', label: '' }]; onScheduleChange?.(n); return n }) }
+  function deleteRow(idx){ setRows(prev => { const n = prev.filter((_, i) => i !== idx); onScheduleChange?.(n); return n }) }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${BD}`, overflowY: 'auto' }}>
+        {[['show','Show Setup'],['prefs','Preferences']].map(([grp, grpLabel]) => (
+          <div key={grp} style={{ padding: '16px 0 8px' }}>
+            <Lbl s={{ padding: '0 20px', marginBottom: 4 }}>{grpLabel}</Lbl>
+            {SETTINGS_ITEMS.filter(s => s.group === grp).map(s => (
+              <button key={s.id} onClick={() => setActive(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: active === s.id ? '#E8E4DF' : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, textAlign: 'left' }}>
+                {s.label}
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={M2} strokeWidth="1.5" strokeLinecap="round"><polyline points="3 2 7 5 3 8"/></svg>
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '24px 28px' }}>
+        {active === 'schedule' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Schedule</p>
+            {rows.map((row, idx) => (
+              <div key={idx} style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                <input value={row.time || ''} onChange={e => changeRow(idx, 'time', e.target.value)} placeholder="Time" style={{ width: 100, height: 40, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, padding: '0 12px', color: TX, outline: 'none' }} />
+                <input value={row.label || ''} onChange={e => changeRow(idx, 'label', e.target.value)} placeholder="Event" style={{ flex: 1, height: 40, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, padding: '0 12px', color: TX, outline: 'none' }} />
+                <button onClick={() => deleteRow(idx)} style={{ width: 32, height: 32, borderRadius: 6, border: `1px solid ${BD}`, background: 'transparent', color: '#C4614A', cursor: 'pointer', fontSize: 18, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              </div>
+            ))}
+            <button onClick={addRow} style={{ height: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: TX, cursor: 'pointer', marginTop: 4 }}>+ Add row</button>
+          </div>
+        )}
+        {active === 'venue' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Venue</p>
+            <Lbl s={{ marginBottom: 6 }}>Location</Lbl>
+            <input value={localVenue} onChange={e => setLocalVenue(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none' }} />
+          </div>
+        )}
+        {active === 'models' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Models</p>
+            <p style={{ fontSize: 13, color: MT }}>{modelCount || 30} models loaded for this show.</p>
+          </div>
+        )}
+        {active === 'team' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Team</p>
+            <p style={{ fontSize: 13, color: MT }}>28 assistants on the team for this show.</p>
+          </div>
+        )}
+        {active === 'notifications' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Notifications</p>
+            {[['Status alerts','Notify when model status changes'],['Pings','Notify when an assistant sends a ping']].map(([label, desc]) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
+                <div><div style={{ fontSize: 14, color: TX }}>{label}</div><div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{desc}</div></div>
+                <span style={{ width: 44, height: 24, borderRadius: 999, background: TX, position: 'relative', flexShrink: 0, display: 'inline-block' }}><span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} /></span>
+              </div>
+            ))}
+          </div>
+        )}
+        {active === 'appearance' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Appearance</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
+              <span style={{ fontSize: 14, color: TX }}>Dark mode</span>
+              <button onClick={onToggleDark} style={{ width: 44, height: 24, borderRadius: 999, background: dark ? TX : BD, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 150ms', flexShrink: 0 }}>
+                <span style={{ position: 'absolute', top: 3, left: dark ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+              </button>
+            </div>
+          </div>
+        )}
+        {active === 'about' && (
+          <div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>About</p>
+            <p style={{ fontSize: 13, color: MT, lineHeight: 1.6 }}>Show Partner helps production teams coordinate talent, beauty, and logistics on show day.</p>
+            <p style={{ fontSize: 12, color: M2, marginTop: 8 }}>Version 1.0 · Front-end preview</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function ProducerIPadView({
   models, setModels,
   walkthroughPhase, setWalkthroughPhase,
@@ -697,6 +1216,9 @@ export default function ProducerIPadView({
   onLogOut,
   dark = false,
   onToggleDark,
+  schedule,
+  onScheduleChange,
+  venue,
 }) {
   const [panel, setPanel]           = useState('default')
   const [pairModel, setPairModel]   = useState(null)
@@ -714,6 +1236,10 @@ export default function ProducerIPadView({
   const [activeModel, setActiveModel] = useState(null)
   const [statusLinkOpen, setStatusLinkOpen] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [ipadSection, setIpadSection] = useState(() => lsGet('sp_ipad_section', 'home'))
+  const [menuOpen, setMenuOpen]       = useState(() => lsGet('sp_ipad_menu', true))
+  const [bellOpen, setBellOpen]       = useState(false)
+  const [showHistoryOpen, setShowHistoryOpen] = useState(false)
 
   const [panelWidth, setPanelWidthRaw] = useState(() => {
     const s = parseInt(localStorage.getItem('sp_panelWidth'), 10)
@@ -871,43 +1397,112 @@ export default function ProducerIPadView({
     <div style={{ position: 'fixed', inset: 0, background: BG, display: 'flex', flexDirection: 'column', fontFamily: 'Inter,system-ui,sans-serif', color: TX }}>
 
       {/* Top bar */}
-      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 20, padding: '12px 24px', borderBottom: `1px solid ${BD}` }}>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: 26, whiteSpace: 'nowrap' }}>{show.name}</span>
-        <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{SVC_LABEL} · {currentTime}</span>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '0 20px', height: 56, borderBottom: `1px solid ${BD}` }}>
+        {/* Menu button M3/M4 */}
+        <button
+          onClick={() => { const next = !menuOpen; setMenuOpen(next); lsSet('sp_ipad_menu', next) }}
+          style={{ width: 44, height: 44, borderRadius: 12, border: `1px solid ${TX}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {menuOpen
+            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          }
+        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 18, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{show.name}</span>
+          <span style={{ fontSize: 10, color: MT, whiteSpace: 'nowrap', letterSpacing: '.06em' }}>{SVC_LABEL} · {currentTime}</span>
+        </div>
         <span style={{ flex: 1 }} />
-        <button onClick={() => setStatusLinkOpen(true)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 999, border: `1px solid ${TX}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', color: TX, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2"><path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"/></svg>
+        <button onClick={() => setStatusLinkOpen(true)} style={{ height: 36, padding: '0 14px', borderRadius: 999, border: `1px solid ${TX}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', color: TX, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2"><path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"/></svg>
           SHARE STATUS LINK
         </button>
-        <div style={{ position: 'relative' }}>
-          <button onClick={() => setProfileMenuOpen(o => !o)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', borderRadius: '50%' }}>
+        {/* Bell D7 */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <button onClick={() => { setBellOpen(o => !o); setProfileMenuOpen(false) }} style={{ width: 40, height: 40, borderRadius: 10, border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="1.8" strokeLinecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span style={{ position: 'absolute', top: 7, right: 7, width: 8, height: 8, borderRadius: '50%', background: '#C4614A' }} />
+          </button>
+          {bellOpen && (
+            <div style={{ position: 'absolute', top: 48, right: 0, width: 320, background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,.12)', zIndex: 350, overflow: 'hidden' }}>
+              <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: MT }}>Notifications</span>
+                <button onClick={() => setBellOpen(false)} style={{ border: 0, background: 'none', fontSize: 11, color: MT, cursor: 'pointer', textDecoration: 'underline' }}>Mark all read</button>
+              </div>
+              {IPAD_NOTIFS.map(n => (
+                <div key={n.id} style={{ display: 'flex', gap: 10, padding: '11px 16px', borderBottom: `1px solid ${BD}`, alignItems: 'flex-start' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: n.dot, flexShrink: 0, marginTop: 4 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: TX }}>{n.title}</div>
+                    <div style={{ fontSize: 11, color: MT, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.subtitle}</div>
+                  </div>
+                  <span style={{ fontSize: 10, color: M2, flexShrink: 0, paddingTop: 1 }}>{n.time}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* Avatar + account menu D1 */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <button onClick={() => { setProfileMenuOpen(o => !o); setBellOpen(false) }} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', borderRadius: '50%' }}>
             <Avatar src={producer.avatar} name={producer.name} size={36} />
           </button>
           {profileMenuOpen && (
-            <div style={{ position: 'absolute', top: 44, right: 0, background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.12)', minWidth: 200, zIndex: 200, overflow: 'hidden' }}>
-              <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${BD}` }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: TX }}>{producer.name}</div>
-                <div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{producer.role === 'lead' ? 'Lead Producer' : producer.role}</div>
+            <div style={{ position: 'absolute', top: 48, right: 0, background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.12)', minWidth: 220, zIndex: 350, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Avatar src={producer.avatar} name={producer.name} size={36} />
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TX }}>{producer.name}</div>
+                  <div style={{ fontSize: 12, color: MT, marginTop: 2 }}>Makeup Producer</div>
+                </div>
               </div>
-              <button onClick={() => { onToggleDark?.(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>
+              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>Switch profile</button>
+              <button onClick={() => onToggleDark?.()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>
                 <span>Dark mode</span>
-                <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? TX : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms' }}>
-                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? TX : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms', display: 'inline-block' }}>
+                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
                 </span>
               </button>
-              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', borderTop: `1px solid ${BD}`, cursor: 'pointer', fontSize: 13, color: '#C4614A', fontWeight: 500 }}>
-                Log out
-              </button>
+              <button onClick={() => { setShowHistoryOpen(true); setProfileMenuOpen(false) }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>Show history</button>
+              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', borderTop: `1px solid ${BD}`, cursor: 'pointer', fontSize: 13, color: '#C4614A', fontWeight: 500 }}>Log out</button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Body */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', position: 'relative' }}>
+      {/* Body: nav + sections */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
 
-        {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '16px 24px 0', paddingBottom: isPortrait ? drawerHeight : 0 }}>
+        {/* Docked nav M4 */}
+        {menuOpen && (
+          <nav aria-label="Main navigation" style={{ width: 96, flexShrink: 0, borderRight: `1px solid ${BD}`, background: '#ECE8E3', display: 'flex', flexDirection: 'column', padding: '4px 0' }}>
+            {IPAD_SECTIONS.map(s => {
+              const isActive = ipadSection === s.id
+              return (
+                <button key={s.id} onClick={() => { setIpadSection(s.id); lsSet('sp_ipad_section', s.id) }} style={{ width: '100%', height: 72, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5, background: isActive ? TX : 'transparent', border: 'none', cursor: 'pointer' }}>
+                  <NavIcon id={s.id} active={isActive} />
+                  <span style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Inter,system-ui,sans-serif', color: isActive ? '#fff' : TX }}>{s.label}</span>
+                </button>
+              )
+            })}
+          </nav>
+        )}
+
+        {/* Section content */}
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+
+          {/* NON-HOME SECTIONS */}
+          {ipadSection === 'assistants' && <IPadAssistantsSection models={models} profiles={profiles} />}
+          {ipadSection === 'lineup'     && <IPadLineupSection models={models} />}
+          {ipadSection === 'studio'     && <IPadStudioSection />}
+          {ipadSection === 'settings'   && <IPadSettingsSection dark={dark} onToggleDark={onToggleDark} schedule={schedule} onScheduleChange={onScheduleChange} venue={venue} modelCount={models.length} />}
+
+          {/* HOME */}
+          {ipadSection === 'home' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', position: 'relative' }}>
+            {/* Main content */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '16px 24px 0', paddingBottom: isPortrait ? drawerHeight : 0 }}>
 
           {/* Metric cards */}
           <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
@@ -1080,20 +1675,6 @@ export default function ProducerIPadView({
           return check ? <TouchupSheet check={check} onSend={handleSendTouchupLocal} onClose={() => setTouchupCheckId(null)} /> : null
         })()}
 
-        {/* Status link overlay */}
-        {statusLinkOpen && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', padding: '12px 20px', background: BG, borderBottom: `1px solid ${BD}` }}>
-              <span style={{ fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', color: MT }}>Status link preview</span>
-              <span style={{ flex: 1 }} />
-              <button onClick={() => setStatusLinkOpen(false)} style={{ height: 36, padding: '0 16px', borderRadius: 999, border: `1px solid ${BD}`, background: 'transparent', fontSize: 12, color: TX, cursor: 'pointer' }}>Close</button>
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto', background: BG }}>
-              <StatusLinkView />
-            </div>
-          </div>
-        )}
-
         {/* Model detail sheet */}
         {activeModel && (
           <ModelDetailSheet
@@ -1115,7 +1696,42 @@ export default function ProducerIPadView({
             currentProfile={producer}
           />
         )}
+          </div>
+          )}
+        </div>
       </div>
+
+      {/* Share status modal D6 */}
+      {statusLinkOpen && <ShareStatusModal onClose={() => setStatusLinkOpen(false)} />}
+
+      {/* Show history */}
+      {showHistoryOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: BG, borderRadius: 20, overflow: 'hidden', width: 460, maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Show history</span>
+              <button onClick={() => setShowHistoryOpen(false)} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontSize: 20, color: M2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                { name: 'Resort 2025',           date: 'June 12, 2025',  role: 'Makeup Producer' },
+                { name: 'Spring / Summer 2025',  date: 'Sep 30, 2024',   role: 'Makeup Producer' },
+                { name: 'Fall / Winter 2024',    date: 'Feb 14, 2024',   role: 'Makeup Artist'   },
+              ].map((sh, i) => (
+                <div key={i} style={{ padding: '12px 16px', background: '#fff', borderRadius: 10, border: `1px solid ${BD}` }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{sh.name}</div>
+                  <div style={{ fontSize: 11, color: MT, marginTop: 3 }}>{sh.date} · {sh.role}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tap-away overlay for dropdowns */}
+      {(bellOpen || profileMenuOpen) && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 300 }} onClick={() => { setBellOpen(false); setProfileMenuOpen(false) }} />
+      )}
     </div>
   )
 }

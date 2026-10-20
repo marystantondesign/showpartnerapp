@@ -320,6 +320,9 @@ function AppInner() {
         onLogOut={handleLogOut}
         dark={dark}
         onToggleDark={toggleDark}
+        schedule={schedule}
+        onScheduleChange={setSchedule}
+        venue={venue}
       />
     )
   }
