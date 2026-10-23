@@ -1117,63 +1117,201 @@ function IPadAssistantsSection({ models, profiles: profs }) {
   )
 }
 
+const LINEUP_PANEL_DATA = {
+  'Mei Lin': {
+    lookLabel: 'Look 06 · walks 6th · Look B',
+    arrival: '2:52',
+    latestUpdate: { time: '3:38', text: 'Marco D: "Waiting on clip-ins from kit 2, back in 10."', chipLabel: 'Hair paused', chipColor: '#8A9BB0', borderColor: '#8A9BB0' },
+    serviceWho: { hair: 'Marco D · paused at 3:38', makeup: 'Sofia R · 18 min so far', nails: 'Bianca R is up next' },
+    allergy: 'Latex. Use non-latex sponges only.',
+    note: 'Coming from Prada, may still have their lash glue on. Sensitive eyes.',
+    updates: [
+      { time: '3:27', text: 'Makeup started · Sofia R' },
+      { time: '3:05', text: 'Hair started · Marco D' },
+      { time: '2:52', text: 'Arrived, came from Prada' },
+      { time: '2:40', text: 'ETA pushed to 2:50' },
+    ],
+    pastShowCount: 2, pastShowNames: 'Valentino FW25, Khaite SS25',
+  },
+  'Sofia Andersen': {
+    lookLabel: 'Look 01 · walks 1st · Look A',
+    arrival: '2:30',
+    latestUpdate: { time: '3:41', text: 'Ivana R: "Touch-up on brow arch needed."', chipLabel: 'Makeup revisit', chipColor: '#C4614A', borderColor: '#C4614A' },
+    serviceWho: { hair: 'Sasha K · done at 3:10', makeup: 'Ivana R · touch-up', nails: 'Bianca R · done' },
+    allergy: null,
+    note: null,
+    updates: [
+      { time: '3:41', text: 'Touch-up flagged · Ivana R' },
+      { time: '3:10', text: 'Hair done · Sasha K' },
+      { time: '2:30', text: 'Arrived' },
+    ],
+    pastShowCount: 1, pastShowNames: 'Valentino FW25',
+  },
+}
+
 function IPadLineupSection({ models }) {
   const [selModel, setSelModel] = useState(null)
+  const svcs = ['hair', 'makeup', 'nails']
+
+  function getPanelData(m) {
+    return LINEUP_PANEL_DATA[m.name] || {
+      lookLabel: `Look ${String(m.lookNumber || m.look).padStart(2,'0')} · Look A`,
+      arrival: '3:00',
+      latestUpdate: null,
+      serviceWho: { hair: null, makeup: null, nails: null },
+      allergy: m.allergy || null,
+      note: m.notes || null,
+      updates: [{ time: '3:00', text: 'Arrived' }],
+      pastShowCount: 1, pastShowNames: 'Valentino FW25',
+    }
+  }
+
+  function getServiceCounts(m) {
+    const c = { done: 0, in_progress: 0, paused: 0 }
+    svcs.forEach(s => {
+      const st = m.services?.[s]?.status
+      if (st === 'done') c.done++
+      else if (st === 'in_progress') c.in_progress++
+      else if (st === 'paused') c.paused++
+    })
+    return c
+  }
+
   return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-      <div style={{ padding: '12px 24px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
-        <Lbl>Show order — {models.length} looks</Lbl>
-      </div>
-      <div style={{ padding: '10px 20px', borderBottom: `1px solid ${BD}`, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 14, overflowX: 'auto' }}>
-        {Object.entries(STATUS_META_LINEUP).map(([key, meta]) => (
-          <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: meta.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: M2, whiteSpace: 'nowrap' }}>{meta.label}</span>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
+      {/* Grid area */}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flexShrink: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 16, rowGap: 8, padding: '16px 24px 12px' }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, whiteSpace: 'nowrap' }}>Show order</span>
+          <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{models.length} looks</span>
+          <span style={{ flex: 1 }} />
+          <span style={{ flexBasis: '100%', display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 11, color: MT }}>
+            {Object.entries(STATUS_META_LINEUP).map(([key, meta]) => (
+              <span key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: meta.color }} />
+                {meta.label}
+              </span>
+            ))}
+          </span>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: selModel ? 'repeat(5, minmax(0,1fr))' : 'repeat(8, minmax(0,1fr))', gap: 12, alignContent: 'start' }}>
+            {models.map((m, i) => {
+              const isSel = selModel?.id === m.id
+              const isNs = !m.status || m.status === 'not_started'
+              const statusColor = STATUS_META_LINEUP[m.status]?.color
+              const lookNum = String(m.lookNumber || i + 1).padStart(2, '0')
+              return (
+                <button key={m.id} onClick={() => setSelModel(isSel ? null : m)}
+                  style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
+                  <span style={{ position: 'relative', width: '100%', aspectRatio: '3 / 4', borderRadius: 10, overflow: 'hidden', background: '#E0DDD8', boxShadow: isSel ? '0 0 0 3px #F5F2EE, 0 0 0 6px #111' : 'none', outline: !isNs ? `4px solid ${statusColor}` : 'none', outlineOffset: -4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: isNs ? 0.45 : 1 }} />
+                    <span style={{ position: 'absolute', left: 8, top: 8, padding: '2px 6px', borderRadius: 4, background: '#fff', fontSize: 12, fontWeight: 600, color: TX }}>{lookNum}</span>
+                  </span>
+                  <span style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name.split(' ')[0]}</span>
+                </button>
+              )
+            })}
           </div>
-        ))}
-      </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, minmax(0,1fr))', gap: 8 }}>
-          {models.map(m => {
-            const borderColor = STATUS_META_LINEUP[m.status]?.color
-            const isNs = !m.status || m.status === 'not_started'
-            return (
-              <button key={m.id} onClick={() => setSelModel(m)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ position: 'relative', width: '100%' }}>
-                  <span style={{ position: 'absolute', top: 3, left: 3, zIndex: 1, fontSize: 10, fontWeight: 600, color: '#111', background: 'white', padding: '1px 3px', borderRadius: 2 }}>{m.lookNumber || m.look}</span>
-                  <img src={m.avatar} alt={m.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block', border: isNs ? '3px solid transparent' : `3px solid ${borderColor}` }} />
-                </div>
-                <span style={{ marginTop: 3, fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: TX, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', textAlign: 'center' }}>{m.name.split(' ')[0]}</span>
-              </button>
-            )
-          })}
         </div>
       </div>
-      {selModel && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end' }}>
-          <div style={{ width: '100%', background: BG, borderRadius: '16px 16px 0 0', padding: 24, maxHeight: '60vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-              <img src={selModel.avatar} alt={selModel.name} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>{selModel.name}</div>
-                <div style={{ fontSize: 11, color: MT, marginTop: 2 }}>Look {selModel.lookNumber || selModel.look}</div>
+      {/* Side panel */}
+      {selModel && (() => {
+        const pd = getPanelData(selModel)
+        const c = getServiceCounts(selModel)
+        return (
+          <aside aria-label="Model details" style={{ width: 400, flexShrink: 0, borderLeft: `1px solid ${BD}`, background: '#FBFAF8', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+              {/* Header */}
+              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <img src={selModel.avatar} alt={selModel.name} style={{ width: 90, aspectRatio: '3 / 4', borderRadius: 12, objectFit: 'cover', flexShrink: 0 }} />
+                <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 2 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, lineHeight: 1.1 }}>{selModel.name}</span>
+                  <span style={{ fontSize: 13, color: MT }}>{pd.lookLabel}</span>
+                  <span style={{ fontSize: 13, color: MT }}>Arrived {pd.arrival}</span>
+                  <span style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <span style={{ fontSize: 12 }}>{c.done} of 3 done</span>
+                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: '#E8E4DF' }}>
+                      <span style={{ width: `${c.done / 3 * 100}%`, background: '#7A9E7E' }} />
+                      <span style={{ width: `${c.in_progress / 3 * 100}%`, background: '#D4A853' }} />
+                      <span style={{ width: `${c.paused / 3 * 100}%`, background: '#8A9BB0' }} />
+                    </div>
+                  </span>
+                </span>
+                <button onClick={() => setSelModel(null)} style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${BD}`, background: 'transparent', fontSize: 18, color: MT, flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
               </div>
-              <button onClick={() => setSelModel(null)} style={{ border: 0, background: 'none', fontSize: 22, color: M2, cursor: 'pointer', lineHeight: 1 }}>×</button>
+              {/* Latest update */}
+              {pd.latestUpdate && (
+                <div style={{ background: '#fff', border: `1px solid ${BD}`, borderLeft: `4px solid ${pd.latestUpdate.borderColor}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Lbl>Latest · {pd.latestUpdate.time}</Lbl>
+                    <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: pd.latestUpdate.chipColor, fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX }}>{pd.latestUpdate.chipLabel}</span>
+                  </span>
+                  <span style={{ fontSize: 14, lineHeight: 1.45 }}>{pd.latestUpdate.text}</span>
+                </div>
+              )}
+              {/* Where they're at */}
+              <div>
+                <Lbl s={{ marginBottom: 2 }}>Where they're at</Lbl>
+                {svcs.map(svc => {
+                  const st = selModel.services?.[svc]?.status || 'not_started'
+                  const chipColor = STATUS_META_LINEUP[st]?.color || '#E0DDD8'
+                  const chipLabel = STATUS_META_LINEUP[st]?.label || 'Not started'
+                  const who = pd.serviceWho[svc]
+                  return (
+                    <div key={svc} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) auto', gap: 10, alignItems: 'center', minHeight: 44, borderBottom: `1px solid ${BD}` }}>
+                      <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{svc}</span>
+                      <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{who || 'Not assigned'}</span>
+                      <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: chipColor, fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX, whiteSpace: 'nowrap' }}>{chipLabel}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              {/* Notes */}
+              {(pd.allergy || pd.note) && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <Lbl>Notes</Lbl>
+                  {pd.allergy && (
+                    <span style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10, background: '#F8E9E5', fontSize: 13, lineHeight: 1.4 }}>
+                      <b style={{ color: '#A33D28', fontSize: 11, letterSpacing: '.08em', paddingTop: 1, flexShrink: 0 }}>ALLERGY</b>
+                      <span>{pd.allergy}</span>
+                    </span>
+                  )}
+                  {pd.note && (
+                    <span style={{ padding: '10px 12px', borderRadius: 10, background: '#fff', border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.4 }}>{pd.note}</span>
+                  )}
+                </div>
+              )}
+              {/* Earlier updates */}
+              {pd.updates.length > 0 && (
+                <div>
+                  <Lbl s={{ marginBottom: 2 }}>Earlier updates</Lbl>
+                  {pd.updates.map((u, i) => (
+                    <div key={i} style={{ display: 'grid', gridTemplateColumns: '52px minmax(0,1fr)', gap: 10, padding: '7px 0', fontSize: 12 }}>
+                      <span style={{ color: MT }}>{u.time}</span>
+                      <span>{u.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Past shows */}
+              <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${BD}`, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', color: TX, cursor: 'pointer' }}>
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontSize: 14 }}>Past shows with you · {pd.pastShowCount}</span>
+                  <span style={{ fontSize: 12, color: MT }}>{pd.pastShowNames}</span>
+                </span>
+                <span aria-hidden="true" style={{ fontSize: 16, color: MT }}>›</span>
+              </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
-              {['hair','makeup','nails'].map(svc => {
-                const st = selModel.services?.[svc]?.status || 'not_started'
-                return (
-                  <div key={svc} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 8, padding: '10px 12px' }}>
-                    <Lbl s={{ marginBottom: 6 }}>{svc}</Lbl>
-                    <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: STATUS_META_LINEUP[st]?.color || '#C8C4BF', fontSize: 10, fontWeight: 600, lineHeight: '22px', color: TX }}>{STATUS_META_LINEUP[st]?.label}</span>
-                  </div>
-                )
-              })}
+            {/* Sticky footer */}
+            <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
+              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>PING ASSISTANT</button>
+              <span style={{ flex: 1 }} />
+              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>UPDATE STATUS</button>
             </div>
-          </div>
-        </div>
-      )}
+          </aside>
+        )
+      })()}
     </div>
   )
 }
