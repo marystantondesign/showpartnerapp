@@ -54,6 +54,17 @@ body {
   font-family: Georgia, serif;
 }
 
+/* Hide Vercel preview toolbar */
+vercel-live-feedback,
+#__vercel_toolbar__ {
+  display: none !important;
+}
+
+/* Focus ring for iPad producer view */
+.sp-ipad *:focus { outline: none; }
+.sp-ipad *:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.dark .sp-ipad *:focus-visible { outline-color: #F0EDE8; }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 0; }
 
