@@ -723,72 +723,99 @@ function NavIcon({ id, active }) {
 
 function ShareStatusModal({ onClose }) {
   const [copied, setCopied] = useState(false)
-  const [phone, setPhone]   = useState('')
-  const [sent, setSent]     = useState(false)
-  const url = 'showpartner.app/s/abc123'
+  const [name,   setName]   = useState('')
+  const [phone,  setPhone]  = useState('')
+  const [sent,   setSent]   = useState(false)
+  const url = 'showpartner.app/s/valentino-ss26-x7k2'
   function handleCopy() {
     try { navigator.clipboard.writeText('https://' + url) } catch {}
     setCopied(true); setTimeout(() => setCopied(false), 2000)
   }
   function handleSend() {
     if (!phone.trim()) return
-    setSent(true); setPhone(''); setTimeout(() => setSent(false), 3000)
+    setSent(true); setName(''); setPhone(''); setTimeout(() => setSent(false), 3000)
   }
   const alreadyHas = [
-    { name: 'Aimi K.',  time: '3:31 PM' },
-    { name: 'Iona M.',  time: '3:29 PM' },
-    { name: 'Kenji W.', time: '3:28 PM' },
+    { name: 'Marco', role: 'Show producer', sent: '1:05 PM', opens: 'opened 6 times' },
+    { name: 'Dana',  role: 'Hair producer', sent: '1:05 PM', opens: 'opened twice'   },
   ]
+  const inputStyle = { height: 48, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, outline: 'none', boxSizing: 'border-box' }
+  const circumference = 2 * Math.PI * 78
+  const readyPct = 8 / 30
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ width: '100%', maxWidth: 840, background: BG, borderRadius: 20, overflow: 'hidden', display: 'flex', maxHeight: 'calc(100vh - 48px)' }}>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRight: `1px solid ${BD}` }}>
-          <div style={{ padding: '24px 28px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>Share status link</span>
-            <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontSize: 20, color: M2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div onClick={e => e.stopPropagation()} role="dialog" aria-label="Share the status link" style={{ width: 820, background: BG, borderRadius: 18, overflow: 'hidden', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 280px' }}>
+        {/* Left column */}
+        <div style={{ padding: '26px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 26 }}>Share the status link</span>
+            <span style={{ fontSize: 13, lineHeight: 1.5, color: MT }}>For the show producer, other teams, dressing. They see numbers only, no names or photos.</span>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div>
-              <Lbl s={{ marginBottom: 8 }}>Link</Lbl>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: '#fff', display: 'flex', alignItems: 'center', padding: '0 14px', fontSize: 13, color: MT, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{url}</div>
-                <button onClick={handleCopy} style={{ height: 44, padding: '0 18px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{copied ? 'COPIED' : 'COPY'}</button>
+          {/* Link row */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', height: 48, padding: '0 14px', border: `1px solid ${DV}`, borderRadius: 10, background: '#fff', fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{url}</span>
+            <button onClick={handleCopy} style={{ minHeight: 48, padding: '0 18px', borderRadius: 10, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{copied ? 'COPIED' : 'COPY'}</button>
+          </div>
+          {/* Text it to */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Lbl>Text it to</Lbl>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" style={{ ...inputStyle, width: 150 }} />
+              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number" style={{ ...inputStyle, flex: 1 }} />
+              <button onClick={handleSend} style={{ minHeight: 48, padding: '0 18px', borderRadius: 10, border: `1px solid ${TX}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>{sent ? 'SENT' : 'SEND'}</button>
+            </div>
+          </div>
+          {/* Already has it */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Lbl s={{ marginBottom: 4 }}>Already has it</Lbl>
+            {alreadyHas.map((p, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 52, borderBottom: `1px solid ${BD}` }}>
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontSize: 14 }}>{p.name} · {p.role}</span>
+                  <span style={{ fontSize: 12, color: MT }}>Texted {p.sent} · {p.opens}</span>
+                </span>
+                <button style={{ minHeight: 40, padding: '0 12px', border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Resend</button>
               </div>
-            </div>
-            <div>
-              <Lbl s={{ marginBottom: 8 }}>Text it to someone</Lbl>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number" style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none', boxSizing: 'border-box' }} />
-                <button onClick={handleSend} disabled={!phone.trim()} style={{ height: 44, padding: '0 18px', borderRadius: 8, border: 0, background: phone.trim() ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.08em', cursor: phone.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>{sent ? 'SENT' : 'SEND'}</button>
-              </div>
-            </div>
-            <div>
-              <Lbl s={{ marginBottom: 10 }}>Already has it</Lbl>
-              {alreadyHas.map((p, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: i < alreadyHas.length - 1 ? `1px solid ${BD}` : 'none' }}>
-                  <span style={{ fontSize: 13, fontFamily: 'Georgia, serif' }}>{p.name}</span>
-                  <span style={{ fontSize: 11, color: MT }}>{p.time}</span>
-                </div>
-              ))}
-            </div>
+            ))}
+          </div>
+          {/* Footer */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto' }}>
+            <span style={{ flex: 1, fontSize: 12, color: MT, lineHeight: 1.4 }}>The link stops working at 7:00 PM, an hour after the show.</span>
+            <button style={{ minHeight: 40, padding: '0 12px', border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: '#A33D28', cursor: 'pointer', whiteSpace: 'nowrap' }}>Turn off now</button>
+            <button onClick={onClose} style={{ minHeight: 44, padding: '0 18px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>DONE</button>
           </div>
         </div>
-        <div style={{ width: 260, flexShrink: 0, background: '#ECE8E3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <div style={{ width: 190, background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,.12)', border: `1px solid ${BD}` }}>
-            <div style={{ background: TX, padding: '14px 16px 12px' }}>
-              <Lbl s={{ color: '#C9C4BE', marginBottom: 4 }}>Live status</Lbl>
-              <div style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: '#fff' }}>{show.name}</div>
-              <div style={{ fontSize: 10, color: '#C9C4BE', marginTop: 2 }}>{SVC_LABEL} · Updated just now</div>
+        {/* Right column: phone preview */}
+        <div style={{ background: '#E8E4DF', padding: '22px 18px', display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+          <Lbl s={{ alignSelf: 'flex-start' }}>What they see</Lbl>
+          <div style={{ width: 220, height: 440, borderRadius: 22, border: '6px solid #111', background: '#F5F2EE', overflow: 'hidden', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{show.name}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, color: MT }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3F6B45' }} />
+              Live · updated 3:45 PM
+            </span>
+            <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="64" height="64" viewBox="0 0 180 180" aria-hidden="true">
+                <circle cx="90" cy="90" r="78" fill="none" stroke="#E8E4DF" strokeWidth="16" />
+                <circle cx="90" cy="90" r="78" fill="none" stroke="#7A9E7E" strokeWidth="16" strokeLinecap="round" strokeDasharray={`${circumference * readyPct} ${circumference}`} transform="rotate(-90 90 90)" />
+                <text x="90" y="100" textAnchor="middle" fontFamily="Georgia, serif" fontSize="34" fill="#111">27%</text>
+              </svg>
+              <span style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 9, color: MT }}>
+                <span>Ready <b style={{ color: TX }}>8 of 30</b></span>
+                <span>Show in <b style={{ color: TX }}>2h 15m</b></span>
+                <span>Not arrived <b style={{ color: TX }}>3</b></span>
+              </span>
             </div>
-            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {[['Done','17/30'],['In progress','8'],['Walkthrough','4:00 PM']].map(([k,v]) => (
-                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: MT }}>
-                  <span>{k}</span><span style={{ fontWeight: 600, color: TX }}>{v}</span>
+            {[['Hair',14],['Makeup',17],['Nails',9]].map(([svc, n]) => (
+              <div key={svc} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <span style={{ fontSize: 10, display: 'flex', justifyContent: 'space-between' }}>{svc}<span style={{ color: MT }}>{n} of 30</span></span>
+                <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: '#E8E4DF' }}>
+                  <span style={{ width: `${n / 30 * 100}%`, background: '#7A9E7E' }} />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+            <span style={{ fontSize: 9, color: MT, marginTop: 4 }}>Walkthrough 4:00 · Dressing 5:00 · Show 6:00</span>
           </div>
-          <p style={{ marginTop: 16, fontSize: 11, color: M2, textAlign: 'center', lineHeight: 1.5 }}>What others see when they open the link.</p>
         </div>
       </div>
     </div>
