@@ -1493,77 +1493,400 @@ function IPadLineupSection({ models }) {
 
 const LOOK_AREAS = ['Eyes','Brows','Skin','Cheeks','Lips']
 
-function IPadStudioSection() {
-  const DEFAULT_DATA = {
-    lookCount: 3,
-    lookNames: { A: 'Look A', B: 'Look B', C: 'Look C' },
-    looks: {
-      A: { areas: { Eyes: { notes: '', products: '', refs: '' }, Brows: { notes: '', products: '', refs: '' }, Skin: { notes: 'Dewy base, focus on glow', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: '', products: '', refs: '' } }, shared: false, pendingApproval: false },
-      B: { areas: { Eyes: { notes: 'Smoky liner, deep shadow', products: '', refs: '' }, Brows: { notes: 'Feathered brow', products: '', refs: '' }, Skin: { notes: '', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: 'Nude gloss', products: '', refs: '' } }, shared: false, pendingApproval: true },
-      C: { areas: { Eyes: { notes: '', products: '', refs: '' }, Brows: { notes: '', products: '', refs: '' }, Skin: { notes: '', products: '', refs: '' }, Cheeks: { notes: '', products: '', refs: '' }, Lips: { notes: '', products: '', refs: '' } }, shared: false, pendingApproval: false },
+const IPAD_LOOKS_INIT = [
+  {
+    id: 'A', name: 'Look A', modelsCount: 14, mediaDesc: 'Demo + 5 photos · 2 clips',
+    state: 'shared', approvedBy: 'Yadim', approvedAt: '1:40',
+    sharedWith: 'Aimi K (lead assistant) and 14 assistants on Look A', openedCount: 11,
+    writtenBy: 'Aimi K',
+    areas: {
+      Eyes:   { howTo: 'Mascara is the whole look. Top and bottom, build in layers, let it go thick and a little clumpy.', products: ['Maybelline Lash Sensational Sky High · Very Black','Basic mascara~Generic'], refs: 3 },
+      Brows:  { howTo: 'Clean. Brushed up with clear gel, no fill.', products: ['Glossier Boy Brow · Clear'], refs: 1 },
+      Skin:   { howTo: 'Sheer. Spot conceal only, let freckles show.', products: ['Armani Luminous Silk · per model','NARS Radiant Creamy Concealer'], refs: 1 },
+      Cheeks: { howTo: 'Nothing.', products: [], refs: 0 },
+      Lips:   { howTo: 'Clean. Balm, then blot.', products: ['Aquaphor Lip Repair'], refs: 1 },
     },
-    assignments: {},
+  },
+  {
+    id: 'B', name: 'Look B', modelsCount: 9, mediaDesc: 'Demo + 4 photos · 1 clip',
+    state: 'waiting', sentTo: 'Yadim', sentAt: '3:12',
+    writtenBy: 'Aimi K',
+    areas: {
+      Eyes:   { howTo: "Smoky liner smudged into the lash line, deep brown shadow to the crease.", products: ["Charlotte Tilbury Rock 'n' Kohl · Barbarella Brown",'Basic brown shadow~Generic'], refs: 2 },
+      Brows:  { howTo: 'Feathered up, a little messy.', products: ['Anastasia Brow Freeze'], refs: 1 },
+      Skin:   { howTo: 'Dewy, glow on the high points.', products: ['Glossier Futuredew','Basic cream highlighter~Generic'], refs: 1 },
+      Cheeks: { howTo: 'Soft warm flush, cream only.', products: ['Merit Flush Balm · Cheeky'], refs: 0 },
+      Lips:   { howTo: 'Nude gloss, blotted center.', products: ['Fenty Gloss Bomb · Fu$$y'], refs: 1 },
+    },
+  },
+  {
+    id: 'C', name: 'Look C', modelsCount: 7, mediaDesc: 'Demo at 2:15 PM',
+    state: 'draft', noDemo: true, areasWritten: 2, areasTotal: 5,
+    writtenBy: 'Aimi K',
+    areas: {
+      Eyes:   { howTo: 'Bare lid, one graphic white line on the upper lash.', products: ['Basic white liner~Generic'], refs: 1 },
+      Brows:  { howTo: '', products: [], refs: 0 },
+      Skin:   { howTo: 'Matte, full coverage, no shine anywhere.', products: ['Estée Lauder Double Wear · per model'], refs: 0 },
+      Cheeks: { howTo: '', products: [], refs: 0 },
+      Lips:   { howTo: '', products: [], refs: 0 },
+    },
+  },
+]
+
+const PRODUCT_SUGGESTIONS = ['Basic mascara~Generic~any black mascara in the kit','Maybelline Lash Sensational Sky High~Very Black','Charlotte Tilbury Rock \'n\' Kohl~Barbarella Brown','L\'Oréal Telescopic~Blackest Black','Lancôme Lash Idôle~Glossy Black']
+
+function IPadStudioSection() {
+  const [looks, setLooks]           = useState(IPAD_LOOKS_INIT)
+  const [selId, setSelId]           = useState('A')
+  const [studioTab, setStudioTab]   = useState('looks')
+  const [editingId, setEditingId]   = useState(null)
+  const [addingNew, setAddingNew]   = useState(false)
+  const [moreMenuId, setMoreMenuId] = useState(null)
+  const [editName, setEditName]     = useState('')
+  const [editArea, setEditArea]     = useState('Eyes')
+  const [editAreaData, setEditAreaData] = useState({})
+  const [prodQuery, setProdQuery]   = useState('')
+  const [prodOpen, setProdOpen]     = useState(false)
+
+  function startEdit(look) {
+    setEditingId(look.id)
+    setEditName(look.name)
+    setEditArea('Eyes')
+    setEditAreaData(JSON.parse(JSON.stringify(look.areas)))
+    setProdQuery(''); setProdOpen(false)
   }
-  const [data, setData]     = useState(() => lsGet(AUTHOR_KEY, DEFAULT_DATA))
-  const [selLook, setSelLook] = useState('A')
-  const [selArea, setSelArea] = useState('Eyes')
 
-  const lookKeys = data.lookNames ? Object.keys(data.lookNames).slice(0, data.lookCount || 3) : ['A','B','C']
+  function saveEdit() {
+    setLooks(prev => prev.map(l => l.id === editingId ? { ...l, name: editName, areas: editAreaData } : l))
+    setEditingId(null)
+  }
 
-  function updateArea(lookKey, area, field, value) {
-    setData(prev => {
-      const next = { ...prev, looks: { ...prev.looks, [lookKey]: { ...prev.looks?.[lookKey], areas: { ...(prev.looks?.[lookKey]?.areas || {}), [area]: { ...(prev.looks?.[lookKey]?.areas?.[area] || {}), [field]: value } } } } }
-      lsSet(AUTHOR_KEY, next); return next
+  function updateEditHowTo(val) {
+    setEditAreaData(prev => ({ ...prev, [editArea]: { ...prev[editArea], howTo: val } }))
+  }
+
+  function removeProduct(p) {
+    setEditAreaData(prev => ({ ...prev, [editArea]: { ...prev[editArea], products: prev[editArea].products.filter(x => x !== p) } }))
+  }
+
+  function addProduct(p) {
+    setEditAreaData(prev => {
+      const cur = prev[editArea]?.products || []
+      if (cur.includes(p)) return prev
+      return { ...prev, [editArea]: { ...prev[editArea], products: [...cur, p] } }
     })
-  }
-  function toggleLookFlag(lookKey, flag) {
-    setData(prev => { const next = { ...prev, looks: { ...prev.looks, [lookKey]: { ...prev.looks?.[lookKey], [flag]: !prev.looks?.[lookKey]?.[flag] } } }; lsSet(AUTHOR_KEY, next); return next })
+    setProdQuery(''); setProdOpen(false)
   }
 
-  const curLook = data.looks?.[selLook] || { areas: {} }
-  const curArea = curLook.areas?.[selArea] || { notes: '', products: '', refs: '' }
+  function sendToArtist(id) {
+    setLooks(prev => prev.map(l => l.id === id ? { ...l, state: 'waiting', sentTo: 'Yadim', sentAt: '3:12' } : l))
+  }
 
-  return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
-      <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}><Lbl>Studio</Lbl></div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-          {lookKeys.map(key => {
-            const look = data.looks?.[key]
-            const name = data.lookNames?.[key] || `Look ${key}`
-            const isActive = selLook === key
+  function cancelRequest(id) {
+    setLooks(prev => prev.map(l => l.id === id ? { ...l, state: 'draft' } : l))
+  }
+
+  function unshare(id) {
+    setLooks(prev => prev.map(l => l.id === id ? { ...l, state: 'draft' } : l))
+    setMoreMenuId(null)
+  }
+
+  function addNewLook() {
+    const newId = String.fromCharCode(65 + looks.length)
+    const blank = { id: newId, name: `Look ${newId}`, modelsCount: 0, mediaDesc: 'No demo yet', state: 'draft', noDemo: true, areasWritten: 0, areasTotal: 5, writtenBy: 'You', areas: { Eyes: { howTo:'',products:[],refs:0 }, Brows: { howTo:'',products:[],refs:0 }, Skin: { howTo:'',products:[],refs:0 }, Cheeks: { howTo:'',products:[],refs:0 }, Lips: { howTo:'',products:[],refs:0 } } }
+    setLooks(prev => [...prev, blank])
+    setAddingNew(false)
+    startEdit(blank)
+    setSelId(newId)
+  }
+
+  const selLook = looks.find(l => l.id === selId) || looks[0]
+  const isEditing = editingId === selId
+  const curEditAreaData = editAreaData[editArea] || { howTo: '', products: [], refs: 0 }
+  const filteredSuggestions = prodQuery ? PRODUCT_SUGGESTIONS.filter(p => p.toLowerCase().includes(prodQuery.toLowerCase())) : PRODUCT_SUGGESTIONS
+
+  function ProductChip({ p }) {
+    const parts = p.split('~')
+    const isGeneric = parts[1] === 'Generic'
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999, background: BG, border: `1px solid ${BD}`, fontSize: 12, whiteSpace: 'nowrap' }}>
+        {parts[0]}
+        {isGeneric && <span style={{ fontSize: 10, letterSpacing: '.08em', color: MT, textTransform: 'uppercase' }}>Generic</span>}
+      </span>
+    )
+  }
+
+  function ByAreaRows({ look }) {
+    return (
+      <div>
+        <Lbl>By area</Lbl>
+        {LOOK_AREAS.map(area => {
+          const a = look.areas[area] || {}
+          const isEmpty = !a.howTo
+          return (
+            <div key={area} style={{ display: 'grid', gridTemplateColumns: '76px minmax(0,1fr) auto', gap: 12, padding: '12px 0', borderBottom: `1px solid ${BD}` }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{area}</span>
+              <span style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span style={{ fontSize: 13, lineHeight: 1.45, color: isEmpty ? M2 : TX }}>{isEmpty ? 'Not written yet.' : a.howTo}</span>
+                {(a.products || []).length > 0 && (
+                  <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {a.products.map((p, i) => <ProductChip key={i} p={p} />)}
+                  </span>
+                )}
+              </span>
+              {a.refs > 0 && <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{a.refs} reference{a.refs > 1 ? 's' : ''}</span>}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  function LookDetail({ look }) {
+    const st = look.state
+    return (
+      <div style={{ minHeight: 0, overflowY: 'auto', background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>{look.name}</span>
+            <span style={{ fontSize: 12, color: MT }}>{look.modelsCount} models · written by {look.writtenBy}</span>
+          </span>
+          {st === 'shared' && <>
+            <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
+            <button onClick={() => setMoreMenuId(moreMenuId === look.id ? null : look.id)} aria-label="More" style={{ width: 40, height: 40, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontSize: 18, color: TX, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>⋯
+              {moreMenuId === look.id && (
+                <div style={{ position: 'absolute', right: 0, top: 46, background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10, minWidth: 200, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+                  {[['Duplicate look', false], ['Assign models', false], ['Unshare from the team', true]].map(([label, isRed]) => (
+                    <button key={label} onClick={() => { if (isRed) unshare(look.id); else setMoreMenuId(null) }} style={{ display: 'flex', alignItems: 'center', width: '100%', minHeight: 44, padding: '0 14px', border: 0, borderRadius: 8, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: isRed ? '#A33D28' : TX, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
+                  ))}
+                </div>
+              )}
+            </button>
+          </>}
+          {st === 'waiting' && <>
+            <button onClick={() => cancelRequest(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: '1px solid #A33D28', background: 'transparent', color: '#A33D28', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>CANCEL REQUEST</button>
+            <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
+          </>}
+          {st === 'draft' && <>
+            <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
+            <button onClick={() => sendToArtist(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SEND TO YADIM</button>
+          </>}
+        </div>
+        {/* Status bar */}
+        {st === 'shared' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#EEF3EE', fontSize: 12, lineHeight: 1.4, color: '#3F6B45' }}>
+          <span style={{ flex: 1 }}>Approved by {look.approvedBy} at {look.approvedAt} · Shared with {look.sharedWith} · {look.openedCount} opened</span>
+          <button style={{ border: 0, background: 'none', padding: 0, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: '#3F6B45', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer' }}>See who</button>
+        </div>}
+        {st === 'waiting' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#FAF1DE', fontSize: 12, lineHeight: 1.4, color: '#8A6516' }}>
+          <span style={{ flex: 1 }}>Sent to {look.sentTo} for approval at {look.sentAt} · Not opened yet. Only you and {look.sentTo} can see it.</span>
+        </div>}
+        {st === 'draft' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#ECE8E3', fontSize: 12, lineHeight: 1.4, color: MT }}>
+          <span style={{ flex: 1 }}>Draft · Only you can see this. {look.areasWritten} of {look.areasTotal} areas written.</span>
+        </div>}
+        {/* Demo */}
+        {look.noDemo ? (
+          <div style={{ height: 200, borderRadius: 12, border: `1px dashed ${DV}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, flexShrink: 0 }}>
+            <span style={{ fontSize: 14 }}>No demo yet</span>
+            <span style={{ fontSize: 12, color: MT }}>Demo scheduled {look.mediaDesc}. Add photos or a video when it&apos;s done.</span>
+          </div>
+        ) : (
+          <div style={{ position: 'relative', height: 200, borderRadius: 12, overflow: 'hidden', flexShrink: 0, background: BD }}>
+            <span style={{ position: 'absolute', left: 12, bottom: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(17,17,17,.75)', color: '#fff', fontSize: 12 }}>Full demo · Yadim and Aimi · 4:12</span>
+          </div>
+        )}
+        {/* Photo strip (only if not noDemo) */}
+        {!look.noDemo && (
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', flexShrink: 0 }}>
+            {[0,1,2,3,4].map(i => (
+              <span key={i} style={{ width: 64, height: 64, borderRadius: 10, background: BD, flexShrink: 0, border: i === 0 ? `2px solid ${TX}` : '2px solid transparent', display: 'block' }} />
+            ))}
+          </div>
+        )}
+        {/* By area */}
+        <ByAreaRows look={look} />
+      </div>
+    )
+  }
+
+  function EditDetail({ look }) {
+    const curProds = curEditAreaData.products || []
+    return (
+      <div style={{ minHeight: 0, overflowY: 'auto', background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Name + actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <input value={editName} onChange={e => setEditName(e.target.value)} aria-label="Look name"
+            style={{ flex: 1, minWidth: 0, height: 44, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Georgia, serif', fontSize: 22, color: TX, background: '#fff', outline: 'none' }} />
+          <button onClick={() => setEditingId(null)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>CANCEL</button>
+          <button onClick={saveEdit} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SAVE DRAFT</button>
+        </div>
+        {/* Models */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 12, color: MT }}>
+          <span>Models</span>
+          {Array.from({length: Math.min(look.modelsCount, 3)}, (_,i) => (
+            <span key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: BD, marginLeft: i > 0 ? -6 : 0, border: '2px solid #fff', display: 'inline-block' }} />
+          ))}
+          {look.modelsCount > 3 && <span>+{look.modelsCount - 3} more · {look.modelsCount} models</span>}
+          <button style={{ border: 0, background: 'none', padding: 0, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Change</button>
+        </div>
+        {/* Area tabs */}
+        <div style={{ display: 'flex', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+          {LOOK_AREAS.map(area => {
+            const hasContent = (editAreaData[area]?.howTo || '') !== ''
+            const isAct = area === editArea
             return (
-              <button key={key} onClick={() => { setSelLook(key); setSelArea('Eyes') }} style={{ width: '100%', padding: '12px 20px', background: isActive ? '#E8E4DF' : 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <span style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: TX }}>{name}</span>
-                {look?.pendingApproval && <span style={{ fontSize: 10, color: '#D4A853', letterSpacing: '.06em' }}>Pending approval</span>}
-                {look?.shared && <span style={{ fontSize: 10, color: '#7A9E7E', letterSpacing: '.06em' }}>Shared</span>}
+              <button key={area} onClick={() => { setEditArea(area); setProdQuery(''); setProdOpen(false) }}
+                style={{ minHeight: 40, padding: '0 14px', border: 0, borderBottom: isAct ? `2px solid ${TX}` : '2px solid transparent', background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: isAct ? TX : MT, cursor: 'pointer', marginBottom: -1 }}>
+                {area}{hasContent ? ' ·' : ''}
               </button>
             )
           })}
         </div>
-      </div>
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 24px', borderBottom: `1px solid ${BD}`, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>{data.lookNames?.[selLook] || `Look ${selLook}`}</span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => toggleLookFlag(selLook, 'pendingApproval')} style={{ height: 36, padding: '0 14px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>{curLook.pendingApproval ? 'REVOKE REQUEST' : 'REQUEST APPROVAL'}</button>
-            <button onClick={() => toggleLookFlag(selLook, 'shared')} style={{ height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, cursor: 'pointer' }}>{curLook.shared ? 'UNSHARE' : 'SHARE'}</button>
+        {/* How to do it */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Lbl>How to do it</Lbl>
+          <textarea rows={2} value={curEditAreaData.howTo || ''} onChange={e => updateEditHowTo(e.target.value)}
+            style={{ padding: 12, border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.45, resize: 'none', color: TX, background: '#fff', outline: 'none' }} />
+        </div>
+        {/* Products */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
+          <Lbl>Products</Lbl>
+          {curProds.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {curProds.map((p, i) => {
+                const parts = p.split('~')
+                return (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999, background: BG, border: `1px solid ${BD}`, fontSize: 12, whiteSpace: 'nowrap' }}>
+                    {parts[0]}
+                    {parts[1] === 'Generic' && <span style={{ fontSize: 10, letterSpacing: '.08em', color: MT, textTransform: 'uppercase' }}>Generic</span>}
+                    <button onClick={() => removeProduct(p)} aria-label={`Remove ${parts[0]}`} style={{ border: 0, background: 'none', padding: 0, color: MT, cursor: 'pointer', lineHeight: 1 }}>×</button>
+                  </span>
+                )
+              })}
+            </div>
+          )}
+          <div style={{ position: 'relative' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: `1px solid ${prodOpen ? TX : DV}`, borderRadius: 10, background: '#fff', fontSize: 14, color: TX }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MT} strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <input value={prodQuery} onChange={e => { setProdQuery(e.target.value); setProdOpen(true) }} onFocus={() => setProdOpen(true)}
+                placeholder="Search products" style={{ flex: 1, border: 0, outline: 'none', background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX }} />
+            </span>
+            {prodOpen && (
+              <div style={{ position: 'absolute', left: 0, right: 0, top: 52, background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10 }}>
+                {filteredSuggestions.map((p, i) => {
+                  const parts = p.split('~')
+                  const isGeneric = parts[1] === 'Generic'
+                  return (
+                    <button key={i} onClick={() => addProduct(p)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', minHeight: 48, padding: '6px 12px', border: 0, borderRadius: 8, background: i === 0 ? BG : 'transparent', textAlign: 'left', fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }}>
+                      <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <span style={{ fontSize: 14 }}>{parts[0]}</span>
+                        <span style={{ fontSize: 12, color: MT }}>{isGeneric ? `Generic · ${parts[2] || ''}` : (parts[1] || '')}</span>
+                      </span>
+                      {isGeneric && <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: MT }}>Generic</span>}
+                    </button>
+                  )
+                })}
+                <div style={{ padding: '8px 12px 4px', fontSize: 12, color: MT, borderTop: `1px solid ${BD}`, marginTop: 4 }}>
+                  Can&apos;t find it? <button onClick={() => { addProduct(prodQuery); }} style={{ border: 0, background: 'none', padding: 0, textDecoration: 'underline', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Add &ldquo;{prodQuery || 'product'}&rdquo; as a new product</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 0, borderBottom: `1px solid ${BD}`, flexShrink: 0, padding: '0 24px', overflowX: 'auto' }}>
-          {LOOK_AREAS.map(area => (
-            <button key={area} onClick={() => setSelArea(area)} style={{ height: 40, padding: '0 14px', background: 'transparent', border: 'none', borderBottom: selArea === area ? `2px solid ${TX}` : '2px solid transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: selArea === area ? TX : MT, cursor: 'pointer', marginBottom: -1, whiteSpace: 'nowrap' }}>{area}</button>
-          ))}
+        {/* References */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Lbl>References</Lbl>
+            <button style={{ border: 0, background: 'none', padding: 0, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Paste a link</button>
+          </span>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {(curEditAreaData.refs || 0) > 0 && Array.from({ length: curEditAreaData.refs }, (_,i) => (
+              <span key={i} style={{ position: 'relative', flexShrink: 0 }}>
+                <span style={{ width: 88, height: 88, borderRadius: 10, background: BD, display: 'block' }} />
+                <span style={{ position: 'absolute', left: 6, right: 6, bottom: 6, fontSize: 10, color: '#fff', background: 'rgba(17,17,17,.7)', borderRadius: 4, padding: '2px 4px', textAlign: 'center' }}>Ref {i+1}</span>
+              </span>
+            ))}
+            <button style={{ width: 88, height: 88, borderRadius: 10, border: `1px dashed ${DV}`, background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, flexShrink: 0, cursor: 'pointer' }}>
+              <span style={{ fontSize: 20, lineHeight: 1 }}>+</span>Photo or video
+            </button>
+          </div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {[['notes','Notes','Describe the look...'],['products','Products','List products used...'],['refs','References','Reference photos or links...']].map(([field, label, ph]) => (
-            <div key={field}>
-              <Lbl s={{ marginBottom: 6 }}>{label}</Lbl>
-              <textarea value={curArea[field] || ''} onChange={e => updateArea(selLook, selArea, field, e.target.value)} rows={field === 'notes' ? 4 : 2} placeholder={ph} style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, resize: 'none', outline: 'none' }} />
-            </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Section header */}
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px 12px' }}>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Studio</span>
+        <span style={{ fontSize: 12, color: MT }}>Makeup · {looks.length} looks · 30 models</span>
+        <span style={{ flex: 1 }} />
+        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#ECE8E3' }}>
+          {(['looks','inventory','receipts']).map(tab => (
+            <button key={tab} onClick={() => setStudioTab(tab)}
+              style={{ minHeight: 36, padding: '0 16px', borderRadius: 999, border: 0, background: studioTab === tab ? TX : 'transparent', color: studioTab === tab ? '#fff' : MT, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, cursor: 'pointer', textTransform: 'capitalize' }}>
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
           ))}
         </div>
       </div>
+
+      {studioTab === 'looks' && (
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '280px minmax(0,1fr)', gap: 20, padding: '0 24px 24px' }} onClick={() => { if (moreMenuId) setMoreMenuId(null); if (prodOpen) setProdOpen(false) }}>
+          {/* Left: look list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflowY: 'auto' }}>
+            {looks.map(look => {
+              const isSel = look.id === selId
+              const stateColor = look.state === 'shared' ? '#3F6B45' : look.state === 'waiting' ? '#8A6516' : MT
+              const stateLabel = look.state === 'shared' ? 'Shared with the team' : look.state === 'waiting' ? `Waiting on Yadim` : 'Draft'
+              return (
+                <button key={look.id} onClick={() => { setSelId(look.id); if (editingId && editingId !== look.id) setEditingId(null) }}
+                  style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 12px', borderRadius: 14, border: isSel ? '1.5px solid #111' : `1px solid ${BD}`, background: '#fff', textAlign: 'left', fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }}>
+                  <span style={{ width: 56, height: 72, borderRadius: 8, background: BD, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: MT, textAlign: 'center' }}>
+                    {look.noDemo ? 'No demo' : ''}
+                  </span>
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{look.name}</span>
+                    <span style={{ fontSize: 12, color: MT }}>{look.modelsCount} models · {look.mediaDesc}</span>
+                    <span style={{ fontSize: 12, color: stateColor, fontWeight: 500 }}>{stateLabel}</span>
+                  </span>
+                </button>
+              )
+            })}
+            <button onClick={() => setAddingNew(true)}
+              style={{ minHeight: 48, borderRadius: 14, border: `1px dashed ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, cursor: 'pointer' }}>
+              + Add a look
+            </button>
+            {addingNew && (
+              <div style={{ padding: '12px 14px', background: '#fff', border: `1px solid ${BD}`, borderRadius: 14 }}>
+                <p style={{ fontSize: 13, color: MT, margin: '0 0 10px' }}>Add a new look?</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={addNewLook} style={{ flex: 1, height: 36, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Add</button>
+                  <button onClick={() => setAddingNew(false)} style={{ flex: 1, height: 36, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Right: detail */}
+          {selLook && (isEditing ? <EditDetail look={selLook} /> : <LookDetail look={selLook} />)}
+        </div>
+      )}
+
+      {studioTab === 'inventory' && (
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px' }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Inventory</span>
+          <p style={{ fontSize: 13, color: MT, marginTop: 8 }}>Product inventory is managed in the Makeup Studio on your phone.</p>
+        </div>
+      )}
+
+      {studioTab === 'receipts' && (
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px' }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Receipts</span>
+          <p style={{ fontSize: 13, color: MT, marginTop: 8 }}>Receipts and expenses are tracked in the Makeup Studio on your phone.</p>
+        </div>
+      )}
     </div>
   )
 }
