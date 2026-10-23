@@ -823,28 +823,48 @@ function ShareStatusModal({ onClose }) {
 }
 
 const INCIDENT_TYPES_IPAD = ['Late Arrival', 'Left Early', 'No Show', 'Medical', 'Other']
+const ASST_SHOW_COUNTS = { 'Sofia Reyes': 4, 'Lena Schmidt': 2, 'Dara Okafor': 1, 'Ivana R': 3, 'Tomás V': 2, 'Kenji Watanabe': 5, 'Mira Patel': 1, 'Aimi K': 6, 'Iona M': 3 }
+const ASST_AVG_TIMES   = { 'Sofia Reyes': '43m', 'Lena Schmidt': '51m', 'Dara Okafor': '38m', 'Ivana R': '29m', 'Tomás V': '46m', 'Kenji Watanabe': '47m', 'Mira Patel': '52m', 'Aimi K': '40m', 'Iona M': '44m' }
+const ASST_FREE_SINCE  = { 'Lena Schmidt': '3:38', 'Dara Okafor': '3:41', 'Mira Patel': '3:20', 'Aimi K': 'at the front', 'Iona M': 'on Look 02' }
+function ordinal(n) { const s = ['th','st','nd','rd']; const v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]) }
 
 function IPadAssistantsSection({ models, profiles: profs }) {
-  const [chip, setChip]         = useState('all')
-  const [selId, setSelId]       = useState(null)
-  const [stars, setStars]       = useState(0)
-  const [note, setNote]         = useState('')
-  const [incidents, setIncidents] = useState([])
-  const [showForm, setShowForm] = useState(false)
-  const [incForm, setIncForm]   = useState({ type: 'Late Arrival', notes: '' })
-  const [pending, setPending]   = useState(null)
+  const [chip, setChip]               = useState('all')
+  const [selId, setSelId]             = useState(null)
+  const [overallStars, setOverallStars] = useState({})
+  const [overallNote, setOverallNote]   = useState({})
+  const [inviteBack, setInviteBack]     = useState({})
+  const [modelStars, setModelStars]     = useState({})
+  const [modelNotes, setModelNotes]     = useState({})
+  const [editingNote, setEditingNote]   = useState(null)
+  const [noteInput, setNoteInput]       = useState('')
+  const [incidents, setIncidents]       = useState([])
+  const [showForm, setShowForm]         = useState(false)
+  const [incForm, setIncForm]           = useState({ type: 'Late Arrival', notes: '' })
+  const [pending, setPending]           = useState(null)
 
   const assistants = profs.filter(p => p.role === 'assistant' || p.role === 'lead_assistant')
   const SPEC_ORDER = ['hair', 'makeup', 'nails']
 
   function getStatus(a) {
-    const busy = models.some(m =>
+    return models.some(m =>
+      (m.services?.hair?.assistantId === a.id   && m.services.hair.status   === 'in_progress') ||
+      (m.services?.makeup?.assistantId === a.id && m.services.makeup.status === 'in_progress') ||
+      (m.services?.nails?.assistantId === a.id  && m.services.nails.status  === 'in_progress')
+    ) ? 'working' : 'free'
+  }
+
+  function getCurrentModel(a) {
+    return models.find(m =>
       (m.services?.hair?.assistantId === a.id   && m.services.hair.status   === 'in_progress') ||
       (m.services?.makeup?.assistantId === a.id && m.services.makeup.status === 'in_progress') ||
       (m.services?.nails?.assistantId === a.id  && m.services.nails.status  === 'in_progress')
     )
-    return busy ? 'working' : 'free'
   }
+
+  const totalLeads  = assistants.filter(a => a.role === 'lead_assistant').length
+  const totalWorking = assistants.filter(a => getStatus(a) === 'working').length
+  const totalFree   = assistants.filter(a => getStatus(a) === 'free').length
 
   const filtered = assistants.filter(a => {
     if (chip === 'all')     return true
@@ -855,10 +875,10 @@ function IPadAssistantsSection({ models, profiles: profs }) {
   })
 
   const grouped = SPEC_ORDER.map(k => ({
-    key: k,
-    label: k.charAt(0).toUpperCase() + k.slice(1),
+    key: k, label: k.charAt(0).toUpperCase() + k.slice(1),
     people: filtered.filter(a => a.specialty === k),
   })).filter(g => g.people.length > 0)
+  const ungrouped = filtered.filter(a => !a.specialty)
 
   const selA = selId ? profs.find(p => p.id === selId) : null
   const assigned = selA ? models.filter(m =>
@@ -866,79 +886,189 @@ function IPadAssistantsSection({ models, profiles: profs }) {
     m.services?.makeup?.assistantId === selA.id ||
     m.services?.nails?.assistantId  === selA.id
   ) : []
+  const selCurrentModel = selA ? getCurrentModel(selA) : null
 
   function submitInc() {
     const inc = { id: Date.now(), type: incForm.type, notes: incForm.notes, time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) }
     setPending(inc); setShowForm(false); setIncForm({ type: 'Late Arrival', notes: '' })
   }
 
+  function AsstRow({ a }) {
+    const st = getStatus(a)
+    const isSel = selId === a.id
+    const curM = getCurrentModel(a)
+    const sub = st === 'working' && curM
+      ? `On ${curM.name} · Look ${curM.lookNumber || curM.look}`
+      : (ASST_FREE_SINCE[a.name] ? `Free since ${ASST_FREE_SINCE[a.name]}` : 'Available')
+    const dotColor = a.role === 'lead_assistant' ? TX : (st === 'working' ? '#D4A853' : '#7A9E7E')
+    return (
+      <button onClick={() => { setSelId(a.id); setShowForm(false); setPending(null) }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 64, padding: '0 12px', background: isSel ? '#fff' : 'transparent', border: 'none', borderRadius: 10, cursor: 'pointer', textAlign: 'left', boxShadow: isSel ? 'inset 0 0 0 1.5px #111' : 'none' }}>
+        <Avatar src={a.avatar} name={a.name} size={40} />
+        <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
+          <span style={{ fontSize: 12, color: MT, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</span>
+        </span>
+        <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: M2, flexShrink: 0 }}>{a.role === 'lead_assistant' ? 'Lead' : (a.specialty || SVC)}</span>
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+      </button>
+    )
+  }
+
+  const chipDef = [
+    { id: 'all',     label: `All ${assistants.length}` },
+    { id: 'working', label: `Working ${totalWorking}` },
+    { id: 'free',    label: `Free ${totalFree}` },
+    { id: 'leads',   label: `Leads ${totalLeads}` },
+  ]
+
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
-      <div style={{ width: 280, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px 12px', borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 12px' }}>Team</p>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {['all','working','free','leads'].map(c => (
-              <button key={c} onClick={() => setChip(c)} style={{ height: 30, padding: '0 12px', borderRadius: 999, border: chip === c ? `1px solid ${TX}` : `1px solid ${DV}`, background: chip === c ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: chip === c ? '#fff' : TX, cursor: 'pointer', textTransform: 'capitalize' }}>{c}</button>
+      {/* Left 440px list */}
+      <div style={{ width: 440, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flexShrink: 0, padding: '16px 20px 10px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Team today</span>
+            <span style={{ fontSize: 12, color: MT }}>{assistants.length - totalLeads} assistants · {totalLeads} leads</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {chipDef.map(c => (
+              <button key={c.id} onClick={() => setChip(c.id)} style={{ height: 36, padding: '0 14px', borderRadius: 999, border: chip === c.id ? `1px solid ${TX}` : `1px solid ${DV}`, background: chip === c.id ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: chip === c.id ? '#fff' : TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>{c.label}</button>
             ))}
           </div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 16px' }}>
           {grouped.map(g => (
             <div key={g.key}>
-              <Lbl s={{ padding: '0 20px', marginTop: 10, marginBottom: 4 }}>{g.label}</Lbl>
-              {g.people.map(a => {
-                const st = getStatus(a)
-                const isSel = selId === a.id
-                return (
-                  <button key={a.id} onClick={() => { setSelId(a.id); setStars(0); setNote(''); setIncidents([]); setShowForm(false); setPending(null) }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', background: isSel ? '#E8E4DF' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                    <Avatar src={a.avatar} name={a.name} size={36} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: TX }}>{a.name}</div>
-                      <div style={{ fontSize: 11, color: st === 'working' ? '#A0761D' : '#7A9E7E', marginTop: 1 }}>{st === 'working' ? 'Working' : 'Free'}</div>
-                    </div>
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={M2} strokeWidth="1.5" strokeLinecap="round"><polyline points="3 2 7 5 3 8"/></svg>
-                  </button>
-                )
-              })}
+              <Lbl s={{ padding: '16px 12px 6px' }}>{g.label}</Lbl>
+              {g.people.map(a => <AsstRow key={a.id} a={a} />)}
             </div>
           ))}
+          {ungrouped.map(a => <AsstRow key={a.id} a={a} />)}
         </div>
       </div>
+      {/* Right: detail */}
       <div style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
         {!selA ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: M2 }}>Select a team member</p>
           </div>
         ) : (
-          <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <Avatar src={selA.avatar} name={selA.name} size={56} />
-              <div>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>{selA.name}</div>
-                <div style={{ fontSize: 11, color: MT, letterSpacing: '.08em', textTransform: 'uppercase', marginTop: 2 }}>{(selA.specialty || selA.role).charAt(0).toUpperCase() + (selA.specialty || selA.role).slice(1)}</div>
-              </div>
+          <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+            {/* 1. Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <Avatar src={selA.avatar} name={selA.name} size={72} />
+              <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ fontFamily: 'Georgia, serif', fontSize: 28 }}>{selA.name}</span>
+                <span style={{ fontSize: 13, color: MT }}>
+                  {selA.role === 'lead_assistant' ? 'Lead assistant' : (selA.specialty ? selA.specialty.charAt(0).toUpperCase() + selA.specialty.slice(1) + ' assistant' : 'Makeup assistant')}
+                  {' · '}{ordinal(ASST_SHOW_COUNTS[selA.name] || 1)} show with you
+                  {selCurrentModel ? ` · on ${selCurrentModel.name} now` : ''}
+                </span>
+              </span>
             </div>
-            <div>
-              <Lbl s={{ marginBottom: 10 }}>Today's models</Lbl>
-              {assigned.length === 0 ? <p style={{ fontSize: 13, color: MT }}>No models assigned.</p> : assigned.map(m => (
-                <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: `1px solid ${BD}` }}>
-                  <Avatar src={m.avatar} name={m.name} size={32} />
-                  <span style={{ flex: 1, fontFamily: 'Georgia, serif', fontSize: 14 }}>{m.name}</span>
-                  <span style={{ fontSize: 11, color: MT }}>Look {m.look || m.lookNumber}</span>
+            {/* 2. Overall card */}
+            <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>Overall for {show.name}</span>
+                  <span style={{ fontSize: 12, color: MT }}>Private. Only you and the agent see this.</span>
+                </span>
+                <span style={{ display: 'flex', gap: 3 }} aria-label={`${overallStars[selA.id] || 0} of 5`}>
+                  {[1,2,3,4,5].map(n => {
+                    const cur = overallStars[selA.id] || 0
+                    return <button key={n} onClick={() => setOverallStars(s => ({ ...s, [selA.id]: cur === n ? 0 : n }))}
+                      style={{ fontSize: 28, color: n <= cur ? '#D4A853' : '#D0CCC7', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 3px', lineHeight: 1 }}>★</button>
+                  })}
+                </span>
+              </div>
+              <textarea value={overallNote[selA.id] || ''} onChange={e => setOverallNote(n => ({ ...n, [selA.id]: e.target.value }))}
+                rows={2} placeholder="Performance notes for post-show review..."
+                style={{ padding: 12, border: `1px solid ${DV}`, borderRadius: 10, background: BG, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.45, resize: 'none', color: TX, outline: 'none' }} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: '#EEF3EE', cursor: 'pointer' }}>
+                <span style={{ width: 22, height: 22, borderRadius: 6, background: inviteBack[selA.id] ? '#3F6B45' : '#fff', border: inviteBack[selA.id] ? 'none' : `1.5px solid #B5B0AA`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {inviteBack[selA.id] && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10"/></svg>}
+                </span>
+                <input type="checkbox" checked={!!inviteBack[selA.id]} onChange={e => setInviteBack(v => ({ ...v, [selA.id]: e.target.checked }))} style={{ display: 'none' }} />
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600 }}>Invite back</span>
+                  <span style={{ fontSize: 12, color: MT }}>Alexis (agent) gets your recommendation when the show wraps.</span>
+                </span>
+              </label>
+            </div>
+            {/* 3. Stat tiles */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
+              {[['Models today', String(assigned.length)], ['Avg time', ASST_AVG_TIMES[selA.name] || '45m'], ['Touch-ups', '0']].map(([lbl, val]) => (
+                <div key={lbl} style={{ border: `1px solid ${BD}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <Lbl>{lbl}</Lbl>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>{val}</span>
                 </div>
               ))}
             </div>
-            <div>
-              <Lbl s={{ marginBottom: 8 }}>Rate (private)</Lbl>
-              <div style={{ display: 'flex', gap: 2 }}>
-                {[1,2,3,4,5].map(n => <button key={n} onClick={() => setStars(stars === n ? 0 : n)} style={{ fontSize: 28, color: n <= stars ? '#D4A853' : '#D0CCC7', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 3px', lineHeight: 1 }}>★</button>)}
+            {/* 4. Today's models */}
+            {assigned.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <Lbl>Today's models</Lbl>
+                  <span style={{ fontSize: 12, color: MT }}>Rate or note each one, optional</span>
+                </div>
+                {assigned.map(m => {
+                  const key = `${selA.id}:${m.id}`
+                  const mStar = modelStars[key] || 0
+                  const mNote = modelNotes[key] || ''
+                  const isEditing = editingNote === key
+                  return (
+                    <div key={m.id} style={{ borderBottom: `1px solid ${BD}` }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 56 }}>
+                        <Avatar src={m.avatar} name={m.name} size={32} />
+                        <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <span style={{ fontSize: 14 }}>{m.name} · Look {m.lookNumber || m.look}</span>
+                          <span style={{ fontSize: 12, color: MT }}>{m.services?.[SVC]?.status === 'in_progress' ? 'In progress' : m.services?.[SVC]?.status === 'done' ? 'Done' : 'Not started'}</span>
+                        </span>
+                        {!mNote && <button onClick={() => { setEditingNote(key); setNoteInput('') }} style={{ border: 0, background: 'none', fontSize: 12, color: MT, textDecoration: 'underline', cursor: 'pointer' }}>Add note</button>}
+                        {mStar === 0
+                          ? <button onClick={() => setModelStars(s => ({ ...s, [key]: 1 }))} style={{ border: 0, background: 'none', fontSize: 12, color: MT, textDecoration: 'underline', cursor: 'pointer' }}>Rate</button>
+                          : <span style={{ display: 'flex', gap: 2 }}>
+                              {[1,2,3,4,5].map(n => <button key={n} onClick={() => setModelStars(s => ({ ...s, [key]: mStar === n ? 0 : n }))} style={{ fontSize: 14, color: n <= mStar ? '#D4A853' : '#D0CCC7', background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', lineHeight: 1 }}>★</button>)}
+                            </span>
+                        }
+                      </div>
+                      {isEditing && (
+                        <div style={{ margin: '0 0 10px 44px', display: 'flex', gap: 8 }}>
+                          <input value={noteInput} onChange={e => setNoteInput(e.target.value)} autoFocus placeholder="Add a note..." style={{ flex: 1, height: 36, padding: '0 10px', borderRadius: 8, border: `1px solid ${DV}`, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, outline: 'none' }} />
+                          <button onClick={() => { if (noteInput.trim()) setModelNotes(n => ({ ...n, [key]: noteInput.trim() })); setEditingNote(null) }} style={{ height: 36, padding: '0 12px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, cursor: 'pointer' }}>Save</button>
+                          <button onClick={() => setEditingNote(null)} style={{ height: 36, padding: '0 12px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>Cancel</button>
+                        </div>
+                      )}
+                      {mNote && !isEditing && (
+                        <div style={{ margin: '0 0 12px 44px', padding: '10px 12px', borderRadius: 10, background: '#fff', border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.45, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                          <span style={{ flex: 1 }}>{mNote}</span>
+                          <button onClick={() => { setNoteInput(mNote); setEditingNote(key) }} style={{ border: 0, background: 'none', fontSize: 11, color: MT, textDecoration: 'underline', cursor: 'pointer', flexShrink: 0 }}>Edit</button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-            </div>
-            <div>
-              <Lbl s={{ marginBottom: 8 }}>Notes (private)</Lbl>
-              <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Performance notes for post-show review..." rows={3} style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, resize: 'none', outline: 'none' }} />
-            </div>
+            )}
+            {/* 5. Their photos */}
+            {assigned.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <Lbl>Their photos</Lbl>
+                  <span style={{ fontSize: 12, color: MT }}>{assigned.length} uploaded</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
+                  {assigned.map(m => (
+                    <span key={m.id} style={{ position: 'relative', flexShrink: 0 }}>
+                      <img src={m.avatar} alt={`Look ${m.lookNumber || m.look}`} style={{ width: 96, height: 128, borderRadius: 10, objectFit: 'cover', display: 'block' }} />
+                      <span style={{ position: 'absolute', left: 6, bottom: 6, padding: '2px 6px', borderRadius: 4, background: 'rgba(17,17,17,.75)', color: '#fff', fontSize: 10 }}>Look {m.lookNumber || m.look}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* 6. Incident form */}
             {showForm && (
               <div style={{ border: `1px solid ${BD}`, borderRadius: 12, padding: 16 }}>
                 <Lbl s={{ marginBottom: 10 }}>Flag an incident</Lbl>
@@ -953,11 +1083,11 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               </div>
             )}
             {pending && (
-              <div style={{ border: '1px solid #C4614A', borderRadius: 12, padding: 16 }}>
-                <Lbl s={{ color: '#C4614A', marginBottom: 8 }}>Confirm incident</Lbl>
-                <p style={{ fontSize: 13, color: TX, margin: '0 0 12px' }}><strong>{pending.type}</strong>{pending.notes ? ` — ${pending.notes}` : ''}</p>
+              <div style={{ border: '1px solid #A33D28', borderRadius: 12, padding: 16 }}>
+                <Lbl s={{ color: '#A33D28', marginBottom: 8 }}>Confirm incident</Lbl>
+                <p style={{ fontSize: 13, color: TX, margin: '0 0 12px' }}><strong>{pending.type}</strong>{pending.notes ? ` -- ${pending.notes}` : ''}</p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => { setIncidents(p => [...p, pending]); setPending(null) }} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: '#C4614A', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>YES, SUBMIT</button>
+                  <button onClick={() => { setIncidents(p => [...p, pending]); setPending(null) }} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: '#A33D28', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>YES, SUBMIT</button>
                   <button onClick={() => setPending(null)} style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>GO BACK</button>
                 </div>
               </div>
@@ -966,19 +1096,19 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               <div>
                 <Lbl s={{ marginBottom: 8 }}>Incident log</Lbl>
                 {incidents.map(inc => (
-                  <div key={inc.id} style={{ display: 'flex', gap: 8, padding: '8px 0 8px 10px', borderLeft: '2px solid #C4614A', marginLeft: -12, borderBottom: `1px solid ${BD}` }}>
+                  <div key={inc.id} style={{ display: 'flex', gap: 8, padding: '8px 0 8px 10px', borderLeft: '2px solid #A33D28', marginLeft: -12, borderBottom: `1px solid ${BD}` }}>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 11, color: '#C4614A', fontWeight: 600, margin: 0 }}>{inc.type}</p>
+                      <p style={{ fontSize: 11, color: '#A33D28', fontWeight: 600, margin: 0 }}>{inc.type}</p>
                       <p style={{ fontSize: 12, color: MT, margin: '2px 0 0' }}>{inc.notes}</p>
                       <p style={{ fontSize: 10, color: M2, margin: '2px 0 0' }}>{inc.time}</p>
                     </div>
-                    <button onClick={() => setIncidents(p => p.filter(i => i.id !== inc.id))} style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: '#C4614A', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>DELETE</button>
+                    <button onClick={() => setIncidents(p => p.filter(i => i.id !== inc.id))} style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: '#A33D28', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>DELETE</button>
                   </div>
                 ))}
               </div>
             )}
             {!showForm && !pending && (
-              <button onClick={() => setShowForm(true)} style={{ width: '100%', height: 48, borderRadius: 10, border: '1px solid #C4614A', background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: '#C4614A', letterSpacing: '.1em', cursor: 'pointer' }}>FLAG AN INCIDENT</button>
+              <button onClick={() => setShowForm(true)} style={{ alignSelf: 'flex-start', minHeight: 44, padding: '0 18px', borderRadius: 8, border: '1px solid #A33D28', background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: '#A33D28', letterSpacing: '.1em', cursor: 'pointer' }}>FLAG AN INCIDENT</button>
             )}
           </div>
         )}
