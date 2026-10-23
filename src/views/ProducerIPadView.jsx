@@ -12,13 +12,14 @@ import StatusLinkView from './StatusLinkView'
 
 const SVC       = 'makeup'
 const SVC_LABEL = 'Makeup'
-const BG = '#F5F2EE', BD = '#E0DDD8', TX = '#111', MT = '#4A4743', M2 = '#6E6A64', DV = '#CFCAC4'
+const BG = 'var(--sp-bg)', BD = 'var(--sp-border)', TX = 'var(--sp-text)', MT = 'var(--sp-muted)', M2 = 'var(--sp-muted-2)', DV = 'var(--sp-divider)'
+const SF = 'var(--sp-surface)', RL = 'var(--sp-rail)'
 
 const CHIP_STATUS = {
   done:        { c: '#7A9E7E', t: 'Done'        },
   in_progress: { c: '#D4A853', t: 'In progress' },
   paused:      { c: '#8A9BB0', t: 'Paused'      },
-  not_started: { c: '#E8E4DF', t: 'Not started' },
+  not_started: { c: 'var(--sp-chip-ns-bg)', t: 'Not started' },
   to_check:    { c: '#DCE8DD', t: 'To check'    },
 }
 
@@ -45,7 +46,7 @@ function Avatar({ src, name, size = 36 }) {
   const ini = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   if (err || !src) {
     return (
-      <span style={{ width: size, height: size, borderRadius: '50%', background: '#E0DDD8', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: Math.round(size * 0.33), color: M2, fontFamily: 'Inter,system-ui,sans-serif' }}>
+      <span style={{ width: size, height: size, borderRadius: '50%', background: 'var(--sp-border)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: Math.round(size * 0.33), color: M2, fontFamily: 'Inter,system-ui,sans-serif' }}>
         {ini}
       </span>
     )
@@ -67,7 +68,7 @@ function Lbl({ children, style: s }) {
 
 function Bar({ segments, dark }) {
   return (
-    <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: dark ? '#3A3734' : '#E8E4DF' }}>
+    <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: dark ? 'var(--sp-divider)' : 'var(--sp-bg-2)' }}>
       {segments.map((s, i) => <span key={i} style={{ width: s.w, background: s.c }} />)}
     </div>
   )
@@ -76,7 +77,7 @@ function Bar({ segments, dark }) {
 function PanelButtons({ onStart, onCompose, wide, startLabel = 'START WALKTHROUGH' }) {
   return (
     <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}`, display: wide ? 'grid' : 'flex', gridTemplateColumns: wide ? '1fr 1fr' : undefined, flexDirection: wide ? undefined : 'column', gap: 8 }}>
-      <button onClick={onStart} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{startLabel}</button>
+      <button onClick={onStart} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{startLabel}</button>
       <button onClick={onCompose} style={{ minHeight: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>ANNOUNCE</button>
     </div>
   )
@@ -91,8 +92,8 @@ function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, w
         </div>
         {tlItems.map(t => (
           <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 36, padding: '0 10px', margin: '0 -10px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
-            <span style={{ width: 64, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
-            <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
+            <span style={{ width: 64, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
+            <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
             <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#E8C77A' : M2 }}>{t.state}</span>
           </div>
         ))}
@@ -105,7 +106,7 @@ function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, w
           const total = got + unopened + undelivered
           const gotPct = total > 0 ? (got / total * 100).toFixed(0) + '%' : '0%'
           if (i === 0) return (
-            <div key={ann.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div key={ann.id} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{ann.text}</span>
                 <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>Auto · {ann.sentAt}</span>
@@ -131,11 +132,11 @@ function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, w
 function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onCompose, wide }) {
   return (
     <>
-      <div style={{ margin: '16px 20px 0', background: TX, color: '#F5F2EE', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Lbl s={{ color: '#C9C4BE' }}>Walkthrough · started {startedAt}</Lbl>
+      <div style={{ margin: '16px 20px 0', background: TX, color: BG, borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Lbl s={{ color: M2 }}>Walkthrough · started {startedAt}</Lbl>
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 44, lineHeight: 1 }}>{elapsed} min</span>
-        <span style={{ fontSize: 12, color: '#E0DDD8' }}>All work paused · models back at 4:30</span>
-        <button style={{ alignSelf: 'flex-start', minHeight: 32, padding: 0, border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, textDecoration: 'underline', color: '#F5F2EE', cursor: 'pointer' }}>Change time</button>
+        <span style={{ fontSize: 12, color: BD }}>All work paused · models back at 4:30</span>
+        <button style={{ alignSelf: 'flex-start', minHeight: 32, padding: 0, border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, textDecoration: 'underline', color: BG, cursor: 'pointer' }}>Change time</button>
       </div>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Lbl>Announcements</Lbl>
@@ -144,7 +145,7 @@ function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onC
           const total = got + unopened + undelivered
           const gotPct = total > 0 ? (got / total * 100).toFixed(0) + '%' : '96%'
           if (i === 0) return (
-            <div key={ann.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={ann.id} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>{ann.text}</span>
                 <span style={{ fontSize: 11, color: MT }}>{ann.sentAt}</span>
@@ -183,7 +184,7 @@ function PairingPanel({ model, assistants, selected, onSelect, onConfirm, onClos
         {assistants.map(a => {
           const isSel = selected === a.id
           return (
-            <button key={a.id} onClick={() => onSelect(a.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, marginBottom: 4, border: isSel ? `1.5px solid ${TX}` : `1px solid transparent`, background: isSel ? '#F5F2EE' : 'transparent', textAlign: 'left', cursor: 'pointer' }}>
+            <button key={a.id} onClick={() => onSelect(a.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, marginBottom: 4, border: isSel ? `1.5px solid ${TX}` : `1px solid transparent`, background: isSel ? BG : 'transparent', textAlign: 'left', cursor: 'pointer' }}>
               <input type="radio" readOnly checked={isSel} style={{ accentColor: TX, width: 16, height: 16, flexShrink: 0 }} />
               <Avatar src={a.avatar} name={a.name} size={32} />
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -195,7 +196,7 @@ function PairingPanel({ model, assistants, selected, onSelect, onConfirm, onClos
         })}
       </div>
       <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
-        <button onClick={onConfirm} disabled={!selected} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: selected ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: selected ? 'pointer' : 'default', textTransform: 'uppercase' }}>
+        <button onClick={onConfirm} disabled={!selected} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: selected ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: selected ? 'pointer' : 'default', textTransform: 'uppercase' }}>
           {selected && selectedName ? `SEND ${model.name.split(' ')[0].toUpperCase()} TO ${selectedName.split(' ')[0].toUpperCase()}` : 'SELECT AN ASSISTANT'}
         </button>
       </div>
@@ -257,7 +258,7 @@ function ComposePanel({ msg, onMsg, to, onTo, onSend, onClose }) {
         </div>
       </div>
       <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
-        <button onClick={onSend} disabled={!msg.trim()} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: msg.trim() ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: msg.trim() ? 'pointer' : 'default' }}>SEND</button>
+        <button onClick={onSend} disabled={!msg.trim()} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: msg.trim() ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: msg.trim() ? 'pointer' : 'default' }}>SEND</button>
       </div>
     </>
   )
@@ -271,7 +272,7 @@ function ConfirmModal({ onConfirm, onCancel }) {
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: MT }}>Everything in progress pauses and every assistant gets a notice.</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 10 }}>
           <button onClick={onCancel} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>NOT YET</button>
-          <button onClick={onConfirm} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH</button>
+          <button onClick={onConfirm} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH</button>
         </div>
       </div>
     </div>
@@ -308,7 +309,7 @@ function ArrivalsPanel({ models, recentArrivals, onArrived, onOpenRunningLate, o
               <div style={{ fontSize: 11, color: MT }}>Look {m.look} · ETA {m.eta || 'TBD'}</div>
             </div>
             <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <button onClick={() => onArrived(m.id)} style={{ height: 40, padding: '0 12px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>ARRIVED</button>
+              <button onClick={() => onArrived(m.id)} style={{ height: 40, padding: '0 12px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>ARRIVED</button>
               <button onClick={() => onOpenRunningLate(m.id)} style={{ height: 40, padding: '0 10px', borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>RUNNING LATE</button>
             </div>
           </div>
@@ -331,8 +332,8 @@ function ArrivalsPanel({ models, recentArrivals, onArrived, onOpenRunningLate, o
                     <div style={{ fontSize: 11, color: MT }}>Look {m.look} · arrived {arr.arrivedAt}</div>
                   </div>
                   {needsPair && (
-                    <button onClick={() => { onPair?.(m); onClose() }} style={{ height: 40, padding: '0 12px 0 8px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                    <button onClick={() => { onPair?.(m); onClose() }} style={{ height: 40, padding: '0 12px 0 8px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
                       PAIR
                     </button>
                   )}
@@ -411,7 +412,7 @@ function RunningLateModal({ model, onSave, onCancel }) {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 10 }}>
           <button onClick={onCancel} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>CANCEL</button>
-          <button onClick={() => onSave(newEtaStr, note)} disabled={!preset || preset === 'pick'} style={{ minHeight: 52, borderRadius: 8, border: 0, background: (preset && preset !== 'pick') ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: (preset && preset !== 'pick') ? 'pointer' : 'default' }}>SAVE NEW ETA</button>
+          <button onClick={() => onSave(newEtaStr, note)} disabled={!preset || preset === 'pick'} style={{ minHeight: 52, borderRadius: 8, border: 0, background: (preset && preset !== 'pick') ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: (preset && preset !== 'pick') ? 'pointer' : 'default' }}>SAVE NEW ETA</button>
         </div>
       </div>
     </div>
@@ -433,7 +434,7 @@ function ToCheckPanel({ toCheckQueue, profiles, onLooksGood, onOpenTouchup, onCl
           <div style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: M2, paddingTop: 8 }}>No checks pending</div>
         )}
         {toCheckQueue.map(check => (
-          <div key={check.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 12 }}>
+          <div key={check.id} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 12, padding: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
               <Avatar src={check.modelAvatar} name={check.modelName} size={48} />
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -442,7 +443,7 @@ function ToCheckPanel({ toCheckQueue, profiles, onLooksGood, onOpenTouchup, onCl
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <button onClick={() => onLooksGood(check.id)} style={{ minHeight: 44, borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>LOOKS GOOD</button>
+              <button onClick={() => onLooksGood(check.id)} style={{ minHeight: 44, borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>LOOKS GOOD</button>
               <button onClick={() => onOpenTouchup(check.id)} style={{ minHeight: 44, borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>TOUCH-UP</button>
             </div>
           </div>
@@ -488,7 +489,7 @@ function TouchupSheet({ check, onSend, onClose }) {
             <Lbl s={{ marginBottom: 8 }}>What to fix</Lbl>
             <input value={note} onChange={e => setNote(e.target.value)} placeholder="Describe what needs adjusting" style={{ width: '100%', boxSizing: 'border-box', height: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 15, padding: '0 14px', color: TX, outline: 'none' }} />
           </div>
-          <button onClick={() => onSend(areas, note)} disabled={!canSend} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: canSend ? TX : DV, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: canSend ? 'pointer' : 'default' }}>
+          <button onClick={() => onSend(areas, note)} disabled={!canSend} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: canSend ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: canSend ? 'pointer' : 'default' }}>
             SEND TO {check.assistantName.split(' ')[0].toUpperCase()}
           </button>
         </div>
@@ -516,10 +517,10 @@ function CollapsedRail({ onExpand, onStartWalkthrough }) {
         <span style={{ fontSize: 9, color: MT }}>got it</span>
       </button>
       <span style={{ flex: 1 }} />
-      <button onClick={onStartWalkthrough} style={{ ...tileStyle, background: TX, color: '#fff' }}>
+      <button onClick={onStartWalkthrough} style={{ ...tileStyle, background: TX, color: 'var(--sp-inverse-text)' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="none"><rect x="7" y="5" width="3.5" height="14" fill="currentColor"/><rect x="13.5" y="5" width="3.5" height="14" fill="currentColor"/></svg>
         <span style={{ fontSize: 10, fontWeight: 600 }}>Start</span>
-        <span style={{ fontSize: 9, color: '#C9C4BE' }}>walkthru</span>
+        <span style={{ fontSize: 9, color: M2 }}>walkthru</span>
       </button>
     </aside>
   )
@@ -589,7 +590,7 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
   }
 
   return (
-    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: liveH, transition: snapping ? 'height 0.25s ease-out' : 'none', background: '#fff', borderTop: `1px solid ${BD}`, boxShadow: '0 -6px 18px rgba(0,0,0,.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 5 }}>
+    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: liveH, transition: snapping ? 'height 0.25s ease-out' : 'none', background: SF, borderTop: `1px solid ${BD}`, boxShadow: '0 -6px 18px rgba(0,0,0,.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 5 }}>
 
       {/* Grab handle */}
       <div
@@ -619,7 +620,7 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
+            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
             <button onClick={onCompose} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>NEW ANNOUNCEMENT</button>
           </div>
         </div>
@@ -638,8 +639,8 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
               <Lbl s={{ marginBottom: 8 }}>Today · show in 2h 15m</Lbl>
               {tlItems.map(t => (
                 <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 44, padding: '0 14px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
-                  <span style={{ width: 72, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
-                  <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? '#fff' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
+                  <span style={{ width: 72, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
+                  <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
                   <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#E8C77A' : M2 }}>{t.state}</span>
                 </div>
               ))}
@@ -653,7 +654,7 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
                 const total  = got + unopened + undelivered
                 const gotPct = total > 0 ? (got / total * 100).toFixed(0) + '%' : '85%'
                 if (i === 0) return (
-                  <div key={ann.id} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div key={ann.id} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 12, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                       <span style={{ fontSize: 13, fontWeight: 600 }}>{ann.text}</span>
                       <span style={{ fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>Auto · {ann.sentAt}</span>
@@ -674,7 +675,7 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
           </div>
           {/* Footer outside scroll */}
           <div style={{ flexShrink: 0, padding: '12px 24px 20px', borderTop: `1px solid ${BD}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
+            <button onClick={onStartWalkthrough} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer' }}>START WALKTHROUGH · PAUSE ALL</button>
             <button onClick={onCompose} style={{ minHeight: 52, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>NEW ANNOUNCEMENT</button>
           </div>
         </>
@@ -696,7 +697,7 @@ const IPAD_SECTIONS = [
 ]
 
 const IPAD_NOTIFS = [
-  { id: 'n1', title: 'Lead check escalated', subtitle: 'Aimi asked Yadim about Sofia R · Mei Lin', time: '3:44', dot: '#111' },
+  { id: 'n1', title: 'Lead check escalated', subtitle: 'Aimi asked Yadim about Sofia R · Mei Lin', time: '3:44', dot: TX },
   { id: 'n2', title: 'Ready to check',       subtitle: 'Kenji W · Camille Dubois, makeup done',   time: '3:43', dot: '#7A9E7E' },
   { id: 'n3', title: 'Running late',          subtitle: 'Priya Sharma, new ETA 3:55',              time: '3:40', dot: '#C4614A' },
   { id: 'n4', title: 'Arrived',               subtitle: 'Yuki Nakamura checked in, not paired',    time: '3:44', dot: '#D4A853' },
@@ -712,7 +713,7 @@ const STATUS_META_LINEUP = {
 }
 
 function NavIcon({ id, active }) {
-  const c = active ? '#fff' : TX
+  const c = active ? 'var(--sp-inverse-text)' : TX
   const s = { fill: 'none', stroke: c, strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }
   if (id === 'home')       return <svg width="22" height="22" viewBox="0 0 24 24" style={s}><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
   if (id === 'assistants') return <svg width="22" height="22" viewBox="0 0 24 24" style={s}><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75M22 21v-2a4 4 0 00-3-3.87"/></svg>
@@ -740,7 +741,7 @@ function StarRow({ stars, max = 5 }) {
 function ShowHistoryModal({ onClose }) {
   const [selId, setSelId] = useState(showHistory[0]?.id)
   const sh = showHistory.find(s => s.id === selId) || showHistory[0]
-  const BD2 = '#E0DDD8', MT2 = '#4A4743', M22 = '#6E6A64'
+  const BD2 = BD, MT2 = MT, M22 = M2
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -758,7 +759,7 @@ function ShowHistoryModal({ onClose }) {
               const isSel = s.id === selId
               return (
                 <button key={s.id} onClick={() => setSelId(s.id)} aria-current={isSel || undefined}
-                  style={{ width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, padding: '12px 14px', borderRadius: 12, border: 0, background: isSel ? '#fff' : 'transparent', boxShadow: isSel ? 'inset 0 0 0 1.5px #111' : 'none', cursor: 'pointer', fontFamily: 'Inter, system-ui, sans-serif', color: TX }}>
+                  style={{ width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, padding: '12px 14px', borderRadius: 12, border: 0, background: isSel ? SF : 'transparent', boxShadow: isSel ? `inset 0 0 0 1.5px ${TX}` : 'none', cursor: 'pointer', fontFamily: 'Inter, system-ui, sans-serif', color: TX }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{s.name}</span>
                   <span style={{ fontSize: 12, color: MT2 }}>{s.date} · {s.venue}, {s.city}</span>
                 </button>
@@ -788,7 +789,7 @@ function ShowHistoryModal({ onClose }) {
               {/* Designer */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Lbl>Designer</Lbl>
-                <div style={{ background: '#fff', border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
+                <div style={{ background: SF, border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{sh.designer?.brand}</span>
                   <span style={{ color: MT2 }}>Show contact: {sh.designer?.showContact} · {sh.designer?.brief}</span>
                 </div>
@@ -821,7 +822,7 @@ function ShowHistoryModal({ onClose }) {
                         <span style={{ fontSize: 12, color: MT2 }}>{a.role}</span>
                       </span>
                       <StarRow stars={a.stars} />
-                      <span style={{ minWidth: 92, textAlign: 'right', fontSize: 12, fontWeight: a.inviteBack ? 600 : 400, color: a.inviteBack ? '#3F6B45' : MT2 }}>
+                      <span style={{ minWidth: 92, textAlign: 'right', fontSize: 12, fontWeight: a.inviteBack ? 600 : 400, color: a.inviteBack ? 'var(--sp-green-text)' : MT2 }}>
                         {a.inviteBack ? 'Invited back' : 'Invite back'}
                       </span>
                     </div>
@@ -835,7 +836,7 @@ function ShowHistoryModal({ onClose }) {
               {/* Venue */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Lbl>Venue</Lbl>
-                <div style={{ background: '#fff', border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
+                <div style={{ background: SF, border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
                   <span style={{ fontSize: 14 }}>{sh.venue}, {sh.city}</span>
                   <span style={{ color: MT2 }}>{sh.venueNotes}</span>
                 </div>
@@ -857,7 +858,7 @@ function ShowHistoryModal({ onClose }) {
               {/* How it went */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Lbl>How it went</Lbl>
-                <div style={{ background: '#fff', border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
+                <div style={{ background: SF, border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
                   {sh.howItWent && <>
                     <span style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                       <span style={{ whiteSpace: 'nowrap' }}>Walkthrough</span>
@@ -870,7 +871,7 @@ function ShowHistoryModal({ onClose }) {
                   </>}
                   <span style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ whiteSpace: 'nowrap' }}>Incidents</span>
-                    <span style={{ color: sh.incidents?.length ? '#A33D28' : '#3F6B45' }}>
+                    <span style={{ color: sh.incidents?.length ? 'var(--sp-red-text)' : 'var(--sp-green-text)' }}>
                       {sh.incidents?.length ? sh.incidents.length + ' logged' : 'None logged'}
                     </span>
                   </span>
@@ -880,7 +881,7 @@ function ShowHistoryModal({ onClose }) {
               {/* Receipts */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <Lbl>Receipts</Lbl>
-                <div style={{ background: '#fff', border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
+                <div style={{ background: SF, border: `1px solid ${BD2}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.45 }}>
                   <span style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ whiteSpace: 'nowrap' }}>Total</span>
                     <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>{sh.receipts?.total}</span>
@@ -914,7 +915,7 @@ function ShareStatusModal({ onClose }) {
     { name: 'Marco', role: 'Show producer', sent: '1:05 PM', opens: 'opened 6 times' },
     { name: 'Dana',  role: 'Hair producer', sent: '1:05 PM', opens: 'opened twice'   },
   ]
-  const inputStyle = { height: 48, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, outline: 'none', boxSizing: 'border-box' }
+  const inputStyle = { height: 48, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, background: SF, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, outline: 'none', boxSizing: 'border-box' }
   const circumference = 2 * Math.PI * 78
   const readyPct = 8 / 30
   return (
@@ -928,8 +929,8 @@ function ShareStatusModal({ onClose }) {
           </div>
           {/* Link row */}
           <div style={{ display: 'flex', gap: 8 }}>
-            <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', height: 48, padding: '0 14px', border: `1px solid ${DV}`, borderRadius: 10, background: '#fff', fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{url}</span>
-            <button onClick={handleCopy} style={{ minHeight: 48, padding: '0 18px', borderRadius: 10, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{copied ? 'COPIED' : 'COPY'}</button>
+            <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', height: 48, padding: '0 14px', border: `1px solid ${DV}`, borderRadius: 10, background: SF, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{url}</span>
+            <button onClick={handleCopy} style={{ minHeight: 48, padding: '0 18px', borderRadius: 10, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{copied ? 'COPIED' : 'COPY'}</button>
           </div>
           {/* Text it to */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -956,24 +957,24 @@ function ShareStatusModal({ onClose }) {
           {/* Footer */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto' }}>
             <span style={{ flex: 1, fontSize: 12, color: MT, lineHeight: 1.4 }}>The link stops working at 7:00 PM, an hour after the show.</span>
-            <button style={{ minHeight: 40, padding: '0 12px', border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: '#A33D28', cursor: 'pointer', whiteSpace: 'nowrap' }}>Turn off now</button>
+            <button style={{ minHeight: 40, padding: '0 12px', border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: 'var(--sp-red-text)', cursor: 'pointer', whiteSpace: 'nowrap' }}>Turn off now</button>
             <button onClick={onClose} style={{ minHeight: 44, padding: '0 18px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}>DONE</button>
           </div>
         </div>
         {/* Right column: phone preview */}
-        <div style={{ background: '#E8E4DF', padding: '22px 18px', display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+        <div style={{ background: 'var(--sp-bg-2)', padding: '22px 18px', display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
           <Lbl s={{ alignSelf: 'flex-start' }}>What they see</Lbl>
-          <div style={{ width: 220, height: 440, borderRadius: 22, border: '6px solid #111', background: '#F5F2EE', overflow: 'hidden', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ width: 220, height: 440, borderRadius: 22, border: `6px solid ${TX}`, background: BG, overflow: 'hidden', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <span style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{show.name}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, color: MT }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#3F6B45' }} />
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--sp-green-text)' }} />
               Live · updated 3:45 PM
             </span>
-            <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 10, padding: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
               <svg width="64" height="64" viewBox="0 0 180 180" aria-hidden="true">
-                <circle cx="90" cy="90" r="78" fill="none" stroke="#E8E4DF" strokeWidth="16" />
+                <circle cx="90" cy="90" r="78" fill="none" stroke="var(--sp-bg-2)" strokeWidth="16" />
                 <circle cx="90" cy="90" r="78" fill="none" stroke="#7A9E7E" strokeWidth="16" strokeLinecap="round" strokeDasharray={`${circumference * readyPct} ${circumference}`} transform="rotate(-90 90 90)" />
-                <text x="90" y="100" textAnchor="middle" fontFamily="Georgia, serif" fontSize="34" fill="#111">27%</text>
+                <text x="90" y="100" textAnchor="middle" fontFamily="Georgia, serif" fontSize="34" fill="currentColor">27%</text>
               </svg>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 9, color: MT }}>
                 <span>Ready <b style={{ color: TX }}>8 of 30</b></span>
@@ -984,7 +985,7 @@ function ShareStatusModal({ onClose }) {
             {[['Hair',14],['Makeup',17],['Nails',9]].map(([svc, n]) => (
               <div key={svc} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <span style={{ fontSize: 10, display: 'flex', justifyContent: 'space-between' }}>{svc}<span style={{ color: MT }}>{n} of 30</span></span>
-                <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: '#E8E4DF' }}>
+                <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: 'var(--sp-bg-2)' }}>
                   <span style={{ width: `${n / 30 * 100}%`, background: '#7A9E7E' }} />
                 </div>
               </div>
@@ -1078,7 +1079,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
     const dotColor = a.role === 'lead_assistant' ? TX : (st === 'working' ? '#D4A853' : '#7A9E7E')
     return (
       <button onClick={() => { setSelId(a.id); setShowForm(false); setPending(null) }}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 64, padding: '0 12px', background: isSel ? '#fff' : 'transparent', border: 'none', borderRadius: 10, cursor: 'pointer', textAlign: 'left', boxShadow: isSel ? 'inset 0 0 0 1.5px #111' : 'none' }}>
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 64, padding: '0 12px', background: isSel ? SF : 'transparent', border: 'none', borderRadius: 10, cursor: 'pointer', textAlign: 'left', boxShadow: isSel ? `inset 0 0 0 1.5px ${TX}` : 'none' }}>
         <Avatar src={a.avatar} name={a.name} size={40} />
         <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <span style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
@@ -1143,7 +1144,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               </span>
             </div>
             {/* 2. Overall card */}
-            <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 16, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>Overall for {show.name}</span>
@@ -1160,8 +1161,8 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               <textarea value={overallNote[selA.id] || ''} onChange={e => setOverallNote(n => ({ ...n, [selA.id]: e.target.value }))}
                 rows={2} placeholder="Performance notes for post-show review..."
                 style={{ padding: 12, border: `1px solid ${DV}`, borderRadius: 10, background: BG, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.45, resize: 'none', color: TX, outline: 'none' }} />
-              <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: '#EEF3EE', cursor: 'pointer' }}>
-                <span style={{ width: 22, height: 22, borderRadius: 6, background: inviteBack[selA.id] ? '#3F6B45' : '#fff', border: inviteBack[selA.id] ? 'none' : `1.5px solid #B5B0AA`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--sp-green-surface)', cursor: 'pointer' }}>
+                <span style={{ width: 22, height: 22, borderRadius: 6, background: inviteBack[selA.id] ? 'var(--sp-green-text)' : SF, border: inviteBack[selA.id] ? 'none' : `1.5px solid #B5B0AA`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {inviteBack[selA.id] && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10"/></svg>}
                 </span>
                 <input type="checkbox" checked={!!inviteBack[selA.id]} onChange={e => setInviteBack(v => ({ ...v, [selA.id]: e.target.checked }))} style={{ display: 'none' }} />
@@ -1210,13 +1211,13 @@ function IPadAssistantsSection({ models, profiles: profs }) {
                       </div>
                       {isEditing && (
                         <div style={{ margin: '0 0 10px 44px', display: 'flex', gap: 8 }}>
-                          <input value={noteInput} onChange={e => setNoteInput(e.target.value)} autoFocus placeholder="Add a note..." style={{ flex: 1, height: 36, padding: '0 10px', borderRadius: 8, border: `1px solid ${DV}`, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, outline: 'none' }} />
-                          <button onClick={() => { if (noteInput.trim()) setModelNotes(n => ({ ...n, [key]: noteInput.trim() })); setEditingNote(null) }} style={{ height: 36, padding: '0 12px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, cursor: 'pointer' }}>Save</button>
+                          <input value={noteInput} onChange={e => setNoteInput(e.target.value)} autoFocus placeholder="Add a note..." style={{ flex: 1, height: 36, padding: '0 10px', borderRadius: 8, border: `1px solid ${DV}`, background: SF, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, outline: 'none' }} />
+                          <button onClick={() => { if (noteInput.trim()) setModelNotes(n => ({ ...n, [key]: noteInput.trim() })); setEditingNote(null) }} style={{ height: 36, padding: '0 12px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, cursor: 'pointer' }}>Save</button>
                           <button onClick={() => setEditingNote(null)} style={{ height: 36, padding: '0 12px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>Cancel</button>
                         </div>
                       )}
                       {mNote && !isEditing && (
-                        <div style={{ margin: '0 0 12px 44px', padding: '10px 12px', borderRadius: 10, background: '#fff', border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.45, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                        <div style={{ margin: '0 0 12px 44px', padding: '10px 12px', borderRadius: 10, background: SF, border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.45, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                           <span style={{ flex: 1 }}>{mNote}</span>
                           <button onClick={() => { setNoteInput(mNote); setEditingNote(key) }} style={{ border: 0, background: 'none', fontSize: 11, color: MT, textDecoration: 'underline', cursor: 'pointer', flexShrink: 0 }}>Edit</button>
                         </div>
@@ -1237,7 +1238,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
                   {assigned.map(m => (
                     <span key={m.id} style={{ position: 'relative', flexShrink: 0 }}>
                       <img src={m.avatar} alt={`Look ${m.lookNumber || m.look}`} style={{ width: 96, height: 128, borderRadius: 10, objectFit: 'cover', display: 'block' }} />
-                      <span style={{ position: 'absolute', left: 6, bottom: 6, padding: '2px 6px', borderRadius: 4, background: 'rgba(17,17,17,.75)', color: '#fff', fontSize: 10 }}>Look {m.lookNumber || m.look}</span>
+                      <span style={{ position: 'absolute', left: 6, bottom: 6, padding: '2px 6px', borderRadius: 4, background: 'rgba(17,17,17,.75)', color: 'var(--sp-inverse-text)', fontSize: 10 }}>Look {m.lookNumber || m.look}</span>
                     </span>
                   ))}
                 </div>
@@ -1258,11 +1259,11 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               </div>
             )}
             {pending && (
-              <div style={{ border: '1px solid #A33D28', borderRadius: 12, padding: 16 }}>
-                <Lbl s={{ color: '#A33D28', marginBottom: 8 }}>Confirm incident</Lbl>
+              <div style={{ border: `1px solid ${TX.replace('var(--sp-text)', 'var(--sp-red-text)')}`, borderRadius: 12, padding: 16 }}>
+                <Lbl s={{ color: 'var(--sp-red-text)', marginBottom: 8 }}>Confirm incident</Lbl>
                 <p style={{ fontSize: 13, color: TX, margin: '0 0 12px' }}><strong>{pending.type}</strong>{pending.notes ? ` -- ${pending.notes}` : ''}</p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => { setIncidents(p => [...p, pending]); setPending(null) }} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: '#A33D28', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>YES, SUBMIT</button>
+                  <button onClick={() => { setIncidents(p => [...p, pending]); setPending(null) }} style={{ flex: 1, height: 44, borderRadius: 8, border: 0, background: 'var(--sp-red-text)', color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}>YES, SUBMIT</button>
                   <button onClick={() => setPending(null)} style={{ flex: 1, height: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, cursor: 'pointer' }}>GO BACK</button>
                 </div>
               </div>
@@ -1271,19 +1272,19 @@ function IPadAssistantsSection({ models, profiles: profs }) {
               <div>
                 <Lbl s={{ marginBottom: 8 }}>Incident log</Lbl>
                 {incidents.map(inc => (
-                  <div key={inc.id} style={{ display: 'flex', gap: 8, padding: '8px 0 8px 10px', borderLeft: '2px solid #A33D28', marginLeft: -12, borderBottom: `1px solid ${BD}` }}>
+                  <div key={inc.id} style={{ display: 'flex', gap: 8, padding: '8px 0 8px 10px', borderLeft: `2px solid var(--sp-red-text)`, marginLeft: -12, borderBottom: `1px solid ${BD}` }}>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 11, color: '#A33D28', fontWeight: 600, margin: 0 }}>{inc.type}</p>
+                      <p style={{ fontSize: 11, color: 'var(--sp-red-text)', fontWeight: 600, margin: 0 }}>{inc.type}</p>
                       <p style={{ fontSize: 12, color: MT, margin: '2px 0 0' }}>{inc.notes}</p>
                       <p style={{ fontSize: 10, color: M2, margin: '2px 0 0' }}>{inc.time}</p>
                     </div>
-                    <button onClick={() => setIncidents(p => p.filter(i => i.id !== inc.id))} style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: '#A33D28', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>DELETE</button>
+                    <button onClick={() => setIncidents(p => p.filter(i => i.id !== inc.id))} style={{ fontSize: 9, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--sp-red-text)', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start' }}>DELETE</button>
                   </div>
                 ))}
               </div>
             )}
             {!showForm && !pending && (
-              <button onClick={() => setShowForm(true)} style={{ alignSelf: 'flex-start', minHeight: 44, padding: '0 18px', borderRadius: 8, border: '1px solid #A33D28', background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: '#A33D28', letterSpacing: '.1em', cursor: 'pointer' }}>FLAG AN INCIDENT</button>
+              <button onClick={() => setShowForm(true)} style={{ alignSelf: 'flex-start', minHeight: 44, padding: '0 18px', borderRadius: 8, border: `1px solid ${TX.replace('var(--sp-text)', 'var(--sp-red-text)')}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: 'var(--sp-red-text)', letterSpacing: '.1em', cursor: 'pointer' }}>FLAG AN INCIDENT</button>
             )}
           </div>
         )}
@@ -1379,9 +1380,9 @@ function IPadLineupSection({ models }) {
               return (
                 <button key={m.id} onClick={() => setSelModel(isSel ? null : m)}
                   style={{ padding: 0, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
-                  <span style={{ position: 'relative', width: '100%', aspectRatio: '3 / 4', borderRadius: 10, overflow: 'hidden', background: '#E0DDD8', boxShadow: isSel ? '0 0 0 3px #F5F2EE, 0 0 0 6px #111' : 'none', outline: !isNs ? `4px solid ${statusColor}` : 'none', outlineOffset: -4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ position: 'relative', width: '100%', aspectRatio: '3 / 4', borderRadius: 10, overflow: 'hidden', background: BD, boxShadow: isSel ? `0 0 0 3px ${BG}, 0 0 0 6px ${TX}` : 'none', outline: !isNs ? `4px solid ${statusColor}` : 'none', outlineOffset: -4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: isNs ? 0.45 : 1 }} />
-                    <span style={{ position: 'absolute', left: 8, top: 8, padding: '2px 6px', borderRadius: 4, background: '#fff', fontSize: 12, fontWeight: 600, color: TX }}>{lookNum}</span>
+                    <span style={{ position: 'absolute', left: 8, top: 8, padding: '2px 6px', borderRadius: 4, background: SF, fontSize: 12, fontWeight: 600, color: TX }}>{lookNum}</span>
                   </span>
                   <span style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name.split(' ')[0]}</span>
                 </button>
@@ -1395,7 +1396,7 @@ function IPadLineupSection({ models }) {
         const pd = getPanelData(selModel)
         const c = getServiceCounts(selModel)
         return (
-          <aside aria-label="Model details" style={{ width: 400, flexShrink: 0, borderLeft: `1px solid ${BD}`, background: '#FBFAF8', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <aside aria-label="Model details" style={{ width: 400, flexShrink: 0, borderLeft: `1px solid ${BD}`, background: BG, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
               {/* Header */}
               <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
@@ -1406,7 +1407,7 @@ function IPadLineupSection({ models }) {
                   <span style={{ fontSize: 13, color: MT }}>Arrived {pd.arrival}</span>
                   <span style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ fontSize: 12 }}>{c.done} of 3 done</span>
-                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: '#E8E4DF' }}>
+                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--sp-bg-2)' }}>
                       <span style={{ width: `${c.done / 3 * 100}%`, background: '#7A9E7E' }} />
                       <span style={{ width: `${c.in_progress / 3 * 100}%`, background: '#D4A853' }} />
                       <span style={{ width: `${c.paused / 3 * 100}%`, background: '#8A9BB0' }} />
@@ -1417,7 +1418,7 @@ function IPadLineupSection({ models }) {
               </div>
               {/* Latest update */}
               {pd.latestUpdate && (
-                <div style={{ background: '#fff', border: `1px solid ${BD}`, borderLeft: `4px solid ${pd.latestUpdate.borderColor}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ background: SF, border: `1px solid ${BD}`, borderLeft: `4px solid ${pd.latestUpdate.borderColor}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Lbl>Latest · {pd.latestUpdate.time}</Lbl>
                     <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: pd.latestUpdate.chipColor, fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX }}>{pd.latestUpdate.chipLabel}</span>
@@ -1430,7 +1431,7 @@ function IPadLineupSection({ models }) {
                 <Lbl s={{ marginBottom: 2 }}>Where they're at</Lbl>
                 {svcs.map(svc => {
                   const st = selModel.services?.[svc]?.status || 'not_started'
-                  const chipColor = STATUS_META_LINEUP[st]?.color || '#E0DDD8'
+                  const chipColor = STATUS_META_LINEUP[st]?.color || BD
                   const chipLabel = STATUS_META_LINEUP[st]?.label || 'Not started'
                   const who = pd.serviceWho[svc]
                   return (
@@ -1448,12 +1449,12 @@ function IPadLineupSection({ models }) {
                   <Lbl>Notes</Lbl>
                   {pd.allergy && (
                     <span style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10, background: '#F8E9E5', fontSize: 13, lineHeight: 1.4 }}>
-                      <b style={{ color: '#A33D28', fontSize: 11, letterSpacing: '.08em', paddingTop: 1, flexShrink: 0 }}>ALLERGY</b>
+                      <b style={{ color: 'var(--sp-red-text)', fontSize: 11, letterSpacing: '.08em', paddingTop: 1, flexShrink: 0 }}>ALLERGY</b>
                       <span>{pd.allergy}</span>
                     </span>
                   )}
                   {pd.note && (
-                    <span style={{ padding: '10px 12px', borderRadius: 10, background: '#fff', border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.4 }}>{pd.note}</span>
+                    <span style={{ padding: '10px 12px', borderRadius: 10, background: SF, border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.4 }}>{pd.note}</span>
                   )}
                 </div>
               )}
@@ -1470,7 +1471,7 @@ function IPadLineupSection({ models }) {
                 </div>
               )}
               {/* Past shows */}
-              <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${BD}`, background: '#fff', fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', color: TX, cursor: 'pointer' }}>
+              <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${BD}`, background: SF, fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', color: TX, cursor: 'pointer' }}>
                 <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ fontSize: 14 }}>Past shows with you · {pd.pastShowCount}</span>
                   <span style={{ fontSize: 12, color: MT }}>{pd.pastShowNames}</span>
@@ -1482,7 +1483,7 @@ function IPadLineupSection({ models }) {
             <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
               <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>PING ASSISTANT</button>
               <span style={{ flex: 1 }} />
-              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>UPDATE STATUS</button>
+              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>UPDATE STATUS</button>
             </div>
           </aside>
         )
@@ -1645,7 +1646,7 @@ function IPadStudioSection() {
   function LookDetail({ look }) {
     const st = look.state
     return (
-      <div style={{ minHeight: 0, overflowY: 'auto', background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
+      <div style={{ minHeight: 0, overflowY: 'auto', background: SF, border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
@@ -1656,32 +1657,32 @@ function IPadStudioSection() {
             <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
             <button onClick={() => setMoreMenuId(moreMenuId === look.id ? null : look.id)} aria-label="More" style={{ width: 40, height: 40, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontSize: 18, color: TX, flexShrink: 0, cursor: 'pointer', position: 'relative' }}>⋯
               {moreMenuId === look.id && (
-                <div style={{ position: 'absolute', right: 0, top: 46, background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10, minWidth: 200, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+                <div style={{ position: 'absolute', right: 0, top: 46, background: SF, border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10, minWidth: 200, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
                   {[['Duplicate look', false], ['Assign models', false], ['Unshare from the team', true]].map(([label, isRed]) => (
-                    <button key={label} onClick={() => { if (isRed) unshare(look.id); else setMoreMenuId(null) }} style={{ display: 'flex', alignItems: 'center', width: '100%', minHeight: 44, padding: '0 14px', border: 0, borderRadius: 8, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: isRed ? '#A33D28' : TX, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
+                    <button key={label} onClick={() => { if (isRed) unshare(look.id); else setMoreMenuId(null) }} style={{ display: 'flex', alignItems: 'center', width: '100%', minHeight: 44, padding: '0 14px', border: 0, borderRadius: 8, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: isRed ? 'var(--sp-red-text)' : TX, cursor: 'pointer', textAlign: 'left' }}>{label}</button>
                   ))}
                 </div>
               )}
             </button>
           </>}
           {st === 'waiting' && <>
-            <button onClick={() => cancelRequest(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: '1px solid #A33D28', background: 'transparent', color: '#A33D28', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>CANCEL REQUEST</button>
+            <button onClick={() => cancelRequest(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${TX.replace('var(--sp-text)', 'var(--sp-red-text)')}`, background: 'transparent', color: 'var(--sp-red-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>CANCEL REQUEST</button>
             <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
           </>}
           {st === 'draft' && <>
             <button onClick={() => startEdit(look)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>EDIT LOOK</button>
-            <button onClick={() => sendToArtist(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SEND TO YADIM</button>
+            <button onClick={() => sendToArtist(look.id)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SEND TO YADIM</button>
           </>}
         </div>
         {/* Status bar */}
-        {st === 'shared' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#EEF3EE', fontSize: 12, lineHeight: 1.4, color: '#3F6B45' }}>
+        {st === 'shared' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: 'var(--sp-green-surface)', fontSize: 12, lineHeight: 1.4, color: 'var(--sp-green-text)' }}>
           <span style={{ flex: 1 }}>Approved by {look.approvedBy} at {look.approvedAt} · Shared with {look.sharedWith} · {look.openedCount} opened</span>
-          <button style={{ border: 0, background: 'none', padding: 0, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: '#3F6B45', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer' }}>See who</button>
+          <button style={{ border: 0, background: 'none', padding: 0, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, textDecoration: 'underline', color: 'var(--sp-green-text)', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer' }}>See who</button>
         </div>}
-        {st === 'waiting' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#FAF1DE', fontSize: 12, lineHeight: 1.4, color: '#8A6516' }}>
+        {st === 'waiting' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: 'var(--sp-amber-surface)', fontSize: 12, lineHeight: 1.4, color: 'var(--sp-amber-text)' }}>
           <span style={{ flex: 1 }}>Sent to {look.sentTo} for approval at {look.sentAt} · Not opened yet. Only you and {look.sentTo} can see it.</span>
         </div>}
-        {st === 'draft' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: '#ECE8E3', fontSize: 12, lineHeight: 1.4, color: MT }}>
+        {st === 'draft' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: RL, fontSize: 12, lineHeight: 1.4, color: MT }}>
           <span style={{ flex: 1 }}>Draft · Only you can see this. {look.areasWritten} of {look.areasTotal} areas written.</span>
         </div>}
         {/* Demo */}
@@ -1692,7 +1693,7 @@ function IPadStudioSection() {
           </div>
         ) : (
           <div style={{ position: 'relative', height: 200, borderRadius: 12, overflow: 'hidden', flexShrink: 0, background: BD }}>
-            <span style={{ position: 'absolute', left: 12, bottom: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(17,17,17,.75)', color: '#fff', fontSize: 12 }}>Full demo · Yadim and Aimi · 4:12</span>
+            <span style={{ position: 'absolute', left: 12, bottom: 12, padding: '6px 10px', borderRadius: 8, background: 'rgba(17,17,17,.75)', color: 'var(--sp-inverse-text)', fontSize: 12 }}>Full demo · Yadim and Aimi · 4:12</span>
           </div>
         )}
         {/* Photo strip (only if not noDemo) */}
@@ -1712,13 +1713,13 @@ function IPadStudioSection() {
   function EditDetail({ look }) {
     const curProds = curEditAreaData.products || []
     return (
-      <div style={{ minHeight: 0, overflowY: 'auto', background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ minHeight: 0, overflowY: 'auto', background: SF, border: `1px solid ${BD}`, borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
         {/* Name + actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <input value={editName} onChange={e => setEditName(e.target.value)} aria-label="Look name"
-            style={{ flex: 1, minWidth: 0, height: 44, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Georgia, serif', fontSize: 22, color: TX, background: '#fff', outline: 'none' }} />
+            style={{ flex: 1, minWidth: 0, height: 44, padding: '0 12px', border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Georgia, serif', fontSize: 22, color: TX, background: SF, outline: 'none' }} />
           <button onClick={() => setEditingId(null)} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>CANCEL</button>
-          <button onClick={saveEdit} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SAVE DRAFT</button>
+          <button onClick={saveEdit} style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>SAVE DRAFT</button>
         </div>
         {/* Models */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 12, color: MT }}>
@@ -1746,7 +1747,7 @@ function IPadStudioSection() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <Lbl>How to do it</Lbl>
           <textarea rows={2} value={curEditAreaData.howTo || ''} onChange={e => updateEditHowTo(e.target.value)}
-            style={{ padding: 12, border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.45, resize: 'none', color: TX, background: '#fff', outline: 'none' }} />
+            style={{ padding: 12, border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.45, resize: 'none', color: TX, background: SF, outline: 'none' }} />
         </div>
         {/* Products */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
@@ -1766,13 +1767,13 @@ function IPadStudioSection() {
             </div>
           )}
           <div style={{ position: 'relative' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: `1px solid ${prodOpen ? TX : DV}`, borderRadius: 10, background: '#fff', fontSize: 14, color: TX }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', border: `1px solid ${prodOpen ? TX : DV}`, borderRadius: 10, background: SF, fontSize: 14, color: TX }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MT} strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
               <input value={prodQuery} onChange={e => { setProdQuery(e.target.value); setProdOpen(true) }} onFocus={() => setProdOpen(true)}
                 placeholder="Search products" style={{ flex: 1, border: 0, outline: 'none', background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX }} />
             </span>
             {prodOpen && (
-              <div style={{ position: 'absolute', left: 0, right: 0, top: 52, background: '#fff', border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10 }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, top: 52, background: SF, border: `1px solid ${BD}`, borderRadius: 12, boxShadow: '0 12px 32px rgba(0,0,0,.14)', padding: 6, zIndex: 10 }}>
                 {filteredSuggestions.map((p, i) => {
                   const parts = p.split('~')
                   const isGeneric = parts[1] === 'Generic'
@@ -1804,7 +1805,7 @@ function IPadStudioSection() {
             {(curEditAreaData.refs || 0) > 0 && Array.from({ length: curEditAreaData.refs }, (_,i) => (
               <span key={i} style={{ position: 'relative', flexShrink: 0 }}>
                 <span style={{ width: 88, height: 88, borderRadius: 10, background: BD, display: 'block' }} />
-                <span style={{ position: 'absolute', left: 6, right: 6, bottom: 6, fontSize: 10, color: '#fff', background: 'rgba(17,17,17,.7)', borderRadius: 4, padding: '2px 4px', textAlign: 'center' }}>Ref {i+1}</span>
+                <span style={{ position: 'absolute', left: 6, right: 6, bottom: 6, fontSize: 10, color: 'var(--sp-inverse-text)', background: 'rgba(17,17,17,.7)', borderRadius: 4, padding: '2px 4px', textAlign: 'center' }}>Ref {i+1}</span>
               </span>
             ))}
             <button style={{ width: 88, height: 88, borderRadius: 10, border: `1px dashed ${DV}`, background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, color: TX, flexShrink: 0, cursor: 'pointer' }}>
@@ -1823,7 +1824,7 @@ function IPadStudioSection() {
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Studio</span>
         <span style={{ fontSize: 12, color: MT }}>Makeup · {looks.length} looks · 30 models</span>
         <span style={{ flex: 1 }} />
-        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#ECE8E3' }}>
+        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: RL }}>
           {(['looks','inventory','receipts']).map(tab => (
             <button key={tab} onClick={() => setStudioTab(tab)}
               style={{ minHeight: 36, padding: '0 16px', borderRadius: 999, border: 0, background: studioTab === tab ? TX : 'transparent', color: studioTab === tab ? '#fff' : MT, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, cursor: 'pointer', textTransform: 'capitalize' }}>
@@ -1839,11 +1840,11 @@ function IPadStudioSection() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflowY: 'auto' }}>
             {looks.map(look => {
               const isSel = look.id === selId
-              const stateColor = look.state === 'shared' ? '#3F6B45' : look.state === 'waiting' ? '#8A6516' : MT
+              const stateColor = look.state === 'shared' ? 'var(--sp-green-text)' : look.state === 'waiting' ? 'var(--sp-amber-text)' : MT
               const stateLabel = look.state === 'shared' ? 'Shared with the team' : look.state === 'waiting' ? `Waiting on Yadim` : 'Draft'
               return (
                 <button key={look.id} onClick={() => { setSelId(look.id); if (editingId && editingId !== look.id) setEditingId(null) }}
-                  style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 12px', borderRadius: 14, border: isSel ? '1.5px solid #111' : `1px solid ${BD}`, background: '#fff', textAlign: 'left', fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }}>
+                  style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 12px', borderRadius: 14, border: isSel ? `1.5px solid ${TX}` : `1px solid ${BD}`, background: SF, textAlign: 'left', fontFamily: 'Inter,system-ui,sans-serif', color: TX, cursor: 'pointer' }}>
                   <span style={{ width: 56, height: 72, borderRadius: 8, background: BD, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: MT, textAlign: 'center' }}>
                     {look.noDemo ? 'No demo' : ''}
                   </span>
@@ -1860,10 +1861,10 @@ function IPadStudioSection() {
               + Add a look
             </button>
             {addingNew && (
-              <div style={{ padding: '12px 14px', background: '#fff', border: `1px solid ${BD}`, borderRadius: 14 }}>
+              <div style={{ padding: '12px 14px', background: SF, border: `1px solid ${BD}`, borderRadius: 14 }}>
                 <p style={{ fontSize: 13, color: MT, margin: '0 0 10px' }}>Add a new look?</p>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={addNewLook} style={{ flex: 1, height: 36, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Add</button>
+                  <button onClick={addNewLook} style={{ flex: 1, height: 36, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Add</button>
                   <button onClick={() => setAddingNew(false)} style={{ flex: 1, height: 36, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
                 </div>
               </div>
@@ -1919,7 +1920,7 @@ function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, v
           <div key={grp} style={{ padding: '16px 0 8px' }}>
             <Lbl s={{ padding: '0 20px', marginBottom: 4 }}>{grpLabel}</Lbl>
             {SETTINGS_ITEMS.filter(s => s.group === grp).map(s => (
-              <button key={s.id} onClick={() => setActive(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: active === s.id ? '#E8E4DF' : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, textAlign: 'left' }}>
+              <button key={s.id} onClick={() => setActive(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: active === s.id ? 'var(--sp-bg-2)' : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, textAlign: 'left' }}>
                 {s.label}
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={M2} strokeWidth="1.5" strokeLinecap="round"><polyline points="3 2 7 5 3 8"/></svg>
               </button>
@@ -1966,7 +1967,7 @@ function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, v
             {[['Status alerts','Notify when model status changes'],['Pings','Notify when an assistant sends a ping']].map(([label, desc]) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
                 <div><div style={{ fontSize: 14, color: TX }}>{label}</div><div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{desc}</div></div>
-                <span style={{ width: 44, height: 24, borderRadius: 999, background: TX, position: 'relative', flexShrink: 0, display: 'inline-block' }}><span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} /></span>
+                <span style={{ width: 44, height: 24, borderRadius: 999, background: TX, position: 'relative', flexShrink: 0, display: 'inline-block' }}><span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: SF, boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} /></span>
               </div>
             ))}
           </div>
@@ -1977,7 +1978,7 @@ function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, v
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
               <span style={{ fontSize: 14, color: TX }}>Dark mode</span>
               <button onClick={onToggleDark} style={{ width: 44, height: 24, borderRadius: 999, background: dark ? TX : BD, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 150ms', flexShrink: 0 }}>
-                <span style={{ position: 'absolute', top: 3, left: dark ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                <span style={{ position: 'absolute', top: 3, left: dark ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
               </button>
             </div>
           </div>
@@ -2194,11 +2195,11 @@ export default function ProducerIPadView({
         {/* Menu button M3/M4 */}
         <button
           onClick={() => { const next = !menuOpen; setMenuOpen(next); lsSet('sp_ipad_menu', next) }}
-          style={{ height: 44, padding: '0 14px 0 12px', borderRadius: 12, border: `1px solid ${TX}`, background: menuOpen ? TX : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
+          style={{ height: 44, padding: '0 14px 0 12px', borderRadius: 12, border: `1px solid ${TX}`, background: menuOpen ? TX : SF, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
         >
           {menuOpen
-            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
           }
         </button>
@@ -2218,7 +2219,7 @@ export default function ProducerIPadView({
             <span style={{ position: 'absolute', top: 7, right: 7, width: 8, height: 8, borderRadius: '50%', background: '#C4614A' }} />
           </button>
           {bellOpen && (
-            <div style={{ position: 'absolute', top: 48, right: 0, width: 320, background: '#fff', border: `1px solid ${BD}`, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,.12)', zIndex: 350, overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 48, right: 0, width: 320, background: SF, border: `1px solid ${BD}`, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,.12)', zIndex: 350, overflow: 'hidden' }}>
               <div style={{ padding: '12px 16px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: MT }}>Notifications</span>
                 <button onClick={() => setBellOpen(false)} style={{ border: 0, background: 'none', fontSize: 11, color: MT, cursor: 'pointer', textDecoration: 'underline' }}>Mark all read</button>
@@ -2242,7 +2243,7 @@ export default function ProducerIPadView({
             <Avatar src={producer.avatar} name={producer.name} size={36} />
           </button>
           {profileMenuOpen && (
-            <div style={{ position: 'absolute', top: 48, right: 0, background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.12)', minWidth: 220, zIndex: 350, overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 48, right: 0, background: SF, border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.12)', minWidth: 220, zIndex: 350, overflow: 'hidden' }}>
               <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Avatar src={producer.avatar} name={producer.name} size={36} />
                 <div>
@@ -2254,7 +2255,7 @@ export default function ProducerIPadView({
               <button onClick={() => onToggleDark?.()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>
                 <span>Dark mode</span>
                 <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? TX : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms', display: 'inline-block' }}>
-                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: '#fff', transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
                 </span>
               </button>
               <button onClick={() => { setShowHistoryOpen(true); setProfileMenuOpen(false) }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>Show history</button>
@@ -2269,7 +2270,7 @@ export default function ProducerIPadView({
 
         {/* Docked nav M4 */}
         {menuOpen && (
-          <nav aria-label="Main navigation" style={{ width: 96, flexShrink: 0, borderRight: `1px solid ${BD}`, background: '#ECE8E3', display: 'flex', flexDirection: 'column', padding: '4px 0' }}>
+          <nav aria-label="Main navigation" style={{ width: 96, flexShrink: 0, borderRight: `1px solid ${BD}`, background: RL, display: 'flex', flexDirection: 'column', padding: '4px 0' }}>
             {IPAD_SECTIONS.map(s => {
               const isActive = ipadSection === s.id
               return (
@@ -2299,9 +2300,9 @@ export default function ProducerIPadView({
 
           {/* Metric cards */}
           <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
-            <div style={{ background: TX, color: '#F5F2EE', borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Lbl s={{ color: '#C9C4BE', whiteSpace: 'nowrap' }}>Fully ready</Lbl>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{DS.ready}<span style={{ fontSize: 15, color: '#C9C4BE' }}> /30</span></span>
+            <div style={{ background: TX, color: BG, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Lbl s={{ color: M2, whiteSpace: 'nowrap' }}>Fully ready</Lbl>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{DS.ready}<span style={{ fontSize: 15, color: M2 }}> /30</span></span>
               <Bar dark segments={[{ w: pct(DS.ready), c: '#7A9E7E' }]} />
             </div>
             {svcCards.map(s => {
@@ -2312,7 +2313,7 @@ export default function ProducerIPadView({
                 ns  > 0 && { n: ns,   l: 'not started',  c: DV        },
               ].filter(Boolean)
               return (
-                <div key={s.svc} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div key={s.svc} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <Lbl s={{ whiteSpace: 'nowrap' }}>{s.label} done</Lbl>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{s.done}<span style={{ fontSize: 15, color: M2 }}> /30</span></span>
                   <Bar segments={[{ w: pct(s.done), c: '#7A9E7E' }, { w: pct(s.ip), c: '#D4A853' }, { w: pct(s.pa), c: '#8A9BB0' }]} />
@@ -2367,13 +2368,13 @@ export default function ProducerIPadView({
                   <Avatar src={m.avatar} name={m.name} size={36} />
                   <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
                     <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
-                    <span style={{ fontSize: 11, color: note.red ? '#A33D28' : MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <span style={{ fontSize: 11, color: note.red ? 'var(--sp-red-text)' : MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {note.text}
                       {narrowMain && !needsPair && aName && <span style={{ color: MT }}> · {aName}</span>}
                     </span>
                     {narrowMain && needsPair && (
-                      <button onClick={() => handlePair(m)} style={{ alignSelf: 'flex-start', marginTop: 2, minHeight: 28, padding: '0 10px 0 8px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                      <button onClick={() => handlePair(m)} style={{ alignSelf: 'flex-start', marginTop: 2, minHeight: 28, padding: '0 10px 0 8px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
                         PAIR
                       </button>
                     )}
@@ -2383,8 +2384,8 @@ export default function ProducerIPadView({
                   <Chip c={nChip.c}  t={nChip.t}  />
                   {!narrowMain && (
                     needsPair ? (
-                      <button onClick={() => handlePair(m)} style={{ justifySelf: 'start', minHeight: 36, padding: '0 14px 0 10px', borderRadius: 999, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                      <button onClick={() => handlePair(m)} style={{ justifySelf: 'start', minHeight: 36, padding: '0 14px 0 10px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
                         PAIR
                       </button>
                     ) : (
