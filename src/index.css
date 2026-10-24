@@ -66,6 +66,16 @@
   --sp-green-surface: #1C2B1E;
   --sp-amber-surface: #2B2214;
   --sp-chip-ns-bg: #8E8A84;
+  --sp-bar-track: #4A4743;
+  --sp-bar-track-inv: #C9C4BE;
+}
+
+/* Account/profile menu hover */
+.sp-profile-menu button {
+  transition-property: background-color, color, opacity;
+}
+.sp-profile-menu button:hover {
+  background-color: var(--sp-bg-2) !important;
 }
 
 * {

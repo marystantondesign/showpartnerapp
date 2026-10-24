@@ -23,12 +23,6 @@ const CHIP_STATUS = {
   to_check:    { c: '#DCE8DD', t: 'To check'    },
 }
 
-const DS = {
-  ready: 8,
-  hair:   { done: 14, ip: 9, pa: 2 },
-  makeup: { done: 17, ip: 8, pa: 0 },
-  nails:  { done: 9,  ip: 6, pa: 0 },
-}
 
 function pct(n) { return (n / 30 * 100).toFixed(1) + '%' }
 function svcChip(entry, wkActive) {
@@ -56,7 +50,7 @@ function Avatar({ src, name, size = 36 }) {
 
 function Chip({ c, t }) {
   return (
-    <span style={{ fontFamily: 'Inter,system-ui,sans-serif', fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', borderRadius: 999, padding: '4px 8px', color: TX, background: c, whiteSpace: 'nowrap', justifySelf: 'start' }}>
+    <span style={{ fontFamily: 'Inter,system-ui,sans-serif', fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', borderRadius: 999, padding: '4px 8px', color: '#111', background: c, whiteSpace: 'nowrap', justifySelf: 'start' }}>
       {t}
     </span>
   )
@@ -66,9 +60,9 @@ function Lbl({ children, style: s }) {
   return <p style={{ fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: M2, margin: 0, ...s }}>{children}</p>
 }
 
-function Bar({ segments, dark }) {
+function Bar({ segments, track = 'var(--sp-bar-track)' }) {
   return (
-    <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: dark ? 'var(--sp-divider)' : 'var(--sp-bg-2)' }}>
+    <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: track }}>
       {segments.map((s, i) => <span key={i} style={{ width: s.w, background: s.c }} />)}
     </div>
   )
@@ -94,7 +88,7 @@ function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, w
           <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 36, padding: '0 10px', margin: '0 -10px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
             <span style={{ width: 64, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
             <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
-            <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#E8C77A' : M2 }}>{t.state}</span>
+            <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-amber-text)' : M2 }}>{t.state}</span>
           </div>
         ))}
         <button onClick={() => {}} style={{ alignSelf: 'flex-start', marginTop: 6, minHeight: 32, padding: 0, border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Push walkthrough time</button>
@@ -228,7 +222,7 @@ function ComposePanel({ msg, onMsg, to, onTo, onSend, onClose }) {
           <Lbl s={{ marginBottom: 8 }}>To</Lbl>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {toOptions.map(opt => (
-              <button key={opt.id} onClick={() => onTo(opt.id)} style={{ minHeight: 34, padding: '0 12px', borderRadius: 999, cursor: 'pointer', border: to === opt.id ? `1px solid ${TX}` : `1px solid ${DV}`, background: to === opt.id ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: to === opt.id ? '#fff' : TX }}>{opt.label}</button>
+              <button key={opt.id} onClick={() => onTo(opt.id)} style={{ minHeight: 34, padding: '0 12px', borderRadius: 999, cursor: 'pointer', border: to === opt.id ? `1px solid ${TX}` : `1px solid ${DV}`, background: to === opt.id ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: to === opt.id ? 'var(--sp-inverse-text)' : TX }}>{opt.label}</button>
             ))}
           </div>
         </div>
@@ -641,7 +635,7 @@ function PortraitDrawer({ open, onToggle, tlItems, announcements, onStartWalkthr
                 <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 44, padding: '0 14px', borderRadius: 8, background: t.kind === 'next' ? TX : 'transparent' }}>
                   <span style={{ width: 72, fontSize: 12, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.time}</span>
                   <span style={{ flex: 1, fontSize: 13, fontWeight: t.kind === 'next' ? 600 : 400, color: t.kind === 'next' ? 'var(--sp-inverse-text)' : t.kind === 'past' ? M2 : TX }}>{t.label}</span>
-                  <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? '#E8C77A' : M2 }}>{t.state}</span>
+                  <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: t.kind === 'next' ? 'var(--sp-amber-text)' : M2 }}>{t.state}</span>
                 </div>
               ))}
               <button onClick={() => {}} style={{ alignSelf: 'flex-start', marginLeft: 14, marginTop: 6, minHeight: 32, padding: 0, border: 0, background: 'none', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, textDecoration: 'underline', color: TX, cursor: 'pointer' }}>Push walkthrough time</button>
@@ -1977,8 +1971,8 @@ function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, v
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Appearance</p>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
               <span style={{ fontSize: 14, color: TX }}>Dark mode</span>
-              <button onClick={onToggleDark} style={{ width: 44, height: 24, borderRadius: 999, background: dark ? TX : BD, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 150ms', flexShrink: 0 }}>
-                <span style={{ position: 'absolute', top: 3, left: dark ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+              <button onClick={onToggleDark} style={{ width: 44, height: 24, borderRadius: 999, background: dark ? '#7A9E7E' : BD, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 150ms', flexShrink: 0 }}>
+                <span style={{ position: 'absolute', top: 3, left: dark ? 23 : 3, width: 18, height: 18, borderRadius: '50%', background: dark ? '#F0EDE8' : SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
               </button>
             </div>
           </div>
@@ -2181,6 +2175,17 @@ export default function ProducerIPadView({
   const gridCols   = narrowMain ? colsNarrow : colsWide
   const showRight  = panel === 'default' || panel === 'confirm' || panel === 'arrivals' || panel === 'to_check'
 
+  const _hairDS = { done: 0, ip: 0, pa: 0 }, _makeupDS = { done: 0, ip: 0, pa: 0 }, _nailsDS = { done: 0, ip: 0, pa: 0 }
+  let _fullyReady = 0
+  for (const m of models) {
+    const hs = m.services.hair?.status, ms = m.services.makeup?.status, ns = m.services.nails?.status
+    if (hs === 'done') _hairDS.done++; else if (hs === 'in_progress') _hairDS.ip++; else if (hs === 'paused') _hairDS.pa++
+    if (ms === 'done') _makeupDS.done++; else if (ms === 'in_progress') _makeupDS.ip++; else if (ms === 'paused') _makeupDS.pa++
+    if (ns === 'done') _nailsDS.done++; else if (ns === 'in_progress') _nailsDS.ip++; else if (ns === 'paused') _nailsDS.pa++
+    if (hs === 'done' && ms === 'done' && ns === 'done') _fullyReady++
+  }
+  const DS = { ready: _fullyReady, hair: _hairDS, makeup: _makeupDS, nails: _nailsDS }
+
   const svcCards = [
     { svc: 'hair',   label: 'Hair',   ...DS.hair   },
     { svc: 'makeup', label: 'Makeup', ...DS.makeup },
@@ -2199,7 +2204,7 @@ export default function ProducerIPadView({
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
         >
           {menuOpen
-            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sp-inverse-text)" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
           }
         </button>
@@ -2243,7 +2248,7 @@ export default function ProducerIPadView({
             <Avatar src={producer.avatar} name={producer.name} size={36} />
           </button>
           {profileMenuOpen && (
-            <div style={{ position: 'absolute', top: 48, right: 0, background: SF, border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.12)', minWidth: 220, zIndex: 350, overflow: 'hidden' }}>
+            <div className="sp-profile-menu" style={{ position: 'absolute', top: 48, right: 0, background: SF, border: `1px solid ${BD}`, borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.12)', minWidth: 220, zIndex: 350, overflow: 'hidden' }}>
               <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Avatar src={producer.avatar} name={producer.name} size={36} />
                 <div>
@@ -2254,12 +2259,12 @@ export default function ProducerIPadView({
               <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>Switch profile</button>
               <button onClick={() => onToggleDark?.()} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>
                 <span>Dark mode</span>
-                <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? TX : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms', display: 'inline-block' }}>
-                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                <span style={{ width: 36, height: 20, borderRadius: 999, background: dark ? '#7A9E7E' : BD, position: 'relative', flexShrink: 0, transition: 'background 150ms', display: 'inline-block' }}>
+                  <span style={{ position: 'absolute', top: 3, left: dark ? 19 : 3, width: 14, height: 14, borderRadius: '50%', background: dark ? '#F0EDE8' : SF, transition: 'left 150ms', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
                 </span>
               </button>
               <button onClick={() => { setShowHistoryOpen(true); setProfileMenuOpen(false) }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: TX }}>Show history</button>
-              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', borderTop: `1px solid ${BD}`, cursor: 'pointer', fontSize: 13, color: '#C4614A', fontWeight: 500 }}>Log out</button>
+              <button onClick={() => { setProfileMenuOpen(false); onLogOut?.() }} style={{ width: '100%', display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', borderTop: `1px solid ${BD}`, cursor: 'pointer', fontSize: 13, color: 'var(--sp-red-text)', fontWeight: 500 }}>Log out</button>
             </div>
           )}
         </div>
@@ -2276,7 +2281,7 @@ export default function ProducerIPadView({
               return (
                 <button key={s.id} onClick={() => { setIpadSection(s.id); lsSet('sp_ipad_section', s.id) }} aria-current={isActive ? 'page' : undefined} style={{ width: 76, minHeight: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: isActive ? TX : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 14, margin: '0 10px' }}>
                   <NavIcon id={s.id} active={isActive} />
-                  <span style={{ fontSize: 11, fontFamily: 'Inter,system-ui,sans-serif', color: isActive ? '#fff' : TX }}>{s.label}</span>
+                  <span style={{ fontSize: 11, fontFamily: 'Inter,system-ui,sans-serif', color: isActive ? 'var(--sp-inverse-text)' : TX }}>{s.label}</span>
                 </button>
               )
             })}
@@ -2303,14 +2308,14 @@ export default function ProducerIPadView({
             <div style={{ background: TX, color: BG, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <Lbl s={{ color: M2, whiteSpace: 'nowrap' }}>Fully ready</Lbl>
               <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{DS.ready}<span style={{ fontSize: 15, color: M2 }}> /30</span></span>
-              <Bar dark segments={[{ w: pct(DS.ready), c: '#7A9E7E' }]} />
+              <Bar track='var(--sp-bar-track-inv)' segments={[{ w: pct(DS.ready), c: '#7A9E7E' }]} />
             </div>
             {svcCards.map(s => {
               const ns = 30 - s.done - s.ip - s.pa
               const parts = [
                 s.ip > 0 && { n: s.ip, l: 'in progress', c: '#D4A853' },
                 s.pa > 0 && { n: s.pa, l: 'paused',      c: '#8A9BB0' },
-                ns  > 0 && { n: ns,   l: 'not started',  c: DV        },
+                ns  > 0 && { n: ns,   l: 'not started',  c: 'var(--sp-chip-ns-bg)' },
               ].filter(Boolean)
               return (
                 <div key={s.svc} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -2343,7 +2348,7 @@ export default function ProducerIPadView({
             ].map(f => {
               const isActive = filter === f.id || (f.panel && panel === f.panel && filter !== 'all')
               return (
-                <button key={f.id} onClick={() => { setFilter(f.id); if (f.panel) setPanel(f.panel) }} style={{ flexShrink: 0, minHeight: 36, padding: '0 14px', borderRadius: 999, cursor: 'pointer', border: isActive ? `1px solid ${TX}` : `1px solid ${DV}`, background: isActive ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: isActive ? '#fff' : TX, whiteSpace: 'nowrap' }}>
+                <button key={f.id} onClick={() => { setFilter(f.id); if (f.panel) setPanel(f.panel) }} style={{ flexShrink: 0, minHeight: 36, padding: '0 14px', borderRadius: 999, cursor: 'pointer', border: isActive ? `1px solid ${TX}` : `1px solid ${DV}`, background: isActive ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: isActive ? 'var(--sp-inverse-text)' : TX, whiteSpace: 'nowrap' }}>
                   {f.label}
                 </button>
               )
