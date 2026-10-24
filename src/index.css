@@ -20,6 +20,8 @@
   --sp-green-surface: #EEF3EE;
   --sp-amber-surface: #FAF1DE;
   --sp-chip-ns-bg: #E8E4DF;
+  --sp-bar-track: #E8E4DF;
+  --sp-bar-track-inv: #CFCAC4;
 }
 
 :root:not([data-theme="light"]) {
@@ -41,6 +43,8 @@
     --sp-green-surface: #1C2B1E;
     --sp-amber-surface: #2B2214;
     --sp-chip-ns-bg: #8E8A84;
+    --sp-bar-track: #4A4743;
+    --sp-bar-track-inv: #C9C4BE;
   }
 }
 

@@ -76,7 +76,12 @@ function AppInner() {
   const isDesktop = useIsDesktop()
   const isTablet  = useIsTablet()
   const [selectedRole, setSelectedRole]     = useState(null)
-  const [dark, setDark]                     = useState(false)
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem('sp_dark') === 'true'
+    document.documentElement.classList.toggle('dark', saved)
+    document.documentElement.setAttribute('data-theme', saved ? 'dark' : 'light')
+    return saved
+  })
   const [tab, setTab]                       = useState('home')
   const [currentProfile, setCurrentProfile] = useState(profiles[0])
   const [models, setModels]                 = useState(initModels)
@@ -127,6 +132,8 @@ function AppInner() {
     setDark(d => {
       const next = !d
       document.documentElement.classList.toggle('dark', next)
+      document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+      localStorage.setItem('sp_dark', String(next))
       return next
     })
   }
