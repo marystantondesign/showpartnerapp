@@ -24,7 +24,20 @@ const CHIP_STATUS = {
 }
 
 
-function pct(n) { return (n / 30 * 100).toFixed(1) + '%' }
+function pct(n, total) { return (n / (total || 30) * 100).toFixed(1) + '%' }
+function timeUntilShow(showtimeStr, nowStr) {
+  const parse = s => {
+    const [time, ampm] = s.trim().split(' ')
+    let [h, m] = time.split(':').map(Number)
+    if (ampm === 'PM' && h !== 12) h += 12
+    if (ampm === 'AM' && h === 12) h = 0
+    return h * 60 + m
+  }
+  const diff = parse(showtimeStr) - parse(nowStr)
+  if (diff <= 0) return null
+  const h = Math.floor(diff / 60), m = diff % 60
+  return h > 0 && m > 0 ? `${h}h ${m}m` : h > 0 ? `${h}h` : `${m}m`
+}
 function svcChip(entry, wkActive) {
   if (!entry) return CHIP_STATUS.not_started
   if (wkActive && entry.status === 'in_progress') return CHIP_STATUS.paused
@@ -2104,7 +2117,9 @@ export default function ProducerIPadView({
   function getModelNote(m) {
     if (!m.arrived) return { text: `Not arrived · ETA ${m.eta || 'TBD'}`, red: true }
     if (m.flagged)  return { text: 'Flagged', red: true }
-    return { text: `Arrived ${m.arrivedAt}`, red: false }
+    const aid = m.services[SVC].assistantId
+    const suffix = aid ? ` · ${getAssistantName(aid) || ''}` : ' · Not paired'
+    return { text: `Arrived ${m.arrivedAt}${suffix}`, red: false }
   }
   function handlePair(m) { setPairModel(m); setPairAssist(null); setPanel('pairing') }
   function handleConfirmPair() {
@@ -2170,9 +2185,7 @@ export default function ProducerIPadView({
     }
   }
 
-  const colsWide   = '40px 40px minmax(0,1fr) 104px 104px 104px minmax(0,0.8fr)'
-  const colsNarrow = '40px 40px minmax(0,1fr) 104px 104px 104px'
-  const gridCols   = narrowMain ? colsNarrow : colsWide
+  const gridCols = '40px 40px minmax(0,1fr) 104px 104px 104px'
   const showRight  = panel === 'default' || panel === 'confirm' || panel === 'arrivals' || panel === 'to_check'
 
   const _hairDS = { done: 0, ip: 0, pa: 0 }, _makeupDS = { done: 0, ip: 0, pa: 0 }, _nailsDS = { done: 0, ip: 0, pa: 0 }
@@ -2185,12 +2198,9 @@ export default function ProducerIPadView({
     if (hs === 'done' && ms === 'done' && ns === 'done') _fullyReady++
   }
   const DS = { ready: _fullyReady, hair: _hairDS, makeup: _makeupDS, nails: _nailsDS }
-
-  const svcCards = [
-    { svc: 'hair',   label: 'Hair',   ...DS.hair   },
-    { svc: 'makeup', label: 'Makeup', ...DS.makeup },
-    { svc: 'nails',  label: 'Nails',  ...DS.nails  },
-  ]
+  const total = models.length
+  const modelOrderMap = Object.fromEntries(models.map((m, i) => [m.id, String(i + 1).padStart(2, '0')]))
+  const orderedSvcs = [SVC, ...['hair', 'makeup', 'nails'].filter(s => s !== SVC)]
 
   return (
     <div className="sp-ipad" style={{ position: 'fixed', inset: 0, background: BG, display: 'flex', flexDirection: 'column', fontFamily: 'Inter,system-ui,sans-serif', color: TX }}>
@@ -2303,53 +2313,71 @@ export default function ProducerIPadView({
             {/* Main content */}
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '16px 24px 0', paddingBottom: isPortrait ? drawerHeight : 0 }}>
 
-          {/* Metric cards */}
-          <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10 }}>
-            <div style={{ background: TX, color: BG, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Lbl s={{ color: M2, whiteSpace: 'nowrap' }}>Fully ready</Lbl>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{DS.ready}<span style={{ fontSize: 15, color: M2 }}> /30</span></span>
-              <Bar track='var(--sp-bar-track-inv)' segments={[{ w: pct(DS.ready), c: '#7A9E7E' }]} />
-            </div>
-            {svcCards.map(s => {
-              const ns = 30 - s.done - s.ip - s.pa
-              const parts = [
-                s.ip > 0 && { n: s.ip, l: 'in progress', c: '#D4A853' },
-                s.pa > 0 && { n: s.pa, l: 'paused',      c: '#8A9BB0' },
-                ns  > 0 && { n: ns,   l: 'not started',  c: 'var(--sp-chip-ns-bg)' },
-              ].filter(Boolean)
-              return (
-                <div key={s.svc} style={{ background: SF, border: `1px solid ${BD}`, borderRadius: 14, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <Lbl s={{ whiteSpace: 'nowrap' }}>{s.label} done</Lbl>
-                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 30, lineHeight: 1, whiteSpace: 'nowrap' }}>{s.done}<span style={{ fontSize: 15, color: M2 }}> /30</span></span>
-                  <Bar segments={[{ w: pct(s.done), c: '#7A9E7E' }, { w: pct(s.ip), c: '#D4A853' }, { w: pct(s.pa), c: '#8A9BB0' }]} />
-                  <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: 10, rowGap: 2 }}>
-                    {parts.map((p, i) => (
-                      <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: MT, whiteSpace: 'nowrap' }}>
-                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: p.c, flexShrink: 0 }} />
-                        {p.n} {p.l}
-                      </span>
+          {/* Metric card K */}
+          {(() => {
+            const readyFrac = DS.ready / total
+            const r = 37.5, circ = +(2 * Math.PI * r).toFixed(1)
+            const arc = +(readyFrac * circ).toFixed(1)
+            const gap = +(circ - arc).toFixed(1)
+            const pctLabel = Math.round(readyFrac * 100) + '%'
+            const svcDS = DS[SVC]
+            const showIn = timeUntilShow(show.showtime, currentTime)
+            const barTrack = dark ? '#4A4743' : '#F0EDE8'
+            return (
+              <div style={{ flexShrink: 0, background: dark ? SF : '#fff', border: `1px solid ${dark ? BD : '#E0DDD8'}`, borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 22 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingRight: 22, borderRight: `1px solid ${dark ? BD : '#E0DDD8'}`, flexShrink: 0 }}>
+                  <span style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
+                    <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
+                      <circle cx="42" cy="42" r="37.5" fill="none" stroke={dark ? '#4A4743' : '#E8E4DF'} strokeWidth="9" />
+                      <circle cx="42" cy="42" r="37.5" fill="none" stroke="#7A9E7E" strokeWidth="9" strokeLinecap="round" strokeDasharray={`${arc} ${gap}`} transform="rotate(-90 42 42)" />
+                    </svg>
+                    <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: 20 }}>{pctLabel}</span>
+                  </span>
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13, color: MT, whiteSpace: 'nowrap' }}>
+                    <span>Fully ready <b style={{ color: TX }}>{DS.ready} of {total}</b></span>
+                    {showIn && <span>Show in <b style={{ color: TX }}>{showIn}</b></span>}
+                    <span>Not arrived <b style={{ color: TX }}>{notArrivedCount}</b></span>
+                  </span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>{SVC_LABEL}</span>
+                    <span style={{ fontSize: 12, color: MT }}>Your team</span>
+                  </span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '92px minmax(0,1fr) 64px', columnGap: 14, rowGap: 8, alignItems: 'center' }}>
+                    {[{ label: 'Done', n: svcDS.done, c: '#7A9E7E' }, { label: 'In progress', n: svcDS.ip, c: '#D4A853' }, { label: 'Paused', n: svcDS.pa, c: '#8A9BB0' }].map(({ label, n, c }) => (
+                      <React.Fragment key={label}>
+                        <span style={{ fontSize: 13, whiteSpace: 'nowrap' }}>{label}</span>
+                        <span style={{ height: 10, borderRadius: 5, background: barTrack, overflow: 'hidden', display: 'block' }}>
+                          <span style={{ display: 'block', height: '100%', width: pct(n, total), background: c, borderRadius: 5 }} />
+                        </span>
+                        <span style={{ fontSize: 13, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                          <b style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 400 }}>{n}</b>
+                          <span style={{ color: MT }}> /{total}</span>
+                        </span>
+                      </React.Fragment>
                     ))}
                   </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })()}
 
-          {/* Filter chips */}
-          <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '14px 0 6px', overflowX: 'auto', flexWrap: 'nowrap' }}>
+          {/* Count tiles */}
+          <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 8, padding: '10px 0 6px' }}>
             {[
-              { id: 'all',             label: `All ${models.length}`,               panel: null           },
-              { id: 'needs_attention', label: `Needs attention ${needsCount}`,       panel: null           },
-              { id: 'not_arrived',     label: `Not arrived ${notArrivedCount}`,      panel: null           },
-              { id: 'arrivals',        label: `Arrivals`,                            panel: 'arrivals'     },
-              { id: 'not_paired',      label: `Not paired ${notPairedCount}`,        panel: null           },
-              { id: 'to_check',        label: `To check ${toCheckCount}`,            panel: 'to_check'     },
-              { id: 'ready',           label: `Ready ${readyCount}`,                 panel: null           },
+              { id: 'all',             label: 'All',              count: models.length, countColor: '#fff',                        darkCountColor: 'var(--sp-inverse-text)' },
+              { id: 'needs_attention', label: 'Needs attention',  count: needsCount,    countColor: 'var(--sp-red-text)',           darkCountColor: 'var(--sp-red-text)'     },
+              { id: 'not_arrived',     label: 'Not arrived',      count: notArrivedCount, countColor: TX,                          darkCountColor: TX                       },
+              { id: 'not_paired',      label: 'Not paired',       count: notPairedCount,  countColor: TX,                          darkCountColor: TX                       },
+              { id: 'ready',           label: 'Ready',            count: readyCount,    countColor: 'var(--sp-green-text)',         darkCountColor: 'var(--sp-green-text)'   },
             ].map(f => {
-              const isActive = filter === f.id || (f.panel && panel === f.panel && filter !== 'all')
+              const isActive = filter === f.id
               return (
-                <button key={f.id} onClick={() => { setFilter(f.id); if (f.panel) setPanel(f.panel) }} style={{ flexShrink: 0, minHeight: 36, padding: '0 14px', borderRadius: 999, cursor: 'pointer', border: isActive ? `1px solid ${TX}` : `1px solid ${DV}`, background: isActive ? TX : 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: isActive ? 'var(--sp-inverse-text)' : TX, whiteSpace: 'nowrap' }}>
-                  {f.label}
+                <button key={f.id} onClick={() => { setFilter(f.id); setPanel('default') }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 52, padding: '0 14px', borderRadius: 12, border: isActive ? `1px solid ${TX}` : `1px solid ${dark ? BD : '#E0DDD8'}`, background: isActive ? TX : (dark ? SF : '#fff'), fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', cursor: 'pointer' }}>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, lineHeight: 1, color: isActive ? 'var(--sp-inverse-text)' : f.countColor }}>{f.count}</span>
+                  <span style={{ fontSize: 12, lineHeight: 1.2, color: isActive ? (dark ? M2 : '#E8E4DF') : MT }}>{f.label}</span>
                 </button>
               )
             })}
@@ -2358,45 +2386,26 @@ export default function ProducerIPadView({
           {/* Model table */}
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: gridCols, alignItems: 'center', columnGap: 10, position: 'sticky', top: 0, background: BG, padding: '8px 0', borderBottom: `1px solid ${DV}` }}>
-              {(narrowMain ? ['Look','','Model','Hair','Makeup','Nails'] : ['Look','','Model','Hair','Makeup','Nails',`${SVC_LABEL} assistant`]).map((h, i) => <Lbl key={i}>{h}</Lbl>)}
+              {['#', '', 'Model', ...orderedSvcs.map(s => s.charAt(0).toUpperCase() + s.slice(1))].map((h, i) => <Lbl key={i}>{h}</Lbl>)}
             </div>
             {filtered.map(m => {
               const note      = getModelNote(m)
-              const hChip     = svcChip(m.services.hair,   wkActive)
-              const mkChip    = svcChip(m.services.makeup, wkActive)
-              const nChip     = svcChip(m.services.nails,  wkActive)
-              const aName     = getAssistantName(m.services[SVC].assistantId)
+              const chipMap   = { hair: svcChip(m.services.hair, wkActive), makeup: svcChip(m.services.makeup, wkActive), nails: svcChip(m.services.nails, wkActive) }
               const needsPair = m.arrived && !m.services[SVC].assistantId
               return (
                 <div key={m.id} onClick={() => setActiveModel(m)} style={{ display: 'grid', gridTemplateColumns: gridCols, alignItems: 'center', columnGap: 10, minHeight: 58, borderBottom: `1px solid ${BD}`, cursor: 'pointer' }}>
-                  <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{m.look}</span>
+                  <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{modelOrderMap[m.id]}</span>
                   <Avatar src={m.avatar} name={m.name} size={36} />
                   <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
                     <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
-                    <span style={{ fontSize: 11, color: note.red ? 'var(--sp-red-text)' : MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {note.text}
-                      {narrowMain && !needsPair && aName && <span style={{ color: MT }}> · {aName}</span>}
-                    </span>
-                    {narrowMain && needsPair && (
-                      <button onClick={() => handlePair(m)} style={{ alignSelf: 'flex-start', marginTop: 2, minHeight: 28, padding: '0 10px 0 8px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
-                        PAIR
-                      </button>
-                    )}
+                    <span style={{ fontSize: 11, color: note.red ? 'var(--sp-red-text)' : MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{note.text}</span>
                   </span>
-                  <Chip c={hChip.c}  t={hChip.t}  />
-                  <Chip c={mkChip.c} t={mkChip.t} />
-                  <Chip c={nChip.c}  t={nChip.t}  />
-                  {!narrowMain && (
-                    needsPair ? (
-                      <button onClick={() => handlePair(m)} style={{ justifySelf: 'start', minHeight: 36, padding: '0 14px 0 10px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
-                        PAIR
-                      </button>
-                    ) : (
-                      <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{aName || '—'}</span>
-                    )
-                  )}
+                  {orderedSvcs.map(svc => {
+                    const chip = chipMap[svc]
+                    return (svc === SVC && needsPair)
+                      ? <button key={svc} onClick={e => { e.stopPropagation(); handlePair(m) }} style={{ justifySelf: 'start', minHeight: 32, padding: '0 12px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', whiteSpace: 'nowrap', cursor: 'pointer' }}>+ PAIR</button>
+                      : <Chip key={svc} c={chip.c} t={chip.t} />
+                  })}
                 </div>
               )
             })}
