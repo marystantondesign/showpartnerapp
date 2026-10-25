@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import {
   models as initModels,
   profiles,
@@ -2346,7 +2346,7 @@ export default function ProducerIPadView({
                   </span>
                   <div style={{ display: 'grid', gridTemplateColumns: '92px minmax(0,1fr) 64px', columnGap: 14, rowGap: 8, alignItems: 'center' }}>
                     {[{ label: 'Done', n: svcDS.done, c: '#7A9E7E' }, { label: 'In progress', n: svcDS.ip, c: '#D4A853' }, { label: 'Paused', n: svcDS.pa, c: '#8A9BB0' }].map(({ label, n, c }) => (
-                      <React.Fragment key={label}>
+                      <Fragment key={label}>
                         <span style={{ fontSize: 13, whiteSpace: 'nowrap' }}>{label}</span>
                         <span style={{ height: 10, borderRadius: 5, background: barTrack, overflow: 'hidden', display: 'block' }}>
                           <span style={{ display: 'block', height: '100%', width: pct(n, total), background: c, borderRadius: 5 }} />
@@ -2355,7 +2355,7 @@ export default function ProducerIPadView({
                           <b style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 400 }}>{n}</b>
                           <span style={{ color: MT }}> /{total}</span>
                         </span>
-                      </React.Fragment>
+                      </Fragment>
                     ))}
                   </div>
                 </div>
