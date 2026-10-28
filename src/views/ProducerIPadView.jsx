@@ -7,7 +7,7 @@ import {
   show,
   showHistory,
 } from '../data/mockData'
-import ModelDetailSheet from '../components/ModelDetailSheet'
+import ModelModal from '../components/ModelModal'
 import StatusLinkView from './StatusLinkView'
 
 const SVC       = 'makeup'
@@ -2483,25 +2483,14 @@ export default function ProducerIPadView({
           return check ? <TouchupSheet check={check} onSend={handleSendTouchupLocal} onClose={() => setTouchupCheckId(null)} /> : null
         })()}
 
-        {/* Model detail sheet */}
+        {/* Model modal */}
         {activeModel && (
-          <ModelDetailSheet
+          <ModelModal
             model={models.find(m => m.id === activeModel.id) || activeModel}
+            profiles={profiles}
+            modelOrderMap={modelOrderMap}
             onClose={() => setActiveModel(null)}
-            onStatusChange={(modelId, newStatus) => {
-              setModels(prev => prev.map(m => {
-                if (m.id !== modelId) return m
-                return {
-                  ...m,
-                  status: newStatus,
-                  statusLog: [...(m.statusLog || []), { status: newStatus, timestamp: fmtNow(), updatedBy: producer?.name || 'Producer' }],
-                }
-              }))
-            }}
-            onNote={(modelId, newNotesArray) => {
-              setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: newNotesArray } : m))
-            }}
-            currentProfile={producer}
+            svc={SVC}
           />
         )}
           </div>
