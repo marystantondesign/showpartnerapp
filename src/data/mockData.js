@@ -167,7 +167,7 @@ export const models = [
   {
     id: 'm4', name: 'Cassidy Martin', look: 'D',
     avatar: '/models/Cassidy-Martin-1.png',
-    arrived: true, arrivedAt: '1:18 PM', eta: null, flagged: false,
+    arrived: true, arrivedAt: '1:18 PM', eta: null, flagged: true, flagReason: 'Allergy check needed',
     services: {
       hair:   _done('p9',  '1:52 PM', 44),
       makeup: _done('p18', '1:57 PM', 38),
@@ -202,7 +202,7 @@ export const models = [
     arrived: true, arrivedAt: '1:22 PM', eta: null, flagged: false,
     services: {
       hair:   _done('p11', '1:58 PM', 45),
-      makeup: _done('p20', '2:02 PM', 42),
+      makeup: { ..._done('p20', '2:02 PM', 42), reviewRequestedAt: '3:41 PM' },
       nails:  _done('p29', '2:15 PM', 26),
     },
     status: 'done',
@@ -280,7 +280,7 @@ export const models = [
     arrived: true, arrivedAt: '1:35 PM', eta: null, flagged: false,
     services: {
       hair:   _done('p7',  '2:15 PM', 44),
-      makeup: _done('p16', '2:20 PM', 40),
+      makeup: { ..._done('p16', '2:20 PM', 40), reviewRequestedAt: '3:22 PM' },
       nails:  _ip('p26',   '3:10 PM'),
     },
     status: 'in_progress',
@@ -310,7 +310,7 @@ export const models = [
     arrived: true, arrivedAt: '1:40 PM', eta: null, flagged: false,
     services: {
       hair:   _done('p9',  '2:20 PM', 45),
-      makeup: _done('p18', '2:25 PM', 38),
+      makeup: { ..._done('p18', '2:25 PM', 38), reviewRequestedAt: '3:28 PM' },
       nails:  _ip('p28',   '3:15 PM'),
     },
     status: 'in_progress',
@@ -451,7 +451,7 @@ export const models = [
   {
     id: 'm23', name: 'Rio Sakamoto', look: 'C',
     avatar: _av('RS', '#8A9BB0'),
-    arrived: true, arrivedAt: '2:12 PM', eta: null, flagged: true,
+    arrived: true, arrivedAt: '2:12 PM', eta: null, flagged: true, flagReason: 'Check in needed',
     services: {
       hair:   _ip('p10',   '3:25 PM'),
       makeup: _ip('p19',   '3:30 PM'),

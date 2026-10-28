@@ -174,40 +174,95 @@ function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onC
   )
 }
 
-function PairingPanel({ model, assistants, selected, onSelect, onConfirm, onClose }) {
-  const selectedName = assistants.find(a => a.id === selected)?.name || ''
-  return (
-    <>
-      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        <Avatar src={model.avatar} name={model.name} size={44} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11, color: MT, marginBottom: 2 }}>Look {model.look} · {model.arrived ? `arrived ${model.arrivedAt}` : `ETA ${model.eta}`}</div>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{model.name}</div>
-        </div>
-        <button onClick={onClose} style={{ border: 0, background: 'none', fontSize: 18, color: M2, cursor: 'pointer', lineHeight: 1, padding: 4 }} aria-label="Close pairing">×</button>
-      </div>
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px' }}>
-        <Lbl s={{ marginBottom: 10 }}>Send to</Lbl>
-        {assistants.map(a => {
-          const isSel = selected === a.id
-          return (
-            <button key={a.id} onClick={() => onSelect(a.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, marginBottom: 4, border: isSel ? `1.5px solid ${TX}` : `1px solid transparent`, background: isSel ? BG : 'transparent', textAlign: 'left', cursor: 'pointer' }}>
-              <input type="radio" readOnly checked={isSel} style={{ accentColor: TX, width: 16, height: 16, flexShrink: 0 }} />
-              <Avatar src={a.avatar} name={a.name} size={32} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: 14 }}>{a.name}</div>
-                <div style={{ fontSize: 11, color: a.free ? '#7A9E7E' : MT }}>{a.free ? 'Free' : `With ${a.currentModelName}`}</div>
-              </div>
-            </button>
-          )
-        })}
-      </div>
-      <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
-        <button onClick={onConfirm} disabled={!selected} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: selected ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: selected ? 'pointer' : 'default', textTransform: 'uppercase' }}>
-          {selected && selectedName ? `SEND ${model.name.split(' ')[0].toUpperCase()} TO ${selectedName.split(' ')[0].toUpperCase()}` : 'SELECT AN ASSISTANT'}
+function NotPairedPanel({ models, pairModel, pairAssist, assistants, modelOrderMap, onSelectModel, onSelectAssist, onConfirm, onBack, dark }) {
+  const unpaired = models.filter(m => m.arrived && !m.services[SVC].assistantId)
+    .sort((a, b) => models.indexOf(a) - models.indexOf(b))
+  const mkFree   = assistants.filter(a => a.specialty === SVC && a.role === 'assistant' && a.free)
+  const mkBusy   = assistants.filter(a => a.specialty === SVC && a.role === 'assistant' && !a.free)
+
+  useEffect(() => {
+    if (pairModel && !pairAssist && mkFree.length > 0) onSelectAssist(mkFree[0].id)
+  }, [pairModel?.id])
+
+  if (pairModel) {
+    const selAssist = assistants.find(a => a.id === pairAssist)
+    const modelFirst = pairModel.name.split(' ')[0]
+    const assistFirst = selAssist?.name.split(' ')[0] || ''
+    const radioRow = (a) => {
+      const isSel = pairAssist === a.id
+      return (
+        <button key={a.id} onClick={() => onSelectAssist(a.id)}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, padding: '0 12px', borderRadius: 8, marginBottom: 4, border: isSel ? `1.5px solid ${TX}` : `1px solid transparent`, background: isSel ? (dark ? SF : '#F5F2EE') : 'transparent', textAlign: 'left', cursor: 'pointer', boxSizing: 'border-box' }}>
+          <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${isSel ? TX : DV}`, background: isSel ? TX : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {isSel && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--sp-inverse-text)' }} />}
+          </div>
+          <Avatar src={a.avatar} name={a.name} size={32} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 14 }}>{a.name}</div>
+            <div style={{ fontSize: 11, color: MT }}>{a.free ? (a.station || 'Free') : `With ${a.currentModelName?.split(' ')[0]} · ${a.station || ''}`}</div>
+          </div>
         </button>
-      </div>
-    </>
+      )
+    }
+    return (
+      <>
+        <div style={{ flexShrink: 0, padding: '12px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          <Avatar src={pairModel.avatar} name={pairModel.name} size={40} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Lbl>#{modelOrderMap[pairModel.id]} · Look {pairModel.look} · arrived {pairModel.arrivedAt}</Lbl>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 20, marginTop: 2 }}>Pair {pairModel.name}</div>
+          </div>
+          {unpaired.length > 1 && (
+            <button onClick={onBack} style={{ border: 0, background: 'none', fontSize: 20, color: M2, cursor: 'pointer', lineHeight: 1, padding: '4px 0 0 4px' }} aria-label="Back to list">×</button>
+          )}
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '12px 20px' }}>
+          {mkFree.length > 0 && (
+            <>
+              <Lbl s={{ marginBottom: 8 }}>Free now · {SVC_LABEL.toUpperCase()}</Lbl>
+              {mkFree.map(radioRow)}
+            </>
+          )}
+          {mkBusy.length > 0 && (
+            <>
+              <Lbl s={{ marginTop: 14, marginBottom: 8 }}>Finishing soon</Lbl>
+              {mkBusy.map(radioRow)}
+            </>
+          )}
+          {selAssist && (
+            <p style={{ fontSize: 11, color: M2, margin: '12px 0 0', lineHeight: 1.5 }}>
+              {selAssist.name.split(' ')[0]} gets a notification with {modelFirst}&apos;s look and where to find them.
+            </p>
+          )}
+        </div>
+        <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
+          <button onClick={onConfirm} disabled={!pairAssist}
+            style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: pairAssist ? TX : DV, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: pairAssist ? 'pointer' : 'default', textTransform: 'uppercase' }}>
+            {pairAssist ? `PAIR ${modelFirst.toUpperCase()} WITH ${assistFirst.toUpperCase()}` : 'SELECT AN ASSISTANT'}
+          </button>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px' }}>
+      <Lbl s={{ marginBottom: 12 }}>Not paired · {unpaired.length}</Lbl>
+      {unpaired.map(m => (
+        <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BD}` }}>
+          <Avatar src={m.avatar} name={m.name} size={40} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+            <div style={{ fontSize: 11, color: MT }}>#{modelOrderMap[m.id]} · arrived {m.arrivedAt}</div>
+          </div>
+          <button onClick={() => onSelectModel(m)}
+            style={{ height: 40, padding: '0 12px 0 8px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
+            PAIR
+          </button>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -286,71 +341,158 @@ function ConfirmModal({ onConfirm, onCancel }) {
   )
 }
 
-function ArrivalsPanel({ models, recentArrivals, onArrived, onOpenRunningLate, onClose, onPair }) {
-  const [search, setSearch] = useState('')
+function ArrivalsPanel({ models, recentArrivals, onArrived, onOpenRunningLate, onPair, modelOrderMap, dark }) {
   const notArrived = models.filter(m => !m.arrived)
-  const filtered = notArrived.filter(m =>
-    !search ||
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    String(m.look).toLowerCase().includes(search.toLowerCase())
-  )
+  const arrivedCount = models.filter(m => m.arrived).length
+
+  const fromMap = {}
+  notArrived.forEach(m => {
+    const key = m.comingFrom || ''
+    if (!fromMap[key]) fromMap[key] = []
+    fromMap[key].push(m)
+  })
+  const fromEntries = Object.entries(fromMap).sort(([a], [b]) => {
+    if (!a) return 1; if (!b) return -1; return a.localeCompare(b)
+  })
+
+  const justArrived = [...recentArrivals].reverse().slice(0, 6)
+    .map(arr => { const m = models.find(x => x.id === arr.modelId); return m ? { ...m, arrRef: arr } : null })
+    .filter(Boolean)
+
+  const pillBase = { height: 44, borderRadius: 999, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap', padding: '0 14px' }
+
   return (
-    <>
-      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${BD}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <Lbl>Arrivals</Lbl>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 20, marginTop: 2 }}>{models.filter(m => m.arrived).length} of {models.length} here</div>
-        </div>
-        <button onClick={onClose} style={{ border: 0, background: 'none', fontSize: 20, color: M2, cursor: 'pointer', lineHeight: 1, padding: '4px 4px 0' }}>×</button>
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '12px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+        <Lbl>Arrivals</Lbl>
+        <span style={{ fontSize: 11, color: M2 }}>{arrivedCount} of {models.length} here</span>
       </div>
-      <div style={{ padding: '10px 20px', borderBottom: `1px solid ${BD}` }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Check in by name or look" style={{ width: '100%', boxSizing: 'border-box', height: 40, borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, padding: '0 16px', color: TX, outline: 'none' }} />
-      </div>
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px' }}>
-        {filtered.length > 0 && <Lbl s={{ marginBottom: 10 }}>Still expected · by ETA</Lbl>}
-        {filtered.map(m => (
-          <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BD}` }}>
-            <Avatar src={m.avatar} name={m.name} size={40} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
-              <div style={{ fontSize: 11, color: MT }}>Look {m.look} · ETA {m.eta || 'TBD'}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <button onClick={() => onArrived(m.id)} style={{ height: 40, padding: '0 12px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>ARRIVED</button>
-              <button onClick={() => onOpenRunningLate(m.id)} style={{ height: 40, padding: '0 10px', borderRadius: 999, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>RUNNING LATE</button>
-            </div>
+
+      {fromEntries.map(([key, grp]) => (
+        <div key={key || '_none'} style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Lbl>{key ? `FROM ${key.toUpperCase()} · ${grp.length}` : `NO ETA · ${grp.length}`}</Lbl>
+            {key && grp.length > 1 && (
+              <button style={{ ...pillBase, height: 30, padding: '0 10px', fontSize: 10, border: `1px solid ${dark ? BD : '#CFCAC4'}`, background: 'transparent', color: TX }}>
+                SET ETA FOR ALL
+              </button>
+            )}
           </div>
-        ))}
-        {filtered.length === 0 && notArrived.length === 0 && (
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: M2, paddingTop: 12 }}>All models checked in</div>
-        )}
-        {recentArrivals.length > 0 && (
-          <>
-            <Lbl s={{ marginTop: 20, marginBottom: 10 }}>Just arrived</Lbl>
-            {[...recentArrivals].reverse().slice(0, 6).map(arr => {
-              const m = models.find(x => x.id === arr.modelId)
-              if (!m) return null
-              const needsPair = m.arrived && !m.services[SVC].assistantId
-              return (
-                <div key={arr.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${BD}` }}>
+          {grp.map(m => (
+            <div key={m.id} style={{ paddingBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 6 }}>
+                <Avatar src={m.avatar} name={m.name} size={40} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, lineHeight: 1.3 }}>{m.name}</div>
+                  <div style={{ fontSize: 11, color: MT, marginTop: 2 }}>#{modelOrderMap[m.id]} · {m.eta ? `ETA ${m.eta}` : 'No ETA'}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, marginLeft: 52 }}>
+                <button onClick={() => onArrived(m.id)} style={{ ...pillBase, border: 0, background: dark ? SF : '#F5F2EE', color: TX, fontWeight: 600 }}>ARRIVED</button>
+                <button onClick={() => onOpenRunningLate(m.id)} style={{ ...pillBase, border: `1px solid ${dark ? BD : '#CFCAC4'}`, background: 'transparent', color: TX }}>RUNNING LATE</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      {justArrived.length > 0 && (
+        <>
+          <Lbl s={{ marginBottom: 10, marginTop: 4 }}>Just arrived</Lbl>
+          {justArrived.map(m => {
+            const needsPair = !m.services?.[SVC]?.assistantId
+            return (
+              <div key={m.id} style={{ paddingBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                   <Avatar src={m.avatar} name={m.name} size={40} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
-                    <div style={{ fontSize: 11, color: MT }}>Look {m.look} · arrived {arr.arrivedAt}</div>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, lineHeight: 1.3 }}>{m.name}</div>
+                    <div style={{ fontSize: 11, color: MT, marginTop: 2 }}>#{modelOrderMap[m.id]} · arrived {m.arrivedAt}</div>
                   </div>
                   {needsPair && (
-                    <button onClick={() => { onPair?.(m); onClose() }} style={{ height: 40, padding: '0 12px 0 8px', borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                    <button onClick={() => onPair?.(m)}
+                      style={{ ...pillBase, height: 40, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>
                       PAIR
                     </button>
                   )}
                 </div>
-              )
-            })}
-          </>
-        )}
-      </div>
-    </>
+              </div>
+            )
+          })}
+        </>
+      )}
+
+      {notArrived.length === 0 && (
+        <div style={{ fontFamily: 'Georgia, serif', fontSize: 16, color: M2, paddingTop: 12 }}>All models checked in</div>
+      )}
+    </div>
+  )
+}
+
+function AttentionPanel({ models, profiles, modelOrderMap, onOpenModel, dark }) {
+  const reviewModels = models.filter(m => m.services[SVC]?.reviewRequestedAt)
+    .sort((a, b) => models.indexOf(a) - models.indexOf(b))
+  const flaggedModels = models.filter(m => m.flagged)
+    .sort((a, b) => models.indexOf(a) - models.indexOf(b))
+
+  function getAssistShort(id) {
+    if (!id) return ''
+    const p = profiles.find(x => x.id === id)
+    if (!p) return ''
+    const parts = p.name.split(' ')
+    return parts[0] + (parts[1] ? ' ' + parts[1][0] + '.' : '')
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {reviewModels.length > 0 && (
+        <>
+          <Lbl>Waiting for review · {reviewModels.length}</Lbl>
+          {reviewModels.map(m => {
+            const svc = m.services[SVC]
+            return (
+              <div key={m.id} style={{ background: dark ? SF : '#fff', border: `1px solid ${dark ? BD : '#E0DDD8'}`, borderRadius: 12, padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Avatar src={m.avatar} name={m.name} size={44} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: 16 }}>{m.name}</div>
+                    <div style={{ fontSize: 11, color: MT, marginTop: 2 }}>#{modelOrderMap[m.id]} · MU: {getAssistShort(svc.assistantId)} · Pinged @ {svc.reviewRequestedAt}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <button style={{ minHeight: 44, borderRadius: 999, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>PING ARTIST</button>
+                  <button style={{ minHeight: 44, borderRadius: 999, border: `1px solid ${dark ? BD : '#CFCAC4'}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>PING LEAD ASSISTANT</button>
+                </div>
+              </div>
+            )
+          })}
+        </>
+      )}
+
+      {flaggedModels.length > 0 && (
+        <>
+          <Lbl>Flagged · {flaggedModels.length}</Lbl>
+          {flaggedModels.map(m => (
+            <button key={m.id} onClick={() => onOpenModel?.(m)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', background: 'none', border: 0, borderBottom: `1px solid ${BD}`, textAlign: 'left', cursor: 'pointer', boxSizing: 'border-box' }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: BD, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: M2, fontFamily: 'Inter,system-ui,sans-serif' }}>
+                {m.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 500, color: TX }}>{m.name}</div>
+                <div style={{ fontSize: 11, color: '#A33D28', marginTop: 1 }}>{m.flagReason || 'Flagged'}</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={M2} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          ))}
+        </>
+      )}
+
+      <p style={{ fontSize: 11, color: M2, margin: 'auto 0 0', lineHeight: 1.5, paddingTop: 12, borderTop: `1px solid ${BD}` }}>
+        Producer, lead assistants and the artist see this list.
+      </p>
+    </div>
   )
 }
 
@@ -2045,6 +2187,7 @@ export default function ProducerIPadView({
   const [panelCollapsed, setPanelCollapsedRaw] = useState(() =>
     localStorage.getItem('sp_panelCollapsed') === 'true'
   )
+  const [pairToast, setPairToast] = useState(null)
 
   useEffect(() => { localStorage.removeItem('sp_panelWidth') }, [])
 
@@ -2065,6 +2208,12 @@ export default function ProducerIPadView({
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  useEffect(() => {
+    if (!pairToast) return
+    const t = setTimeout(() => setPairToast(null), 5000)
+    return () => clearTimeout(t)
+  }, [pairToast])
+
   const wkActive  = walkthroughPhase === 'in_progress'
   const producer  = profiles.find(p => p.role === 'lead') || profiles[0]
 
@@ -2077,7 +2226,7 @@ export default function ProducerIPadView({
   const readyCount      = models.filter(m => m.services.hair.status === 'done' && m.services.makeup.status === 'done' && m.services.nails.status === 'done').length
   const notArrivedCount = models.filter(m => !m.arrived).length
   const notPairedCount  = models.filter(m => m.arrived && !m.services[SVC].assistantId).length
-  const needsCount      = models.filter(m => m.flagged).length
+  const needsCount      = models.filter(m => m.flagged || m.services[SVC]?.reviewRequestedAt).length
   const toCheckCount    = toCheckQueue.length
 
   useEffect(() => {
@@ -2122,11 +2271,27 @@ export default function ProducerIPadView({
     const suffix = aid ? ` · ${getAssistantName(aid) || ''}` : ' · Not paired'
     return { text: `Arrived ${m.arrivedAt}${suffix}`, red: false }
   }
-  function handlePair(m) { setPairModel(m); setPairAssist(null); setPanel('pairing') }
+  function handlePair(m) {
+    setPairModel(m); setPairAssist(null)
+    setFilter('not_paired'); setPanel('pairing')
+    if (panelCollapsed) expandPanel()
+  }
   function handleConfirmPair() {
     if (!pairModel || !pairAssist) return
-    setModels(prev => prev.map(m => m.id === pairModel.id ? { ...m, services: { ...m.services, [SVC]: { ...m.services[SVC], assistantId: pairAssist } } } : m))
-    setPanel('default')
+    const assistantName = profiles.find(p => p.id === pairAssist)?.name || ''
+    const modelId = pairModel.id
+    const modelName = pairModel.name
+    setModels(prev => prev.map(m => m.id === modelId ? { ...m, services: { ...m.services, [SVC]: { ...m.services[SVC], assistantId: pairAssist } } } : m))
+    const remainingAfter = models.filter(m => m.arrived && !m.services[SVC].assistantId && m.id !== modelId).length
+    if (remainingAfter > 0) { setPairModel(null); setPairAssist(null); setPanel('not_paired_list') }
+    else { setPairModel(null); setPairAssist(null); setFilter('all'); setPanel('default') }
+    setPairToast({ modelId, modelName, assistantName })
+  }
+  function handleUndoPair() {
+    if (!pairToast) return
+    setModels(prev => prev.map(m => m.id === pairToast.modelId ? { ...m, services: { ...m.services, [SVC]: { ...m.services[SVC], assistantId: null } } } : m))
+    setFilter('not_paired'); setPanel('not_paired_list')
+    setPairToast(null)
   }
   function handleStartWalkthrough() {
     const t = fmtNow()
@@ -2186,7 +2351,7 @@ export default function ProducerIPadView({
     not_paired:      { label: 'Not paired', count: notPairedCount,  filterPanel: 'not_paired_list' },
   }
   const tbCfg = showToggleBar ? _tbMap[filter] : null
-  const leftTabActive = tbCfg ? panel === tbCfg.filterPanel : false
+  const leftTabActive = tbCfg ? (panel === tbCfg.filterPanel || (filter === 'not_paired' && panel === 'pairing')) : false
 
   return (
     <div className="sp-ipad" style={{ position: 'fixed', inset: 0, background: BG, display: 'flex', flexDirection: 'column', fontFamily: 'Inter,system-ui,sans-serif', color: TX }}>
@@ -2350,7 +2515,7 @@ export default function ProducerIPadView({
           })()}
 
           {/* Count tiles */}
-          <div style={{ flexShrink: 0, display: 'flex', flexWrap: 'wrap', gap: 8, padding: '10px 0 6px' }}>
+          <div style={{ flexShrink: 0, display: 'flex', flexWrap: 'nowrap', gap: 8, padding: '10px 0 6px', overflowX: 'auto' }}>
             {[
               { id: 'all',             label: 'Models',           count: models.length, countColor: TX,                            always: true  },
               { id: 'needs_attention', label: 'Needs attention',  count: needsCount,    countColor: 'var(--sp-red-text)',           always: false },
@@ -2361,8 +2526,8 @@ export default function ProducerIPadView({
               const isActive = filter === f.id
               const openPanel = f.id === 'not_arrived' ? 'arrivals' : f.id === 'needs_attention' ? 'attention' : f.id === 'not_paired' ? 'not_paired_list' : 'default'
               return (
-                <button key={f.id} onClick={() => { setFilter(f.id); setPanel(openPanel) }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 52, padding: '0 14px', borderRadius: 12, border: isActive ? `1px solid ${TX}` : `1px solid ${dark ? BD : '#E0DDD8'}`, background: isActive ? TX : (dark ? SF : '#fff'), fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', cursor: 'pointer' }}>
+                <button key={f.id} onClick={() => { setFilter(f.id); setPanel(openPanel); if (panelCollapsed) expandPanel() }}
+                  style={{ flex: '1 1 0', minWidth: 0, maxWidth: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 52, padding: '0 14px', borderRadius: 12, border: isActive ? `1px solid ${TX}` : `1px solid ${dark ? BD : '#E0DDD8'}`, background: isActive ? TX : (dark ? SF : '#fff'), fontFamily: 'Inter,system-ui,sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, lineHeight: 1, color: isActive ? 'var(--sp-inverse-text)' : f.countColor }}>{f.count}</span>
                   <span style={{ fontSize: 12, lineHeight: 1.2, color: isActive ? (dark ? M2 : '#E8E4DF') : MT }}>{f.label}</span>
                 </button>
@@ -2437,24 +2602,31 @@ export default function ProducerIPadView({
                     </div>
                   )}
                   <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                    {panel === 'pairing' && pairModel && (
-                      <PairingPanel model={pairModel} assistants={mkAssistants} selected={pairAssist} onSelect={setPairAssist} onConfirm={handleConfirmPair} onClose={() => setPanel('default')} />
+                    {(panel === 'pairing' || panel === 'not_paired_list') && (
+                      <NotPairedPanel
+                        models={models}
+                        pairModel={pairModel}
+                        pairAssist={pairAssist}
+                        assistants={mkAssistants}
+                        modelOrderMap={modelOrderMap}
+                        onSelectModel={(m) => { setPairModel(m); setPairAssist(null); setPanel('pairing') }}
+                        onSelectAssist={setPairAssist}
+                        onConfirm={handleConfirmPair}
+                        onBack={() => { setPairModel(null); setPairAssist(null); setPanel('not_paired_list') }}
+                        dark={dark}
+                      />
                     )}
                     {panel === 'compose' && (
                       <ComposePanel msg={composeMsg} onMsg={setComposeMsg} to={composeTo} onTo={setComposeTo} onSend={handleSend} onClose={() => setPanel('default')} />
                     )}
                     {panel === 'arrivals' && (
-                      <ArrivalsPanel models={models} recentArrivals={recentArrivals} onArrived={handleArrivedLocal} onOpenRunningLate={(id) => setLateModalId(id)} onClose={() => setPanel('default')} onPair={(m) => { setPairModel(m); setPairAssist(null); setPanel('pairing') }} />
+                      <ArrivalsPanel models={models} recentArrivals={recentArrivals} onArrived={handleArrivedLocal} onOpenRunningLate={(id) => setLateModalId(id)} onPair={handlePair} modelOrderMap={modelOrderMap} dark={dark} />
                     )}
                     {panel === 'to_check' && (
                       <ToCheckPanel toCheckQueue={toCheckQueue} profiles={profiles} onLooksGood={(id) => onLooksGood?.(id)} onOpenTouchup={handleOpenTouchup} onClose={() => setPanel('default')} />
                     )}
-                    {(panel === 'attention' || panel === 'not_paired_list') && (
-                      wkActive ? (
-                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} />
-                      ) : (
-                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
-                      )
+                    {panel === 'attention' && (
+                      <AttentionPanel models={models} profiles={profiles} modelOrderMap={modelOrderMap} onOpenModel={setActiveModel} dark={dark} />
                     )}
                     {(panel === 'default' || panel === 'confirm') && (
                       wkActive ? (
@@ -2473,6 +2645,18 @@ export default function ProducerIPadView({
         {/* Portrait drawer */}
         {isPortrait && (
           <PortraitDrawer open={drawerOpen} onToggle={setDrawerOpen} tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
+        )}
+
+        {/* Pair toast */}
+        {pairToast && (
+          <div role="status" style={{ position: 'absolute', left: 24, bottom: 24, right: effectivePanelW + 14, display: 'flex', alignItems: 'center', gap: 14, padding: '12px 12px 12px 18px', borderRadius: 12, background: '#111', color: '#fff', boxShadow: '0 8px 24px rgba(0,0,0,.18)', zIndex: 50, pointerEvents: 'auto' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9CC4A0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 14 }}>{pairToast.modelName} is paired with {pairToast.assistantName}</span>
+              <span style={{ fontSize: 12, color: '#CFCAC4' }}>{pairToast.assistantName.split(' ')[0]} was notified with {pairToast.modelName.split(' ')[0]}&apos;s look and where to find them</span>
+            </span>
+            <button onClick={handleUndoPair} style={{ minHeight: 44, padding: '0 16px', borderRadius: 8, border: '1px solid #4A4743', background: 'transparent', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer', whiteSpace: 'nowrap' }}>UNDO</button>
+          </div>
         )}
 
         {/* Confirm modal */}
