@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useIsTablet } from '../hooks/useIsTablet'
 
-export default function BottomSheet({ open, onClose, children, height = '85%', noPadding = false, footer }) {
+export default function BottomSheet({ open, onClose, children, height = '85%', maxHeight, noPadding = false, footer }) {
   const isTablet   = useIsTablet()
   const sheetRef   = useRef(null)
   const isDragging = useRef(false)
@@ -92,7 +92,7 @@ export default function BottomSheet({ open, onClose, children, height = '85%', n
         className="relative bg-greige dark:bg-greige-dark rounded-t-2xl flex flex-col"
         style={{
           height,
-          maxHeight: '92dvh',
+          maxHeight: maxHeight ?? '92dvh',
           transform: `translateY(${dragY}px)`,
           transition: isDragging.current ? 'none' : 'transform 0.2s ease-out',
           willChange: 'transform',

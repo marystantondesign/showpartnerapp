@@ -52,7 +52,7 @@ export const profiles = [
   // Key artists
   { id: 'p2', name: 'Marcus Lee', role: 'artist', specialty: 'hair', avatar: '/artists/Marcus-Lee.png',
     tags: ['Editorial styling', 'Hair extensions', 'Avant-garde cuts', 'Color work', 'Braiding'] },
-  { id: 'p3', name: 'Yadim', role: 'artist', specialty: 'makeup', avatar: '/artists/Zoe-Parker.png',
+  { id: 'p3', name: 'Yadim', role: 'artist', specialty: 'makeup', avatar: '/assistants/yadim.jpg',
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
 
   // Lead assistants (new role)
@@ -71,16 +71,16 @@ export const profiles = [
   { id: 'p14', name: 'Tomás V.',       role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: _av('TV', '#7A9E7E'),             station: 'Station 9' },
 
   // Makeup assistants (9)
-  { id: 'p15', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/benji.jpg',   station: 'Station 1' },
-  { id: 'p16', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/kenji.jpg',   station: 'Station 2' },
-  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/sofia.jpg',   station: 'Station 9' },
+  { id: 'p15', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/benji.jpg',   station: 'Station 5' },
+  { id: 'p16', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/kenji.jpg',   station: 'Station 1' },
+  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/sofia.jpg',   station: 'Station 2' },
   { id: 'p18', name: 'Aisha Johnson',  role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 3,  avatar: '/assistants/aisha.jpg',   station: 'Station 3' },
   { id: 'p19', name: 'Lena Schmidt',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/lena.jpg',    station: 'Station 4' },
-  { id: 'p20', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/mira.jpg',    station: 'Station 5' },
-  { id: 'p21', name: 'Carmen Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/carmen.jpg',  station: 'Station 6' },
-  { id: 'p22', name: 'Yuki T.',        role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/yuki.jpg',    station: 'Station 7' },
-  { id: 'p23', name: 'Ella Voss',      role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/ella.jpg',    station: 'Station 8' },
-  { id: 'p32', name: 'Dara Okafor',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/dara.jpg',    station: 'Station 9'  },
+  { id: 'p20', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/mira.jpg',    station: 'Station 6' },
+  { id: 'p21', name: 'Carmen Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/carmen.jpg',  station: 'Station 7' },
+  { id: 'p22', name: 'Yuki T.',        role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/yuki.jpg',    station: 'Station 8' },
+  { id: 'p23', name: 'Ella Voss',      role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/ella.jpg',    station: 'Station 9' },
+  { id: 'p32', name: 'Dara Okafor',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/dara.jpg',    station: 'Station 10' },
   { id: 'p33', name: 'Dev Kapoor',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/dev.jpg',     station: 'Station 10' },
   { id: 'p34', name: 'Ivana Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/ivana.jpg',   station: 'Station 11' },
   { id: 'p35', name: 'Leo Tan',       role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/leo.jpg',     station: 'Station 12' },
@@ -701,6 +701,25 @@ export const notifications = [
   { id: 'n3', text: 'Marcus Lee added note on Justin M.',  status: null,          timestamp: '3:10 PM', read: true  },
   { id: 'n4', text: 'Priya Sharma nails started',          status: 'in_progress', timestamp: '3:05 PM', read: true  },
 ]
+
+export const profileNotifications = {
+  // Benji Adams (p15) — makeup assistant
+  'p15': [
+    { id: 'bn1', type: 'ping',       text: 'Iona M pinged you: get Mei Lin reviewed by Yadim',               timestamp: '4:41 PM', read: false, dot: 'red'  },
+    { id: 'bn2', type: 'walkthrough', text: 'Walkthrough in 15 minutes',                                      timestamp: '3:45 PM', read: true,  dot: 'gray' },
+    { id: 'bn3', type: 'walkthrough', text: 'Walkthrough in 30 minutes',                                      timestamp: '3:30 PM', read: true,  dot: 'gray' },
+    { id: 'bn4', type: 'pairing',     text: "You're paired with Rosa Ferreira · Look C · Station 5", timestamp: '2:32 PM', read: false, dot: 'gold' },
+  ],
+  // Iona M (p5) — lead assistant
+  'p5': [
+    { id: 'im1', type: 'review_request', text: 'Dev Kapoor pinged you to get Camille Dubois reviewed · Look 13 · Station 11', timestamp: '4:38 PM', read: false, dot: 'red'  },
+    { id: 'im2', type: 'review_request', text: 'Aisha Johnson pinged you to get Luna Torres reviewed · Look 7 · Station 3',   timestamp: '4:25 PM', read: false, dot: 'red'  },
+    { id: 'im3', type: 'finished',       text: 'Sofia Reyes finished Mei Lin · Look 06',                                           timestamp: '4:10 PM', read: true,  dot: 'gray' },
+    { id: 'im4', type: 'producer_ping',  text: 'Jen Z pinged you: Amara Diallo needs a touch-up',                                       timestamp: '3:55 PM', read: false, dot: 'red'  },
+    { id: 'im5', type: 'walkthrough',    text: 'Walkthrough in 15 minutes',                                                             timestamp: '3:45 PM', read: true,  dot: 'gray' },
+    { id: 'im6', type: 'walkthrough',    text: 'Walkthrough in 30 minutes',                                                             timestamp: '3:30 PM', read: true,  dot: 'gray' },
+  ],
+}
 
 // ─── Schedule (legacy — use timeline for new views) ───────────────────────────
 export const schedule = [

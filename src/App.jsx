@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { models as initModels, notifications as initNotifs, profiles, schedule as initSchedule, announcements as initAnnouncements, timeline } from './data/mockData'
+import { models as initModels, notifications as initNotifs, profileNotifications, profiles, schedule as initSchedule, announcements as initAnnouncements, timeline } from './data/mockData'
 import RoleSelect from './components/RoleSelect'
 import ShowHistory from './components/ShowHistory'
 import AgentDesktopView from './views/AgentDesktopView'
@@ -17,6 +17,7 @@ import DashboardView from './views/DashboardView'
 import SettingsView from './views/SettingsView'
 import StudioView from './views/StudioView'
 import AssistantHomeView from './views/AssistantHomeView'
+import AssistantTodayView from './views/AssistantTodayView'
 import ArtistHomeView from './views/ArtistHomeView'
 import StatusLinkView from './views/StatusLinkView'
 
@@ -342,13 +343,36 @@ function AppInner() {
           onToggleDark={toggleDark}
           currentProfile={currentProfile}
           onSwitchProfile={setCurrentProfile}
-          notifications={notifications}
+          notifications={profileNotifications[currentProfile.id] ?? notifications}
           onBell={() => setBellOpen(true)}
           onShowHistory={() => setShowHistoryOpen(true)}
         />
 
         <div className="flex-1 overflow-hidden flex flex-col">
           {tab === 'home' && (currentProfile.role === 'assistant' || currentProfile.role === 'lead_assistant') && (
+            <AssistantTodayView
+              currentProfile={currentProfile}
+              profiles={profiles}
+              schedule={schedule}
+              venue={venue}
+            />
+          )}
+          {tab === 'home' && currentProfile.role === 'artist' && (
+            <ArtistHomeView
+              currentProfile={currentProfile}
+              models={models}
+              secondOpinionRequests={secondOpinionRequests}
+              onAcceptRequest={handleAcceptSecondOpinion}
+              onDismissRequest={handleDismissSecondOpinion}
+              onLooksGood={handleLooksGoodArtist}
+              onSuggestChange={handleDismissSecondOpinion}
+              onToast={showToast}
+            />
+          )}
+          {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && currentProfile.role !== 'artist' && (
+            <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />
+          )}
+          {tab === 'list' && (currentProfile.role === 'assistant' || currentProfile.role === 'lead_assistant') && (
             <AssistantHomeView
               currentProfile={currentProfile}
               models={models} setModels={setModels}
@@ -369,22 +393,9 @@ function AppInner() {
               onSendTouchup={handleSendTouchup}
             />
           )}
-          {tab === 'home' && currentProfile.role === 'artist' && (
-            <ArtistHomeView
-              currentProfile={currentProfile}
-              models={models}
-              secondOpinionRequests={secondOpinionRequests}
-              onAcceptRequest={handleAcceptSecondOpinion}
-              onDismissRequest={handleDismissSecondOpinion}
-              onLooksGood={handleLooksGoodArtist}
-              onSuggestChange={handleDismissSecondOpinion}
-              onToast={showToast}
-            />
+          {tab === 'list' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && (
+            <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />
           )}
-          {tab === 'home' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && currentProfile.role !== 'artist' && (
-            <HomeView dark={dark} currentProfile={currentProfile} onToast={showToast} models={models} venue={venue} schedule={schedule} />
-          )}
-          {tab === 'list'      && <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'dashboard' && (
             <DashboardView
@@ -419,7 +430,7 @@ function AppInner() {
       <NotificationDrawer
         open={bellOpen}
         onClose={() => setBellOpen(false)}
-        notifications={notifications}
+        notifications={profileNotifications[currentProfile.id] ?? notifications}
       />
     </div>
   )
