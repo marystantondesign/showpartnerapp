@@ -56,8 +56,8 @@ export const profiles = [
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
 
   // Lead assistants (new role)
-  { id: 'p4', name: 'Aimi K', role: 'lead_assistant', specialty: 'hair', avatar: _av('AK', '#7A9E7E') },
-  { id: 'p5', name: 'Iona', role: 'lead_assistant', specialty: 'makeup', avatar: _av('IO', '#D4A853') },
+  { id: 'p4', name: 'Aimi K', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/aimi.jpg' },
+  { id: 'p5', name: 'Iona M', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/iona.jpg' },
 
   // Hair assistants (9)
   { id: 'p6',  name: 'Sophia Rivera',  role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/assistants/Sophia-Rivera.png', station: 'Station 1' },
@@ -71,15 +71,21 @@ export const profiles = [
   { id: 'p14', name: 'Tomás V.',       role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: _av('TV', '#7A9E7E'),             station: 'Station 9' },
 
   // Makeup assistants (9)
-  { id: 'p15', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/Benji-Adams.png',   station: 'Station 1' },
-  { id: 'p16', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Kenji-Watanabe.png',   station: 'Station 2' },
-  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Sofia-Reyes.png',      station: 'Station 9' },
-  { id: 'p18', name: 'Aisha Johnson',  role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 3,  avatar: '/artists/Aisha-Johnson.png',    station: 'Station 3' },
-  { id: 'p19', name: 'Lena Schmidt',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Lena-Schmidt.png',     station: 'Station 4' },
-  { id: 'p20', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/artists/Mira-Patel.png',       station: 'Station 5' },
-  { id: 'p21', name: 'Carmen Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: _av('CR', '#D4A853'),             station: 'Station 6' },
-  { id: 'p22', name: 'Yuki T.',        role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: _av('YT', '#D4A853'),             station: 'Station 7' },
-  { id: 'p23', name: 'Ella Voss',      role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: _av('EV', '#D4A853'),             station: 'Station 8' },
+  { id: 'p15', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/benji.jpg',   station: 'Station 1' },
+  { id: 'p16', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/kenji.jpg',   station: 'Station 2' },
+  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/sofia.jpg',   station: 'Station 9' },
+  { id: 'p18', name: 'Aisha Johnson',  role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 3,  avatar: '/assistants/aisha.jpg',   station: 'Station 3' },
+  { id: 'p19', name: 'Lena Schmidt',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/lena.jpg',    station: 'Station 4' },
+  { id: 'p20', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/mira.jpg',    station: 'Station 5' },
+  { id: 'p21', name: 'Carmen Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/carmen.jpg',  station: 'Station 6' },
+  { id: 'p22', name: 'Yuki T.',        role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/yuki.jpg',    station: 'Station 7' },
+  { id: 'p23', name: 'Ella Voss',      role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/ella.jpg',    station: 'Station 8' },
+  { id: 'p32', name: 'Dara Okafor',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/dara.jpg',    station: 'Station 9'  },
+  { id: 'p33', name: 'Dev Kapoor',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/dev.jpg',     station: 'Station 10' },
+  { id: 'p34', name: 'Ivana Ruiz',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/ivana.jpg',   station: 'Station 11' },
+  { id: 'p35', name: 'Leo Tan',       role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/leo.jpg',     station: 'Station 12' },
+  { id: 'p36', name: 'Theo Grant',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/theo.jpg',    station: 'Station 13' },
+  { id: 'p37', name: 'Tomás Vega',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/tomas.jpg',   station: 'Station 14' },
 
   // Nails assistants (8)
   { id: 'p24', name: 'Nadia Faris',    role: 'assistant', specialty: 'nails',  trackingState: 'active',               avatar: '/assistants/Nadia-Faris.png',   station: 'Station 1' },
@@ -265,7 +271,7 @@ export const models = [
     arrived: true, arrivedAt: '1:32 PM', eta: null, flagged: false,
     services: {
       hair:   _done('p6',  '2:12 PM', 48),
-      makeup: _done('p15', '2:16 PM', 42),
+      makeup: _ip('p37',   '3:45 PM'),
       nails:  _ip('p25',   '3:08 PM'),
     },
     status: 'in_progress',
@@ -497,7 +503,7 @@ export const models = [
     arrived: true, arrivedAt: '2:30 PM', eta: null, flagged: false,
     services: {
       hair:   _ns('p13'),
-      makeup: _ns('p22'),
+      makeup: _ip('p32',   '3:50 PM'),
       nails:  _ns(),
     },
     status: 'not_started',
@@ -512,7 +518,7 @@ export const models = [
     arrived: true, arrivedAt: '3:10 PM', eta: null, flagged: false,
     services: {
       hair:   _ns(),
-      makeup: _ns(),
+      makeup: _ip('p33',   '3:52 PM'),
       nails:  _ns(),
     },
     status: 'not_started',
@@ -527,7 +533,7 @@ export const models = [
     arrived: false, arrivedAt: null, eta: '5:00 PM', flagged: false, comingFrom: 'Prada',
     services: {
       hair:   _ns(),
-      makeup: _ns(),
+      makeup: _ip('p34',   '3:55 PM'),
       nails:  _ns(),
     },
     status: 'not_started',
@@ -540,7 +546,7 @@ export const models = [
     arrived: false, arrivedAt: null, eta: '5:15 PM', flagged: false, comingFrom: 'Prada',
     services: {
       hair:   _ns(),
-      makeup: _ns(),
+      makeup: _ip('p35',   '3:58 PM'),
       nails:  _ns(),
     },
     status: 'not_started',
@@ -553,7 +559,7 @@ export const models = [
     arrived: false, arrivedAt: null, eta: '5:30 PM', flagged: false, comingFrom: 'Khaite',
     services: {
       hair:   _ns(),
-      makeup: _ns(),
+      makeup: _ip('p36',   '4:00 PM'),
       nails:  _ns(),
     },
     status: 'not_started',

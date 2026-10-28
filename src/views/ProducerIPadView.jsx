@@ -1148,9 +1148,9 @@ function ShareStatusModal({ onClose }) {
 }
 
 const INCIDENT_TYPES_IPAD = ['Late Arrival', 'Left Early', 'No Show', 'Medical', 'Other']
-const ASST_SHOW_COUNTS = { 'Sofia Reyes': 4, 'Lena Schmidt': 2, 'Dara Okafor': 1, 'Ivana R': 3, 'Tomás V': 2, 'Kenji Watanabe': 5, 'Mira Patel': 1, 'Aimi K': 6, 'Iona M': 3 }
+const ASST_SHOW_COUNTS = { 'Sofia Reyes': 4, 'Lena Schmidt': 2, 'Kenji Watanabe': 5, 'Mira Patel': 1, 'Aimi K': 6, 'Iona M': 3, 'Dara Okafor': 1, 'Dev Kapoor': 2, 'Ivana Ruiz': 3, 'Leo Tan': 1, 'Theo Grant': 2, 'Tomás Vega': 2 }
 const ASST_AVG_TIMES   = { 'Sofia Reyes': '43m', 'Lena Schmidt': '51m', 'Dara Okafor': '38m', 'Ivana R': '29m', 'Tomás V': '46m', 'Kenji Watanabe': '47m', 'Mira Patel': '52m', 'Aimi K': '40m', 'Iona M': '44m' }
-const ASST_FREE_SINCE  = { 'Lena Schmidt': '3:38', 'Dara Okafor': '3:41', 'Mira Patel': '3:20', 'Aimi K': 'at the front', 'Iona M': 'on Look 02' }
+const ASST_FREE_SINCE  = { 'Lena Schmidt': '3:38', 'Mira Patel': '3:20', 'Aimi K': 'At the front · 1 review waiting' }
 function ordinal(n) { const s = ['th','st','nd','rd']; const v = n % 100; return n + (s[(v-20)%10] || s[v] || s[0]) }
 
 function IPadAssistantsSection({ models, profiles: profs }) {
@@ -1168,8 +1168,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
   const [incForm, setIncForm]           = useState({ type: 'Late Arrival', notes: '' })
   const [pending, setPending]           = useState(null)
 
-  const assistants = profs.filter(p => p.role === 'assistant' || p.role === 'lead_assistant')
-  const SPEC_ORDER = ['hair', 'makeup', 'nails']
+  const assistants = profs.filter(p => (p.role === 'assistant' || p.role === 'lead_assistant') && p.specialty === SVC)
 
   function getStatus(a) {
     return models.some(m =>
@@ -1187,25 +1186,24 @@ function IPadAssistantsSection({ models, profiles: profs }) {
     )
   }
 
-  const totalLeads  = assistants.filter(a => a.role === 'lead_assistant').length
-  const totalWorking = assistants.filter(a => getStatus(a) === 'working').length
-  const totalFree   = assistants.filter(a => getStatus(a) === 'free').length
+  const totalLeads   = assistants.filter(a => a.role === 'lead_assistant').length
+  const totalWorking = assistants.filter(a => a.role !== 'lead_assistant' && getStatus(a) === 'working').length
+  const totalFree    = assistants.filter(a => a.role !== 'lead_assistant' && getStatus(a) === 'free').length
 
   const filtered = assistants.filter(a => {
     if (chip === 'all')     return true
-    if (chip === 'working') return getStatus(a) === 'working'
-    if (chip === 'free')    return getStatus(a) === 'free'
+    if (chip === 'working') return a.role !== 'lead_assistant' && getStatus(a) === 'working'
+    if (chip === 'free')    return a.role !== 'lead_assistant' && getStatus(a) === 'free'
     if (chip === 'leads')   return a.role === 'lead_assistant'
     return true
   })
 
-  const grouped = SPEC_ORDER.map(k => ({
-    key: k, label: k.charAt(0).toUpperCase() + k.slice(1),
-    people: filtered.filter(a => a.specialty === k),
-  })).filter(g => g.people.length > 0)
-  const ungrouped = filtered.filter(a => !a.specialty)
+  const filteredLeads    = filtered.filter(a => a.role === 'lead_assistant')
+  const filteredNonLeads = filtered.filter(a => a.role !== 'lead_assistant')
+                                   .sort((a, b) => a.name.localeCompare(b.name))
+  const sortedList = [...filteredLeads, ...filteredNonLeads]
 
-  const selA = selId ? profs.find(p => p.id === selId) : null
+  const selA = selId ? assistants.find(p => p.id === selId) : null
   const assigned = selA ? models.filter(m =>
     m.services?.hair?.assistantId   === selA.id ||
     m.services?.makeup?.assistantId === selA.id ||
@@ -1224,7 +1222,9 @@ function IPadAssistantsSection({ models, profiles: profs }) {
     const curM = getCurrentModel(a)
     const sub = st === 'working' && curM
       ? `On ${curM.name} · Look ${curM.lookNumber || curM.look}`
-      : (ASST_FREE_SINCE[a.name] ? `Free since ${ASST_FREE_SINCE[a.name]}` : 'Available')
+      : (ASST_FREE_SINCE[a.name]
+          ? (a.role === 'lead_assistant' ? ASST_FREE_SINCE[a.name] : `Free since ${ASST_FREE_SINCE[a.name]}`)
+          : 'Available')
     const dotColor = a.role === 'lead_assistant' ? TX : (st === 'working' ? '#D4A853' : '#7A9E7E')
     return (
       <button onClick={() => { setSelId(a.id); setShowForm(false); setPending(null) }}
@@ -1234,7 +1234,9 @@ function IPadAssistantsSection({ models, profiles: profs }) {
           <span style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</span>
           <span style={{ fontSize: 12, color: MT, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</span>
         </span>
-        <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: M2, flexShrink: 0 }}>{a.role === 'lead_assistant' ? 'Lead' : (a.specialty || SVC)}</span>
+        {a.role === 'lead_assistant' && (
+          <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: M2, flexShrink: 0 }}>Lead</span>
+        )}
         <span style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
       </button>
     )
@@ -1253,7 +1255,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
       <div style={{ width: 440, flexShrink: 0, borderRight: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ flexShrink: 0, padding: '16px 20px 10px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Team today</span>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>{SVC_LABEL} team today</span>
             <span style={{ fontSize: 12, color: MT }}>{assistants.length - totalLeads} assistants · {totalLeads} leads</span>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -1263,13 +1265,7 @@ function IPadAssistantsSection({ models, profiles: profs }) {
           </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 16px' }}>
-          {grouped.map(g => (
-            <div key={g.key}>
-              <Lbl s={{ padding: '16px 12px 6px' }}>{g.label}</Lbl>
-              {g.people.map(a => <AsstRow key={a.id} a={a} />)}
-            </div>
-          ))}
-          {ungrouped.map(a => <AsstRow key={a.id} a={a} />)}
+          {sortedList.map(a => <AsstRow key={a.id} a={a} />)}
         </div>
       </div>
       {/* Right: detail */}

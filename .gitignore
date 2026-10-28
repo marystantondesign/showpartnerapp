@@ -46,6 +46,14 @@ Thumbs.db
 !public/models/*.jpeg
 !public/models/*.png
 !public/models/*.webp
+# Allow assistant photos in public/assistants/
+!public/assistants/*.jpg
+!public/assistants/*.jpeg
+!public/assistants/*.png
+# Allow design-handoff assets
+!design-handoff/**/*.png
+!design-handoff/**/*.jpg
+!design-handoff/**/*.html
 .vercel
 bts.html
 bts_files/
