@@ -81,16 +81,16 @@ function Bar({ segments, track = 'var(--sp-bar-track)' }) {
   )
 }
 
-function PanelButtons({ onStart, onCompose, wide, startLabel = 'START WALKTHROUGH' }) {
+function PanelButtons({ onStart, onCompose, startLabel = 'START WALKTHROUGH' }) {
   return (
-    <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}`, display: wide ? 'grid' : 'flex', gridTemplateColumns: wide ? '1fr 1fr' : undefined, flexDirection: wide ? undefined : 'column', gap: 8 }}>
+    <div style={{ flexShrink: 0, padding: '12px 20px 16px', borderTop: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
       <button onClick={onStart} style={{ minHeight: 52, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.12em', cursor: 'pointer', whiteSpace: 'nowrap' }}>{startLabel}</button>
       <button onClick={onCompose} style={{ minHeight: 44, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>ANNOUNCE</button>
     </div>
   )
 }
 
-function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, wide }) {
+function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose }) {
   return (
     <>
       <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 2, borderBottom: `1px solid ${BD}` }}>
@@ -131,12 +131,12 @@ function DefaultPanel({ tlItems, announcements, onStartWalkthrough, onCompose, w
           )
         })}
       </div>
-      <PanelButtons onStart={onStartWalkthrough} onCompose={onCompose} wide={wide} />
+      <PanelButtons onStart={onStartWalkthrough} onCompose={onCompose} />
     </>
   )
 }
 
-function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onCompose, wide }) {
+function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onCompose }) {
   return (
     <>
       <div style={{ margin: '16px 20px 0', background: TX, color: BG, borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -169,7 +169,7 @@ function WalkthroughPanel({ elapsed, startedAt, announcements, onModelsBack, onC
           )
         })}
       </div>
-      <PanelButtons onStart={onModelsBack} onCompose={onCompose} wide={wide} startLabel="MODELS BACK · RESUME" />
+      <PanelButtons onStart={onModelsBack} onCompose={onCompose} startLabel="MODELS BACK · RESUME" />
     </>
   )
 }
@@ -2042,15 +2042,11 @@ export default function ProducerIPadView({
   const [bellOpen, setBellOpen]       = useState(false)
   const [showHistoryOpen, setShowHistoryOpen] = useState(false)
 
-  const [panelWidth, setPanelWidthRaw] = useState(() => {
-    const s = parseInt(localStorage.getItem('sp_panelWidth'), 10)
-    return !isNaN(s) ? Math.max(300, Math.min(600, s)) : 340
-  })
   const [panelCollapsed, setPanelCollapsedRaw] = useState(() =>
     localStorage.getItem('sp_panelCollapsed') === 'true'
   )
 
-  const dragRef = useRef({ active: false, startX: 0, startW: 0 })
+  useEffect(() => { localStorage.removeItem('sp_panelWidth') }, [])
 
   useEffect(() => {
     const iv = setInterval(() => setCurrentTime(fmtNow()), 30000)
@@ -2073,10 +2069,9 @@ export default function ProducerIPadView({
   const producer  = profiles.find(p => p.role === 'lead') || profiles[0]
 
   const isPortrait      = windowSize.w <= windowSize.h
-  const effectivePanelW = isPortrait ? 0 : (panelCollapsed ? 72 : panelWidth)
+  const effectivePanelW = isPortrait ? 0 : (panelCollapsed ? 72 : 340)
   const mainWidth       = windowSize.w - effectivePanelW
   const narrowMain      = mainWidth < 720
-  const widePanel       = !panelCollapsed && panelWidth >= 480
   const drawerHeight    = drawerOpen ? 470 : 160
 
   const readyCount      = models.filter(m => m.services.hair.status === 'done' && m.services.makeup.status === 'done' && m.services.nails.status === 'done').length
@@ -2165,30 +2160,6 @@ export default function ProducerIPadView({
     if (!touchupCheckId) return
     onSendTouchup?.(touchupCheckId, areas, note)
     setTouchupCheckId(null)
-  }
-
-  function onHandlePointerDown(e) {
-    e.currentTarget.setPointerCapture(e.pointerId)
-    dragRef.current = { active: true, startX: e.clientX, startW: panelWidth }
-  }
-  function onHandlePointerMove(e) {
-    if (!dragRef.current.active) return
-    const delta = dragRef.current.startX - e.clientX
-    setPanelWidthRaw(Math.max(200, Math.min(600, dragRef.current.startW + delta)))
-  }
-  function onHandlePointerUp(e) {
-    if (!dragRef.current.active) return
-    dragRef.current.active = false
-    const delta = dragRef.current.startX - e.clientX
-    const finalW = dragRef.current.startW + delta
-    if (finalW < 200) {
-      setPanelCollapsedRaw(true); localStorage.setItem('sp_panelCollapsed', 'true')
-      const savedW = Math.max(300, Math.min(600, dragRef.current.startW))
-      setPanelWidthRaw(savedW); localStorage.setItem('sp_panelWidth', String(savedW))
-    } else {
-      const w = Math.max(300, Math.min(600, finalW))
-      setPanelWidthRaw(w); localStorage.setItem('sp_panelWidth', String(w))
-    }
   }
 
   const gridCols = '40px 40px minmax(0,1fr) 104px 104px 104px'
@@ -2431,16 +2402,8 @@ export default function ProducerIPadView({
         {/* Landscape panel */}
         {!isPortrait && (
           <>
-            <div
-              onPointerDown={onHandlePointerDown}
-              onPointerMove={onHandlePointerMove}
-              onPointerUp={onHandlePointerUp}
-              onPointerCancel={onHandlePointerUp}
-              style={{ width: 14, flexShrink: 0, borderLeft: `1px solid ${BD}`, cursor: 'col-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', userSelect: 'none' }}
-            >
-              <span style={{ width: 3, height: 28, borderRadius: 2, background: DV }} />
-            </div>
-            <aside style={{ width: panelCollapsed ? 72 : panelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ width: 1, flexShrink: 0, background: BD }} />
+            <aside style={{ width: panelCollapsed ? 72 : 340, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {panelCollapsed ? (
                 <CollapsedRail onExpand={expandPanel} onStartWalkthrough={() => setPanel('confirm')} />
               ) : (
@@ -2488,16 +2451,16 @@ export default function ProducerIPadView({
                     )}
                     {(panel === 'attention' || panel === 'not_paired_list') && (
                       wkActive ? (
-                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} wide={widePanel} />
+                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} />
                       ) : (
-                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} wide={widePanel} />
+                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
                       )
                     )}
                     {(panel === 'default' || panel === 'confirm') && (
                       wkActive ? (
-                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} wide={widePanel} />
+                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} />
                       ) : (
-                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} wide={widePanel} />
+                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} />
                       )
                     )}
                   </div>
