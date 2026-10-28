@@ -1,23 +1,21 @@
-# 16-01 · Tapping a model on Home opens the model modal (R1), and fixes the white screen
+# 16-01 · Model modal from Home (R1)
 
-Ground rules: redesign branch only. Never commit to or merge into main, never run vercel --prod, never promote or redeploy to production. Pushing to redesign deploys to showpartnerapp-2.vercel.app on its own. No em dashes in any copy. Copy is gender-neutral (they, not she).
+Ground rules: redesign branch only. Never commit to or merge into main, never run vercel --prod, never promote or redeploy to production. Pushing to redesign deploys to showpartnerapp-2.vercel.app on its own. No em dashes anywhere in the UI, including as an empty-value placeholder. Copy is gender-neutral (they, not she).
 
-Scope: src/views/ProducerIPadView.jsx (Home rows) and whatever component you create for the modal. Match screens/16-home-fixes/r1-model-modal.png and design-source/Fix-R1-ModelModal.dc.html exactly. Don't touch the Lineup side panel's behavior.
+Scope: src/views/ProducerIPadView.jsx and the model modal component. Match screens/16-home-fixes/r1-model-modal.png and design-source/Fix-R1-ModelModal.dc.html.
 
-The bug: tapping any model row on Home (for example Sofia Andersen) turns the whole screen white. Home rows open the old src/components/ModelDetailSheet.jsx (rendered near line 2488). It reads model.assignedArtists and model.statusLog, which the redesign model data no longer has (status now lives in model.services), so it throws at about line 320 and React unmounts the app.
+Step 1: copy the eight PNGs into design-handoff/screens/16-home-fixes/ and the eight .dc.html files into design-handoff/design-source/, replacing any older copies with the same names. List them back to me. Open r1-model-modal.png and Fix-R1-ModelModal.dc.html before coding.
+Step 2: before editing, report the file and line numbers of the modal component, its left and right columns, the "Where they're at" rows, and the Latest card.
 
-Step 1: copy the six PNGs into design-handoff/screens/16-home-fixes/ and the six .dc.html files into design-handoff/design-source/. List them back to me. Open r1-model-modal.png and Fix-R1-ModelModal.dc.html before coding.
-Step 2: before editing, report the file and line numbers for: the Home row onClick, where ModelDetailSheet is rendered, the Lineup model panel inside IPadLineupSection, and where services, notes and past shows live in src/data/mockData.js.
+1. Tapping any model row on Home opens this modal. It must never blank the screen (the old ModelDetailSheet must not be used on the iPad producer view).
+2. Column widths: the modal stays 940 x 640. The left column is now 460px and the right column takes the rest. The left column must never scroll as a whole.
+3. Left column, top to bottom:
+   - Two cards side by side: model (photo, name, "Model", "#06 · Look B") and the producer's-discipline assistant paired with them (photo, name, "Assistant", "Station 9"). Photos are 128px tall, full card width, 12px radius, object-fit cover. Names are Georgia 22px on one line.
+   - If the model has no assistant for the producer's discipline, that card shows a + PAIR button (opens the pairing panel from 16-07).
+   - "Where they're at": one 40px row per discipline, producer's discipline first. When nobody is assigned, show "Not paired", never an em dash.
+   - "Earlier updates" with 12px of space above it. If the list is long, only this list scrolls.
+   - "Past shows with you · N" card pinned at the bottom.
+4. Right column: header "3 of 3 done · all done" (or the in-progress summary) with the × button, then the Latest card, then Notes with allergy rows and the outlined + ADD A NOTE button, then the sticky PING ASSISTANT / UPDATE STATUS footer.
+5. Bug: the Latest card's chip and text come from different updates (Sofia Andersen shows a "Nails done" chip over "Nails started · Nadia F."). The chip and the text must both describe the same, most recent update.
 
-1. Stop using ModelDetailSheet on the iPad producer view. Tapping any Home row opens the new model modal instead. Every model must open without errors, including unpaired and not-arrived models.
-2. Modal: 940 x 640, 18px radius, #F5F2EE, centered over a rgba(0,0,0,0.45) backdrop. Tapping the backdrop, the × or Escape closes it. Same size as the Show history modal.
-3. Left column (320px, white, 1px #E0DDD8 right border, 24px padding), top to bottom:
-   - Two cards side by side, square 12px-radius photos. Left: model name (Georgia 20px), "Model", "#06 · Look B". Right: the producer's-discipline assistant paired with this model, with their photo, name, "Assistant", "Station 9". If unpaired, show a + PAIR button in that slot (opens the pairing panel from 16-05).
-   - "Where they're at": one row per discipline, producer's discipline first (Makeup, Hair, Nails for a makeup producer). Each row: discipline, "assistant · time so far" or "paused at 3:38" or "Bianca R is up next", and the status chip.
-   - "Earlier updates" with 12px of extra space above it: time and text, newest first.
-   - "Past shows with you · 2" card at the bottom, opening Show history filtered to this model.
-4. Right column: a header row with "0 of 3 done · makeup in progress, hair paused" and the × button. Then the Latest card (time, status chip, the update text and who sent it). Then Notes, full width: the label, allergy rows tinted #F8E9E5 with ALLERGY in #A33D28, other notes as white cards, then an outlined "+ ADD A NOTE" button (44px tall) that adds a note. Sticky footer: PING ASSISTANT outlined on the left, UPDATE STATUS black on the right.
-5. Add station to assistant profiles and any missing allergy, notes, coming-from and past-shows fields to the mock data, so every model fills the modal.
-6. Dark mode uses the existing variables (card #242220, borders and text from the variables).
-
-Acceptance: tapping every row on Home opens the modal and never blanks the screen. Report file names and line numbers changed, run the build, commit and push to redesign.
+Acceptance: a model with a long name (Natasha Ivanova, Sofia Andersen) fits on one line, the left column never scrolls as a whole, and the Latest chip matches its text. Report changes, build, commit and push to redesign.

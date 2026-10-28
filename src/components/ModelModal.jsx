@@ -44,15 +44,15 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
 
   function discDetailText(disc) {
     const s = model.services[disc]
-    if (!s) return '—'
+    if (!s) return 'Not paired'
     const asst = s.assistantId ? profileById(s.assistantId) : null
     const sn = asst ? shortName(asst) : null
     switch (s.status) {
       case 'done':        return sn ? `${sn} · done` : 'Done'
       case 'in_progress': return sn ? `${sn} · in progress` : 'In progress'
-      case 'paused':      return s.pausedAt ? `${sn || 'Paused'} · paused at ${s.pausedAt}` : (sn ? `${sn} · paused` : 'Paused')
-      case 'not_started': return sn ? `${sn} is up next` : '—'
-      default:            return '—'
+      case 'paused':      return s.pausedAt ? `${sn || ''} · paused at ${s.pausedAt}`.replace(/^ · /, '') : (sn ? `${sn} · paused` : 'Paused')
+      case 'not_started': return sn ? `${sn} is up next` : 'Not paired'
+      default:            return 'Not paired'
     }
   }
 
@@ -80,15 +80,27 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
       const asst = s.assistantId ? profileById(s.assistantId) : null
       const sn = asst ? shortName(asst) : null
       if (s.startedAt) {
-        events.push({ time: s.startedAt, sort: parseTimeToMins(s.startedAt), text: `${DISC_LABEL[disc]} started${sn ? ' · ' + sn : ''}` })
+        events.push({
+          time: s.startedAt,
+          sort: parseTimeToMins(s.startedAt),
+          text: `${DISC_LABEL[disc]} started${sn ? ' · ' + sn : ''}`,
+          chipStatus: 'in_progress',
+          chipLabel: `${DISC_LABEL[disc]} in progress`,
+        })
       }
       if (s.pausedAt) {
-        events.push({ time: s.pausedAt, sort: parseTimeToMins(s.pausedAt), text: `${DISC_LABEL[disc]} paused${sn ? ' · ' + sn : ''}` })
+        events.push({
+          time: s.pausedAt,
+          sort: parseTimeToMins(s.pausedAt),
+          text: `${DISC_LABEL[disc]} paused${sn ? ' · ' + sn : ''}`,
+          chipStatus: 'paused',
+          chipLabel: `${DISC_LABEL[disc]} paused`,
+        })
       }
     }
     if (model.arrivedAt) {
       const txt = model.comingFrom ? `Arrived, came from ${model.comingFrom}` : 'Arrived'
-      events.push({ time: model.arrivedAt, sort: parseTimeToMins(model.arrivedAt), text: txt })
+      events.push({ time: model.arrivedAt, sort: parseTimeToMins(model.arrivedAt), text: txt, chipStatus: null, chipLabel: null })
     }
     return events.sort((a, b) => b.sort - a.sort)
   }
@@ -96,19 +108,6 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
   const updates = computeUpdates()
   const latestUpdate = updates[0]
 
-  function getLatestChipForUpdate(update) {
-    if (!update) return null
-    for (const disc of ['makeup', 'hair', 'nails']) {
-      if (update.text.toLowerCase().startsWith(DISC_LABEL[disc].toLowerCase())) {
-        const st = model.services[disc]?.status || 'not_started'
-        const chip = CHIP[st]
-        return { ...chip, label: `${DISC_LABEL[disc]} ${chip.t.toLowerCase()}` }
-      }
-    }
-    return null
-  }
-
-  const latestChip = getLatestChipForUpdate(latestUpdate)
   const pastShows = modelHistory[model.id] || []
   const pastShowNames = pastShows.map(s => s.showName).join(', ')
 
@@ -120,8 +119,9 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
   const BG  = 'var(--sp-bg)'
   const allergyBg   = isDark ? '#3A1E1B' : '#F8E9E5'
   const allergyText = isDark ? '#E8826B' : '#A33D28'
+  const borderMuted = isDark ? 'var(--sp-border)' : '#CFCAC4'
 
-  function Chip({ status }) {
+  function Chip({ status, label }) {
     const ch = CHIP[status] || CHIP.not_started
     return (
       <span style={{
@@ -129,7 +129,7 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
         letterSpacing: '.1em', textTransform: 'uppercase', borderRadius: 999,
         padding: '4px 8px', background: ch.c, color: '#111', whiteSpace: 'nowrap',
       }}>
-        {ch.t}
+        {label || ch.t}
       </span>
     )
   }
@@ -160,14 +160,14 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
         style={{
           width: 940, height: 640, background: BG, borderRadius: 18,
           overflow: 'hidden', display: 'grid',
-          gridTemplateColumns: '320px minmax(0,1fr)',
+          gridTemplateColumns: '460px minmax(0,1fr)',
         }}
       >
-        {/* ── Left column ── */}
+        {/* ── Left column (no overall scroll) ── */}
         <div style={{
           background: SF, borderRight: `1px solid ${BD}`, padding: 24,
-          display: 'flex', flexDirection: 'column', gap: 14,
-          minHeight: 0, overflowY: 'auto',
+          display: 'flex', flexDirection: 'column',
+          height: '100%', boxSizing: 'border-box', overflow: 'hidden',
         }}>
           {/* Model + Assistant cards */}
           <div style={{ flexShrink: 0, display: 'flex', gap: 12 }}>
@@ -176,12 +176,12 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
               <img
                 src={model.avatar}
                 alt={model.name}
-                style={{ width: '100%', aspectRatio: '1/1', borderRadius: 12, objectFit: 'cover', objectPosition: '50% 20%' }}
+                style={{ width: '100%', height: 128, borderRadius: 12, objectFit: 'cover', objectPosition: '50% 20%' }}
               />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <span style={{ fontFamily: 'Georgia,serif', fontSize: 20, lineHeight: 1.15, color: TX }}>{model.name}</span>
+                <span style={{ fontFamily: 'Georgia,serif', fontSize: 22, lineHeight: 1.15, color: TX, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{model.name}</span>
                 <span style={{ fontSize: 13, color: MT }}>Model</span>
-                <span style={{ fontSize: 13, color: MT }}>#{orderNum} · Look {model.look}</span>
+                <span style={{ fontSize: 13, color: MT }}>#{orderNum} &middot; Look {model.look}</span>
               </div>
             </div>
             {/* Assistant card */}
@@ -191,38 +191,41 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
                   <img
                     src={svcAssistant.avatar}
                     alt={svcAssistant.name}
-                    style={{ width: '100%', aspectRatio: '1/1', borderRadius: 12, objectFit: 'cover', objectPosition: '50% 20%' }}
+                    style={{ width: '100%', height: 128, borderRadius: 12, objectFit: 'cover', objectPosition: '50% 20%' }}
                   />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontFamily: 'Georgia,serif', fontSize: 20, lineHeight: 1.15, color: TX }}>{svcAssistant.name}</span>
+                    <span style={{ fontFamily: 'Georgia,serif', fontSize: 22, lineHeight: 1.15, color: TX, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{svcAssistant.name}</span>
                     <span style={{ fontSize: 13, color: MT }}>Assistant</span>
                     {svcAssistant.station && <span style={{ fontSize: 13, color: MT }}>{svcAssistant.station}</span>}
                   </div>
                 </>
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 80 }}>
-                  <button
-                    style={{
-                      minHeight: 36, padding: '0 16px', borderRadius: 999,
-                      border: `1px solid ${TX}`, background: 'transparent',
-                      fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600,
-                      letterSpacing: '.1em', color: TX, cursor: 'pointer',
-                    }}
-                  >
-                    + PAIR
-                  </button>
-                </div>
+                <>
+                  <div style={{ width: '100%', height: 128, borderRadius: 12, background: BD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button
+                      style={{
+                        minHeight: 36, padding: '0 16px', borderRadius: 999,
+                        border: `1px solid ${TX}`, background: 'transparent',
+                        fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600,
+                        letterSpacing: '.1em', color: TX, cursor: 'pointer',
+                      }}
+                    >
+                      + PAIR
+                    </button>
+                  </div>
+                  <span style={{ fontSize: 13, color: MT }}>Not paired</span>
+                </>
               )}
             </div>
           </div>
 
           {/* Where they're at */}
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, marginTop: 14 }}>
             <Lbl style={{ marginBottom: 2 }}>Where they're at</Lbl>
             {orderedDiscs.map(disc => (
               <div key={disc} style={{
-                display: 'grid', gridTemplateColumns: '70px minmax(0,1fr) auto',
-                gap: 10, alignItems: 'center', minHeight: 46, borderBottom: `1px solid ${BD}`,
+                display: 'grid', gridTemplateColumns: '76px minmax(0,1fr) auto',
+                gap: 10, alignItems: 'center', minHeight: 40, borderBottom: `1px solid ${BD}`,
               }}>
                 <span style={{ fontSize: 13, color: TX }}>{DISC_LABEL[disc]}</span>
                 <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -233,13 +236,13 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
             ))}
           </div>
 
-          {/* Earlier updates */}
-          <div style={{ flexShrink: 0, paddingTop: 12 }}>
+          {/* Earlier updates — only this section scrolls */}
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingTop: 12 }}>
             <Lbl style={{ marginBottom: 2 }}>Earlier updates</Lbl>
             {updates.length === 0
               ? <span style={{ fontSize: 12, color: MT }}>No updates yet</span>
               : updates.map((u, i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '52px minmax(0,1fr)', gap: 10, padding: '6px 0', fontSize: 12 }}>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '52px minmax(0,1fr)', gap: 10, padding: '5px 0', fontSize: 12 }}>
                   <span style={{ color: MT }}>{u.time}</span>
                   <span style={{ color: TX }}>{u.text}</span>
                 </div>
@@ -247,15 +250,15 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
             }
           </div>
 
-          {/* Past shows */}
+          {/* Past shows — pinned to bottom */}
           <button
             onClick={() => {}}
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               minHeight: 56, padding: '10px 14px', borderRadius: 12,
               border: `1px solid ${BD}`, background: BG,
               fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left',
-              color: TX, cursor: 'pointer', marginTop: 'auto',
+              color: TX, cursor: 'pointer',
             }}
           >
             <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -275,10 +278,10 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
             flexShrink: 0, display: 'flex', alignItems: 'center', gap: 12,
             padding: '16px 20px 12px 28px', borderBottom: `1px solid ${BD}`,
           }}>
-            <span style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', minWidth: 0 }}>
+            <span style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
               <span style={{ fontSize: 13, color: TX, whiteSpace: 'nowrap' }}>{doneCount} of {orderedDiscs.length} done</span>
               <span style={{ fontSize: 12, color: '#4A4743', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                · {statusSummary()}
+                &middot; {statusSummary()}
               </span>
             </span>
             <button
@@ -298,22 +301,16 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
             display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
             columnGap: 28, rowGap: 20, alignContent: 'start',
           }}>
-            {/* Latest card */}
+            {/* Latest card — chip and text from the same event */}
             {latestUpdate && (
               <div style={{
                 gridColumn: '1 / -1', background: SF, border: `1px solid ${BD}`,
                 borderRadius: 12, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <Lbl>Latest · {latestUpdate.time}</Lbl>
-                  {latestChip && (
-                    <span style={{
-                      fontFamily: 'Inter,system-ui,sans-serif', fontSize: 9, fontWeight: 600,
-                      letterSpacing: '.1em', textTransform: 'uppercase', borderRadius: 999,
-                      padding: '4px 8px', background: latestChip.c, color: '#111', whiteSpace: 'nowrap',
-                    }}>
-                      {latestChip.label}
-                    </span>
+                  <Lbl>Latest &middot; {latestUpdate.time}</Lbl>
+                  {latestUpdate.chipStatus && (
+                    <Chip status={latestUpdate.chipStatus} label={latestUpdate.chipLabel} />
                   )}
                 </div>
                 <span style={{ fontSize: 15, lineHeight: 1.45, color: TX }}>{latestUpdate.text}</span>
@@ -347,7 +344,7 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
                 style={{
                   alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8,
                   minHeight: 44, padding: '0 16px', borderRadius: 8,
-                  border: `1px solid ${isDark ? 'var(--sp-border)' : '#CFCAC4'}`,
+                  border: `1px solid ${borderMuted}`,
                   background: SF, color: TX,
                   fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer',
                 }}
@@ -365,7 +362,7 @@ export default function ModelModal({ model, profiles, modelOrderMap, onClose, sv
           }}>
             <button style={{
               minHeight: 48, padding: '0 18px', borderRadius: 8,
-              border: `1px solid ${isDark ? 'var(--sp-border)' : '#CFCAC4'}`,
+              border: `1px solid ${borderMuted}`,
               background: 'transparent', color: TX,
               fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', cursor: 'pointer',
             }}>PING ASSISTANT</button>

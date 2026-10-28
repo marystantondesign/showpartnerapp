@@ -2069,6 +2069,12 @@ export default function ProducerIPadView({
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  useEffect(() => {
+    if (filter === 'needs_attention' && needsCount === 0)      { setFilter('all'); setPanel('default') }
+    else if (filter === 'not_arrived' && notArrivedCount === 0) { setFilter('all'); setPanel('default') }
+    else if (filter === 'not_paired' && notPairedCount === 0)   { setFilter('all'); setPanel('default') }
+  }, [needsCount, notArrivedCount, notPairedCount, filter])
+
   const wkActive  = walkthroughPhase === 'in_progress'
   const producer  = profiles.find(p => p.role === 'lead') || profiles[0]
 
@@ -2094,7 +2100,7 @@ export default function ProducerIPadView({
       case 'to_check':        return toCheckQueue.some(c => c.modelId === m.id)
       default:                return true
     }
-  })
+  }).sort((a, b) => models.indexOf(a) - models.indexOf(b))
 
   const mkAssistants = profiles
     .filter(p => p.specialty === SVC && (p.role === 'assistant' || p.role === 'lead_assistant'))
@@ -2201,6 +2207,15 @@ export default function ProducerIPadView({
   const total = models.length
   const modelOrderMap = Object.fromEntries(models.map((m, i) => [m.id, String(i + 1).padStart(2, '0')]))
   const orderedSvcs = [SVC, ...['hair', 'makeup', 'nails'].filter(s => s !== SVC)]
+
+  const showToggleBar = filter === 'not_arrived' || filter === 'needs_attention' || filter === 'not_paired'
+  const _tbMap = {
+    not_arrived:     { label: 'Arrivals',   count: notArrivedCount, filterPanel: 'arrivals'        },
+    needs_attention: { label: 'Attention',  count: needsCount,      filterPanel: 'attention'       },
+    not_paired:      { label: 'Not paired', count: notPairedCount,  filterPanel: 'not_paired_list' },
+  }
+  const tbCfg = showToggleBar ? _tbMap[filter] : null
+  const leftTabActive = tbCfg ? panel === tbCfg.filterPanel : false
 
   return (
     <div className="sp-ipad" style={{ position: 'fixed', inset: 0, background: BG, display: 'flex', flexDirection: 'column', fontFamily: 'Inter,system-ui,sans-serif', color: TX }}>
@@ -2364,17 +2379,18 @@ export default function ProducerIPadView({
           })()}
 
           {/* Count tiles */}
-          <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 8, padding: '10px 0 6px' }}>
+          <div style={{ flexShrink: 0, display: 'flex', flexWrap: 'wrap', gap: 8, padding: '10px 0 6px' }}>
             {[
-              { id: 'all',             label: 'All',              count: models.length, countColor: '#fff',                        darkCountColor: 'var(--sp-inverse-text)' },
-              { id: 'needs_attention', label: 'Needs attention',  count: needsCount,    countColor: 'var(--sp-red-text)',           darkCountColor: 'var(--sp-red-text)'     },
-              { id: 'not_arrived',     label: 'Not arrived',      count: notArrivedCount, countColor: TX,                          darkCountColor: TX                       },
-              { id: 'not_paired',      label: 'Not paired',       count: notPairedCount,  countColor: TX,                          darkCountColor: TX                       },
-              { id: 'ready',           label: 'Ready',            count: readyCount,    countColor: 'var(--sp-green-text)',         darkCountColor: 'var(--sp-green-text)'   },
-            ].map(f => {
+              { id: 'all',             label: 'Models',           count: models.length, countColor: TX,                            always: true  },
+              { id: 'needs_attention', label: 'Needs attention',  count: needsCount,    countColor: 'var(--sp-red-text)',           always: false },
+              { id: 'not_arrived',     label: 'Not arrived',      count: notArrivedCount, countColor: TX,                          always: false },
+              { id: 'not_paired',      label: 'Not paired',       count: notPairedCount,  countColor: TX,                          always: false },
+              { id: 'ready',           label: 'Ready',            count: readyCount,    countColor: 'var(--sp-green-text)',         always: true  },
+            ].filter(f => f.always || f.count > 0).map(f => {
               const isActive = filter === f.id
+              const openPanel = f.id === 'not_arrived' ? 'arrivals' : f.id === 'needs_attention' ? 'attention' : f.id === 'not_paired' ? 'not_paired_list' : 'default'
               return (
-                <button key={f.id} onClick={() => { setFilter(f.id); setPanel('default') }}
+                <button key={f.id} onClick={() => { setFilter(f.id); setPanel(openPanel) }}
                   style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 52, padding: '0 14px', borderRadius: 12, border: isActive ? `1px solid ${TX}` : `1px solid ${dark ? BD : '#E0DDD8'}`, background: isActive ? TX : (dark ? SF : '#fff'), fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', cursor: 'pointer' }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, lineHeight: 1, color: isActive ? 'var(--sp-inverse-text)' : f.countColor }}>{f.count}</span>
                   <span style={{ fontSize: 12, lineHeight: 1.2, color: isActive ? (dark ? M2 : '#E8E4DF') : MT }}>{f.label}</span>
@@ -2429,11 +2445,34 @@ export default function ProducerIPadView({
                 <CollapsedRail onExpand={expandPanel} onStartWalkthrough={() => setPanel('confirm')} />
               ) : (
                 <>
-                  <div style={{ flexShrink: 0, padding: '8px 12px 0', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button onClick={collapsePanel} aria-label="Collapse panel" style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
-                  </div>
+                  {showToggleBar && tbCfg ? (
+                    <div style={{ flexShrink: 0, padding: '12px 12px 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ flex: 1, background: dark ? BD : '#ECE8E3', borderRadius: 12, padding: 3, display: 'flex', gap: 3 }}>
+                        <button
+                          onClick={() => setPanel(tbCfg.filterPanel)}
+                          style={{ flex: 1, height: 40, borderRadius: 9, border: 0, background: leftTabActive ? (dark ? SF : '#fff') : 'transparent', boxShadow: leftTabActive ? '0 1px 2px rgba(0,0,0,.10)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, fontWeight: leftTabActive ? 600 : 400, color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        >
+                          {tbCfg.label}
+                          <span style={{ minWidth: 20, height: 20, borderRadius: 10, padding: '0 6px', background: leftTabActive ? (dark ? '#fff' : '#111') : '#D9D4CE', color: leftTabActive ? (dark ? '#111' : '#fff') : '#111', fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>{tbCfg.count}</span>
+                        </button>
+                        <button
+                          onClick={() => setPanel('default')}
+                          style={{ flex: 1, height: 40, borderRadius: 9, border: 0, background: !leftTabActive ? (dark ? SF : '#fff') : 'transparent', boxShadow: !leftTabActive ? '0 1px 2px rgba(0,0,0,.10)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, fontWeight: !leftTabActive ? 600 : 400, color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        >
+                          Timeline
+                        </button>
+                      </div>
+                      <button onClick={collapsePanel} aria-label="Collapse panel" style={{ width: 44, height: 44, flexShrink: 0, borderRadius: 12, border: `1px solid ${dark ? BD : '#E0DDD8'}`, background: dark ? SF : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ flexShrink: 0, padding: '8px 12px 0', display: 'flex', justifyContent: 'flex-end' }}>
+                      <button onClick={collapsePanel} aria-label="Collapse panel" style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TX} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                      </button>
+                    </div>
+                  )}
                   <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                     {panel === 'pairing' && pairModel && (
                       <PairingPanel model={pairModel} assistants={mkAssistants} selected={pairAssist} onSelect={setPairAssist} onConfirm={handleConfirmPair} onClose={() => setPanel('default')} />
@@ -2446,6 +2485,13 @@ export default function ProducerIPadView({
                     )}
                     {panel === 'to_check' && (
                       <ToCheckPanel toCheckQueue={toCheckQueue} profiles={profiles} onLooksGood={(id) => onLooksGood?.(id)} onOpenTouchup={handleOpenTouchup} onClose={() => setPanel('default')} />
+                    )}
+                    {(panel === 'attention' || panel === 'not_paired_list') && (
+                      wkActive ? (
+                        <WalkthroughPanel elapsed={wkElapsed} startedAt={wkStartedAt} announcements={announcements} onModelsBack={handleModelsBack} onCompose={() => setPanel('compose')} wide={widePanel} />
+                      ) : (
+                        <DefaultPanel tlItems={tlItems} announcements={announcements} onStartWalkthrough={() => setPanel('confirm')} onCompose={() => setPanel('compose')} wide={widePanel} />
+                      )
                     )}
                     {(panel === 'default' || panel === 'confirm') && (
                       wkActive ? (
