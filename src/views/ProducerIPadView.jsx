@@ -2069,12 +2069,6 @@ export default function ProducerIPadView({
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  useEffect(() => {
-    if (filter === 'needs_attention' && needsCount === 0)      { setFilter('all'); setPanel('default') }
-    else if (filter === 'not_arrived' && notArrivedCount === 0) { setFilter('all'); setPanel('default') }
-    else if (filter === 'not_paired' && notPairedCount === 0)   { setFilter('all'); setPanel('default') }
-  }, [needsCount, notArrivedCount, notPairedCount, filter])
-
   const wkActive  = walkthroughPhase === 'in_progress'
   const producer  = profiles.find(p => p.role === 'lead') || profiles[0]
 
@@ -2090,6 +2084,12 @@ export default function ProducerIPadView({
   const notPairedCount  = models.filter(m => m.arrived && !m.services[SVC].assistantId).length
   const needsCount      = models.filter(m => m.flagged).length
   const toCheckCount    = toCheckQueue.length
+
+  useEffect(() => {
+    if (filter === 'needs_attention' && needsCount === 0)       { setFilter('all'); setPanel('default') }
+    else if (filter === 'not_arrived' && notArrivedCount === 0) { setFilter('all'); setPanel('default') }
+    else if (filter === 'not_paired' && notPairedCount === 0)   { setFilter('all'); setPanel('default') }
+  }, [needsCount, notArrivedCount, notPairedCount, filter])
 
   const filtered = models.filter(m => {
     switch (filter) {
