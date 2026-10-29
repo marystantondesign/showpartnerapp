@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>P1 · Lineup, model panel (Cassidy #04)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-family:Inter,system-ui,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A64;margin:0}
+.chip{font-family:Inter,system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:4px 8px;color:#111;white-space:nowrap;justify-self:start}
+.f{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #CFCAC4;background:transparent;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#111}
+.fon{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #111;background:#111;font-family:Inter,system-ui,sans-serif;font-size:12px;color:#fff}
+.row{display:grid;grid-template-columns:28px 36px minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr);align-items:center;column-gap:10px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#E8E4DF}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#E8E4DF}
+.lg{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#4A4743;white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%}
+.ib{width:44px;height:44px;border-radius:12px;border:0;background:transparent;display:flex;align-items:center;justify-content:center}
+.chips{display:flex;gap:8px;overflow-x:auto;flex-wrap:nowrap}
+.chips button{flex-shrink:0;white-space:nowrap}
+.nm{font-family:Georgia,serif;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb{min-height:40px;padding:0 16px;border-radius:999px;border:0;background:transparent;font-family:Inter,system-ui,sans-serif;font-size:13px;color:#4A4743}
+.tbon{min-height:40px;padding:0 16px;border-radius:999px;border:0;background:#111;font-family:Inter,system-ui,sans-serif;font-size:13px;color:#fff}
+.mi{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 14px;border-radius:8px;font-size:14px;color:#111}
+</style>
+</helmet>
+<div style="width: 1180px; height: 820px; position: relative; display: flex; flex-direction: column; background: #F5F2EE; font-family: Inter, system-ui, sans-serif; color: #111; overflow: hidden">
+  <div style="flex-shrink: 0; display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #E0DDD8">
+    <button aria-label="Close menu" aria-expanded="true" style="flex-shrink: 0; height: 44px; padding: 0 14px 0 12px; border-radius: 12px; border: 1px solid #111; background: #111; color: #fff; display: flex; align-items: center; gap: 10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Georgia, serif; font-size: 22px; white-space: nowrap">Valentino SS26</span><span style="font-size: 11px; color: #4A4743; white-space: nowrap">Makeup · 3:45 PM</span></span>
+    <span style="flex: 1"></span>
+    <button style="min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #111; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .08em; color: #111; display: flex; align-items: center; gap: 8px; white-space: nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" aria-hidden="true"><path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"></path></svg>STATUS LINK</button>
+    <button aria-label="Notifications" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" aria-hidden="true"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"></path><path d="M10 20a2 2 0 004 0"></path></svg><span style="position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: #C4614A"></span></button>
+    <button aria-label="Account menu" style="width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 0; background: none"><img src="/_blob/0a3feb4a34854d1403d19aea4f3cb43c" alt="" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"></button>
+  </div>
+  <div style="flex: 1; min-height: 0; display: flex">
+    <nav aria-label="Sections" style="width: 96px; flex-shrink: 0; padding: 12px 0; background: #ECE8E3; border-right: 1px solid #E0DDD8; display: flex; flex-direction: column; align-items: center; gap: 4px"><button style="width: 76px; min-height: 64px; border: 0; border-radius: 14px; background: transparent; color: #4A4743; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"></path><path d="M10 20v-6h4v6"></path></svg>Home</button><button style="width: 76px; min-height: 64px; border: 0; border-radius: 14px; background: transparent; color: #4A4743; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M16 14c2.3.2 4 1.8 4.5 5"></path></svg>Assistants</button><button aria-current="page" style="width: 76px; min-height: 64px; border: 0; border-radius: 14px; background: #111; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"></rect><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"></rect><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"></rect><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"></rect></svg>Lineup</button><button style="width: 76px; min-height: 64px; border: 0; border-radius: 14px; background: transparent; color: #4A4743; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="6" width="17" height="13" rx="2"></rect><circle cx="12" cy="12.5" r="3.2"></circle><path d="M8.5 6l1.5-2h4l1.5 2"></path></svg>Studio</button><button style="width: 76px; min-height: 64px; border: 0; border-radius: 14px; background: transparent; color: #4A4743; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"></path></svg>Settings</button></nav>
+    <div style="flex: 1; min-width: 0; min-height: 0; display: flex"><div style="flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column">
+  <div style="flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 16px 24px 12px"><span style="font-size: 12px; color: rgb(74, 71, 67)">30 Models</span>
+    <span style="flex: 1 1 0%"></span>
+    <span style="display: flex; gap: 14px; font-size: 11px; color: rgb(74, 71, 67)"><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: rgb(122, 158, 126)"></span>Ready</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: rgb(212, 168, 83)"></span>In progress</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: rgb(196, 97, 74)"></span>Needs attention</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: rgb(207, 202, 196)"></span>Not arrived</span></span>
+  </div>
+  <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 24px 24px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; align-content: start">
+    <sc-for list="{{ looks }}" as="l" hint-placeholder-count="24">
+      <button style="padding: 0; border: 0; background: none; display: flex; flex-direction: column; gap: 6px; text-align: left; font-family: Inter, system-ui, sans-serif; color: #111">
+        <span style="position: relative; width: 100%; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: #E0DDD8; box-shadow: {{ l.sh }}; outline: 4px solid {{ l.c }}; outline-offset: -4px; display: flex; align-items: center; justify-content: center">
+          <sc-if value="{{ l.img }}" hint-placeholder-val="{{ true }}"><img src="{{ l.img }}" alt="" style="width: 100%; height: 100%; object-fit: cover; opacity: {{ l.op }}"></sc-if>
+          <sc-if value="{{ l.noImg }}" hint-placeholder-val="{{ false }}"><span style="font-family: Georgia, serif; font-size: 20px; color: #6E6A64">{{ l.ini }}</span></sc-if>
+          <span style="position: absolute; left: 8px; top: 8px; padding: 2px 6px; border-radius: 4px; background: #fff; font-size: 12px; font-weight: 600">{{ l.n }}</span>
+        </span>
+        <span style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ l.name }}</span>
+      </button>
+    </sc-for>
+  </div>
+    </div><aside aria-label="Model details" style="width: 400px; flex-shrink: 0; border-left: 1px solid #E0DDD8; background: #FBFAF8; display: flex; flex-direction: column; min-height: 0">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; gap: 14px; align-items: flex-start">
+          <img src="/_blob/516936c7d2187fa9f3462b1f7bf9edc3" alt="Cassidy Martin" style="width: 112px; height: 150px; border-radius: 12px; object-fit: cover; object-position: 50% 20%; flex-shrink: 0">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 2px"><span style="font-family: Georgia, serif; font-size: 24px; line-height: 1.1">Cassidy Martin</span><span style="font-size: 13px; color: #4A4743">Look D · Aisha Johnson</span><span style="font-size: 13px; color: #4A4743">Arrived 1:18 PM</span><span style="margin-top: 6px; align-self: flex-start"><span class="chip" style="background: #8A9BB0">Makeup paused</span></span></span>
+          <button aria-label="Close" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E0DDD8; background: transparent; font-size: 20px; color: #4A4743; flex-shrink: 0">×</button>
+        </div>
+        <div style="background: #fff; border: 1px solid #E0DDD8; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+          <span style="display: flex; justify-content: space-between; align-items: center"><p class="lbl">Latest · 4:12 PM</p><span class="chip" style="background: #8A9BB0">Makeup paused</span></span>
+          <span style="font-size: 14px; line-height: 1.45">Aisha J: “Waiting on lashes from kit 2, back in 10.”</span>
+        </div>
+        <div><p class="lbl" style="margin-bottom: 2px">Where they’re at</p><div style="display: grid; grid-template-columns: 72px minmax(0,1fr) auto; gap: 10px; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 13px">Makeup</span><span style="font-size: 12px; color: #4A4743; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Aisha Johnson · paused 22 min</span><span class="chip" style="background: #8A9BB0">Paused</span></div><div style="display: grid; grid-template-columns: 72px minmax(0,1fr) auto; gap: 10px; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 13px">Hair</span><span style="font-size: 12px; color: #4A4743; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span><span class="chip" style="background: #D4A853">In progress</span></div><div style="display: grid; grid-template-columns: 72px minmax(0,1fr) auto; gap: 10px; align-items: center; min-height: 44px; border-bottom: 1px solid #E0DDD8"><span style="font-size: 13px">Nails</span><span style="font-size: 12px; color: #4A4743; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span><span class="chip" style="background: #E0DDD8">Not started</span></div></div>
+        <div style="display: flex; flex-direction: column; gap: 8px"><p class="lbl">Notes</p><button style="align-self: flex-start; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #CFCAC4; background: #fff; color: #111; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; white-space: nowrap"><span aria-hidden="true" style="font-size: 16px; line-height: 1">+</span>ADD A NOTE</button></div>
+        <div><p class="lbl" style="margin-bottom: 2px">Earlier updates</p><div style="display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 10px; padding: 6px 0; font-size: 12px"><span style="color: #4A4743">4:12 PM</span><span>Makeup paused · Aisha J</span></div><div style="display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 10px; padding: 6px 0; font-size: 12px"><span style="color: #4A4743">3:50 PM</span><span>Makeup started · Aisha J</span></div><div style="display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 10px; padding: 6px 0; font-size: 12px"><span style="color: #4A4743">3:31 PM</span><span>Hair started</span></div><div style="display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 10px; padding: 6px 0; font-size: 12px"><span style="color: #4A4743">3:05 PM</span><span>Paired with Aisha Johnson</span></div><div style="display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 10px; padding: 6px 0; font-size: 12px"><span style="color: #4A4743">1:18 PM</span><span>Arrived</span></div></div>
+        <button style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 10px 14px; border-radius: 12px; border: 1px solid #E0DDD8; background: #fff; font-family: Inter, system-ui, sans-serif; text-align: left; color: #111"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px">Past shows with Art Partner · 2</span><span style="font-size: 12px; color: #4A4743">Valentino FW25, Khaite SS25</span></span><span aria-hidden="true" style="font-size: 18px">›</span></button>
+      </div>
+      <div style="flex-shrink: 0; display: flex; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid #E0DDD8; position: relative"><button style="min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #CFCAC4; background: #fff; color: #111; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; white-space: nowrap">PING ASSISTANT</button><span style="flex: 1"></span><button style="min-height: 44px; padding: 0 18px; border-radius: 8px; border: 0; background: #111; color: #fff; font-family: Inter, system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; white-space: nowrap">UPDATE STATUS</button></div>
+    </aside></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1180,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const B = {"SA": "1705ea7146c2879258c52a172e2bdcbe", "ML": "92535a459422f9a2aeb42fee5cce377d", "AJ": "25da83555fcf1ca7fad82ae9a74e05c8", "AD": "2af75eeca89115daaf4090df5de1cc6c", "CD": "0145c19aa201167cced03e129ff8b0d5", "PS": "eb52f2831800e0153855e0ed84e447ed", "JZ": "0a3feb4a34854d1403d19aea4f3cb43c", "SR": "5b370e82a4bbedcb21f4c073c692ddbe", "NW": "ea6acda3f6057bedc0507a8c40c7c996", "IV": "51aaf3e84d643549a2269259b2d5dba8", "CM": "516936c7d2187fa9f3462b1f7bf9edc3", "VC": "1342cce88599bee20ed3598e988331b1", "IL": "3d891c22981e5e0215b67093c01fc8d3", "EM": "d5c8a934a3794fe2651afd9315dfaf14"};
+    const C = { r:'#7A9E7E', p:'#D4A853', a:'#C4614A', n:'#CFCAC4' };
+    const raw = [['SA','Sofia Andersen','a'],['NW','Neville Williams','p'],['IV','Irina Volkov','n'],['CM','Cassidy Martin','p'],['AJ','Aaliyah Jones','r'],['ML','Mei Lin','p'],['VC','Valentina Cruz','r'],['EM','Elena Morozova','p'],['PS','Priya Sharma','n'],['IL','Ingrid Larsen','r'],['AD','Amara Diallo','p'],['','Hana Tanaka','n'],['CD','Camille Dubois','p'],['','Ingrid Strand','r'],['','Yuki Nakamura','p'],['','Zara Okoye','r'],['','Lucia Ferri','p'],['','Nadia Rahman','r'],['','Ella Brooks','p'],['','Maya Chen','r'],['','Sasha Ivanova','p'],['','Lea Dupont','p'],['','Anya Kim','r'],['','Rosa Mendes','p']];
+    const looks = raw.map(([k,name,s],i) => ({ n: String(i+1).padStart(2,'0'), name, img: k ? '/_blob/' + B[k] : '', noImg: !k, ini: name.split(' ').map(w=>w[0]).join(''), c: C[s], op: s === 'n' ? .45 : 1, sh: i === 3 ? '0 0 0 3px #F5F2EE, 0 0 0 6px #111' : 'none' }));
+    return { looks };
+  }
+}
+</script>
+</body>
+</html>
