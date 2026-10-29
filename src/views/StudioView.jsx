@@ -1035,7 +1035,7 @@ function AssistantStudioFlow({ currentProfile, models }) {
 
 // ─── Authoring flow (A1-A5) ───────────────────────────────────────────────────
 const DEFAULT_AREAS = ['Eyes', 'Brows', 'Skin', 'Cheeks', 'Lips']
-const AUTHOR_KEY = 'showpartner_author_v1'
+const AUTHOR_KEY = 'showpartner_author_v2'
 
 function getDefaultAuthorData() {
   const mkLook = () => ({
@@ -1057,7 +1057,7 @@ function getDefaultAuthorData() {
     changes: [],
   }
   return {
-    lookCount: 3,
+    lookCount: 0,
     lookNames: { A: 'Look A', B: 'Look B', C: 'Look C', D: 'Look D' },
     looks: { A: mkLook(), B: seededB, C: mkLook(), D: mkLook() },
     assignments: {},
@@ -1181,12 +1181,15 @@ function AuthoringFlow({ currentProfile, models }) {
     const lookName = data.lookNames[activeLookId] || `Look ${activeLookId}`
 
     const isLeadAssistant = role === 'lead_assistant'
-    const ctaLabel = isLeadAssistant ? 'SEND TO YADIM TO APPROVE' : 'SHARE WITH ASSISTANTS'
-    const ctaSubtext = isLeadAssistant
-      ? 'Assistants see it once Yadim approves. Empty areas stay hidden.'
-      : role === 'artist'
-        ? 'Goes straight to all assistants. No approval needed.'
-        : 'Empty areas stay hidden.'
+    const ctaLabel = isLeadAssistant ? 'SEND TO ARTIST TO APPROVE' : 'SHARE WITH ASSISTANTS'
+    const ctaDisabled = isLeadAssistant && writtenCount === 0
+    const ctaSubtext = ctaDisabled
+      ? 'Write at least one area first. Assistants see the look once the artist approves.'
+      : isLeadAssistant
+        ? 'Assistants see the look once the artist approves.'
+        : role === 'artist'
+          ? 'Goes straight to all assistants. No approval needed.'
+          : 'Empty areas stay hidden.'
 
     function handleShare() {
       const next = {
@@ -1296,7 +1299,7 @@ function AuthoringFlow({ currentProfile, models }) {
         </div>
 
         <div style={{ flexShrink: 0, padding: '12px 16px 16px', borderTop: '1px solid #E0DDD8', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button onClick={handleShare} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: 'pointer' }}>
+          <button onClick={ctaDisabled ? undefined : handleShare} disabled={ctaDisabled} style={{ width: '100%', minHeight: 52, borderRadius: 8, border: 0, background: ctaDisabled ? '#CFCAC4' : '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 12, letterSpacing: '.12em', cursor: ctaDisabled ? 'default' : 'pointer' }}>
             {ctaLabel}
           </button>
           <span style={{ fontSize: 11, color: '#4A4743', textAlign: 'center' }}>{ctaSubtext}</span>
