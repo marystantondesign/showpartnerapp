@@ -141,7 +141,11 @@ function AppInner() {
       status: 'pending',
     },
   ])
-  const [toCheckQueue, setToCheckQueue]     = useState([])
+  const [toCheckQueue, setToCheckQueue]     = useState([
+    { id: 'chk-m6',  modelId: 'm6',  modelName: 'Mei Lin',        modelAvatar: '/models/Mei-Lin-1.png',        modelLook: 'B', assistantId: 'p20', assistantName: 'Mira Patel',     doneAt: '3:41 PM', specialty: 'makeup' },
+    { id: 'chk-m11', modelId: 'm11', modelName: 'Amara Diallo',   modelAvatar: '/models/Amara-Diallo-1.png',   modelLook: 'C', assistantId: 'p16', assistantName: 'Kenji Watanabe', doneAt: '3:22 PM', specialty: 'makeup' },
+    { id: 'chk-m13', modelId: 'm13', modelName: 'Camille Dubois', modelAvatar: '/models/Camille-DuBois-1.png', modelLook: 'A', assistantId: 'p18', assistantName: 'Aisha Johnson',  doneAt: '3:28 PM', specialty: 'makeup' },
+  ])
   const [touchupNotes, setTouchupNotes]     = useState([])
   const [runningLates, setRunningLates]     = useState({})
   const [recentArrivals, setRecentArrivals] = useState([])

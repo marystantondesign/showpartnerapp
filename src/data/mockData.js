@@ -278,7 +278,7 @@ export const models = [
     arrived: true, arrivedAt: '1:32 PM', eta: null, flagged: false,
     services: {
       hair:   _done('p6',  '2:12 PM', 48),
-      makeup: _ip('p37',   '3:45 PM'),
+      makeup: _ip('p4',    '3:30 PM'),
       nails:  _ip('p25',   '3:08 PM'),
     },
     status: 'in_progress',

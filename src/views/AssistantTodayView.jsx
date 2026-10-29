@@ -214,7 +214,7 @@ export default function AssistantTodayView({ currentProfile, profiles, schedule,
           <p style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64', margin: '0 0 6px' }}>
             {fmtDateLabel(now)}
           </p>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 34, lineHeight: 1.15, color: '#111', margin: '0 0 6px' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 26, lineHeight: 1.15, color: '#111', margin: '0 0 6px' }}>
             {fmtCountdown(minsUntilShow)}
           </p>
           <p style={{ fontSize: 14, color: '#6E6A64', margin: 0 }}>
