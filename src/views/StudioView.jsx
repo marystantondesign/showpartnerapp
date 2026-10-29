@@ -1217,41 +1217,61 @@ function AuthoringFlow({ currentProfile, models }) {
           <span style={{ fontSize: 11, color: '#4A4743', paddingRight: 8 }}>{currentProfile?.name?.split(' ')[0]} · {role}</span>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Media card */}
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', padding: 12, borderRadius: 12, background: '#fff', border: '1px solid #E0DDD8' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 8, background: '#E0DDD8', flexShrink: 0, overflow: 'hidden' }}>
-              {lookMedia[0] && <img src={lookMedia[0].dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {/* Main photo section */}
+          <div style={{ display: 'flex', gap: 12, padding: '16px 0', borderBottom: '1px solid #E0DDD8' }}>
+            <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 10, overflow: 'hidden', border: lookMedia[0] ? 'none' : '1.5px dashed #CFCAC4', background: '#E8E4DF', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              {lookMedia[0]
+                ? <img src={lookMedia[0].dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8580" strokeWidth="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    <span style={{ fontSize: 9, color: '#8A8580', letterSpacing: '.06em' }}>Main photo</span>
+                  </>
+              }
             </div>
-            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>{lookMedia.length ? `Demo video and ${lookMedia.filter(m => m.type === 'photo').length} photos` : 'No media yet'}</span>
-              {capturers.length > 0 && <span style={{ fontSize: 11, color: '#4A4743' }}>Captured by {capturers.join(', ')}</span>}
-            </span>
-            <ChevronRight />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 2 }}>
+              <span style={{ fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>
+                {lookMedia[0] ? 'MAIN PHOTO' : 'START WITH PHOTOS'}
+              </span>
+              <span style={{ fontSize: 12, color: '#4A4743', lineHeight: 1.45 }}>
+                {lookMedia[0]
+                  ? 'Shown on the look card and to assistants first.'
+                  : 'Upload the main photo and any close-ups from the test. Tag each one by area.'
+                }
+              </span>
+              {!lookMedia[0] && (
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button style={{ height: 32, padding: '0 14px', borderRadius: 999, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 11, cursor: 'pointer' }}>Take photo</button>
+                  <button style={{ height: 32, padding: '0 14px', borderRadius: 999, border: '1px solid #CFCAC4', background: 'transparent', color: '#111', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 11, cursor: 'pointer' }}>From library</button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Areas */}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Areas</p>
-              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>{writtenCount} of {areaNames.length} written</p>
+          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: 16, paddingBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>AREAS</p>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>{writtenCount} OF {areaNames.length} DONE</p>
             </div>
-            {areaNames.map(aname => {
+            {areaNames.map((aname, aIdx) => {
               const aData = lookData.areas[aname] || { notes: '', products: [], refs: [] }
-              const refCount = aData.refs?.length || 0
+              const isDone = !!aData.notes?.trim()
+              const prodCount = aData.products?.length || 0
+              const areaPhotoCount = lookMedia.filter(m => m.areaTag === aname && m.type === 'photo').length
+              const subtextParts = isDone
+                ? ['Done', prodCount > 0 ? `${prodCount} product${prodCount !== 1 ? 's' : ''}` : null, areaPhotoCount > 0 ? `${areaPhotoCount} photo${areaPhotoCount !== 1 ? 's' : ''}` : null].filter(Boolean)
+                : ['Add steps', areaPhotoCount > 0 ? `${areaPhotoCount} photo${areaPhotoCount !== 1 ? 's' : ''}` : null].filter(Boolean)
               return (
                 <button
                   key={aname}
                   onClick={() => { setActiveAreaName(aname); setScreen('area') }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8', width: '100%', padding: 0, borderLeft: 0, borderRight: 0, borderTop: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 52, borderBottom: aIdx < areaNames.length - 1 ? '1px solid #E0DDD8' : 'none', width: '100%', padding: '4px 0', borderTop: 0, borderLeft: 0, borderRight: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
                 >
-                  <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, padding: '10px 0' }}>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: isDone ? '#7A9E7E' : '#CFCAC4', flexShrink: 0 }} />
+                  <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{aname}</span>
-                    {aData.notes?.trim()
-                      ? <span style={{ fontSize: 12, color: '#2E2C29' }}>{aData.notes.slice(0, 80)}{aData.notes.length > 80 ? '...' : ''}</span>
-                      : <span style={{ fontSize: 12, color: '#A33D28' }}>No notes yet</span>
-                    }
-                    {refCount > 0 && <span style={{ fontSize: 11, color: '#4A4743' }}>{refCount} reference{refCount !== 1 ? 's' : ''}</span>}
+                    <span style={{ fontSize: 12, color: isDone ? '#4A4743' : '#6E6A64' }}>{subtextParts.join(' · ')}</span>
                   </span>
                   <ChevronRight />
                 </button>
@@ -1285,10 +1305,35 @@ function AuthoringFlow({ currentProfile, models }) {
             )}
           </div>
 
+          {/* Photos */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 16, paddingBottom: 16, borderTop: '1px solid #E0DDD8' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>
+                {lookMedia.filter(m => m.type === 'photo').length > 0 ? `PHOTOS · ${lookMedia.filter(m => m.type === 'photo').length}` : 'PHOTOS'}
+              </p>
+              {lookMedia.filter(m => m.type === 'photo').length > 0 && (
+                <button style={{ border: 0, background: 'none', fontSize: 12, color: '#111', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: 'Inter, system-ui, sans-serif' }}>See all</button>
+              )}
+            </div>
+            {lookMedia.filter(m => m.type === 'photo').length === 0
+              ? <p style={{ margin: 0, fontSize: 13, color: '#4A4743', lineHeight: 1.5 }}>No photos yet. Photos you add show up here and in each area they're tagged for.</p>
+              : (
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {lookMedia.filter(m => m.type === 'photo').slice(0, 4).map(item => (
+                    <div key={item.id} style={{ position: 'relative', width: 76, height: 76, flexShrink: 0, borderRadius: 8, overflow: 'hidden' }}>
+                      <img src={item.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <span style={{ position: 'absolute', left: 3, bottom: 3, padding: '2px 4px', borderRadius: 3, background: 'rgba(17,17,17,.7)', color: '#fff', fontSize: 8, fontWeight: 600, letterSpacing: '.05em', textTransform: 'uppercase' }}>{item.areaTag}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+          </div>
+
           {/* Models row */}
           <button
             onClick={() => { setLocalAssign({ ...data.assignments }); setFilterLook(null); setScreen('assign') }}
-            style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderBottom: '1px solid #E0DDD8', width: '100%', padding: 0, borderLeft: 0, borderRight: 0, borderTop: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, borderTop: '1px solid #E0DDD8', borderBottom: '1px solid #E0DDD8', width: '100%', padding: '4px 0', borderLeft: 0, borderRight: 0, background: 'none', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
           >
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, padding: '10px 0' }}>
               <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>Models getting {lookName}</span>
@@ -1356,7 +1401,7 @@ function AuthoringFlow({ currentProfile, models }) {
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Notes */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>How it is done</p>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Steps</p>
             <div style={{ position: 'relative' }}>
               <textarea
                 rows={6}
@@ -1403,11 +1448,11 @@ function AuthoringFlow({ currentProfile, models }) {
             </button>
           </div>
 
-          {/* References */}
+          {/* Photos tagged for this area */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>References</p>
-              <span style={{ fontSize: 11, color: '#4A4743' }}>From {lookName}'s photos and clips</span>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Photos tagged {activeAreaName}{sortedMedia.filter(m => m.areaTag === activeAreaName).length > 0 ? ` · ${sortedMedia.filter(m => m.areaTag === activeAreaName).length}` : ''}</p>
+              <button style={{ border: 0, background: 'none', fontSize: 11, color: '#111', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: 'Inter, system-ui, sans-serif' }}>Tag photos</button>
             </div>
             {sortedMedia.length === 0
               ? <span style={{ fontSize: 12, color: '#4A4743' }}>No media captured for {lookName} yet.</span>
@@ -1594,29 +1639,58 @@ function AuthoringFlow({ currentProfile, models }) {
   }
 
   // List screen (default)
+  if (lookIds.length === 0) {
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 32px', gap: 16 }}>
+        <p style={{ fontFamily: 'Georgia, serif', fontSize: 26, color: '#111', margin: 0, textAlign: 'center' }}>No looks yet</p>
+        <p style={{ fontSize: 14, color: '#4A4743', margin: 0, textAlign: 'center', lineHeight: 1.5 }}>Set up today's makeup looks so your team has the steps, products and photos for each one.</p>
+        <button
+          onClick={() => setScreen('setup')}
+          style={{ marginTop: 8, height: 52, padding: '0 36px', borderRadius: 999, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: 'pointer' }}
+        >
+          SET UP LOOKS
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>Looks</p>
-        <button onClick={() => setScreen('setup')} style={{ border: 0, background: 'none', fontSize: 12, color: '#111', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: 'Inter, system-ui, sans-serif' }}>Set up</button>
+        <p style={{ margin: 0, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#6E6A64' }}>TODAY'S LOOKS · {lookIds.length}</p>
+        <button onClick={() => setScreen('setup')} style={{ border: 0, background: 'none', fontSize: 12, color: '#111', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontFamily: 'Inter, system-ui, sans-serif' }}>Edit looks</button>
       </div>
       {lookIds.map(id => {
         const lookData = data.looks[id] || { areas: {} }
         const areaNames = Object.keys(lookData.areas)
         const writtenCount = areaNames.filter(a => lookData.areas[a]?.notes?.trim()).length
         const lookName = data.lookNames[id] || `Look ${id}`
+        const idMedia = SEEDED_LOOK_MEDIA[id] || []
+        const mainPhotoUrl = idMedia[0]?.dataUrl || null
+        const photoCount = idMedia.filter(m => m.type === 'photo').length
+        const isStarted = writtenCount > 0 || photoCount > 0
+        const subtextParts = []
+        if (writtenCount > 0) subtextParts.push(`${writtenCount} of ${areaNames.length} areas`)
+        if (photoCount > 0) subtextParts.push(`${photoCount} photo${photoCount !== 1 ? 's' : ''}`)
+        const subtext = isStarted ? subtextParts.join(' · ') : 'Not started'
         return (
           <button
             key={id}
             onClick={() => { setActiveLookId(id); setScreen('look') }}
-            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 14, borderRadius: 12, border: '1px solid #E0DDD8', background: '#fff', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
+            style={{ display: 'flex', gap: 14, padding: 12, borderRadius: 12, border: '1px solid #E0DDD8', background: '#fff', textAlign: 'left', fontFamily: 'Inter, system-ui, sans-serif', color: '#111', cursor: 'pointer' }}
           >
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: 28, color: '#6E6A64', width: 28, flexShrink: 0 }}>{id}</span>
-            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 17 }}>{lookName}</span>
-              <span style={{ fontSize: 12, color: writtenCount > 0 ? '#4A4743' : '#A33D28' }}>
-                {writtenCount} of {areaNames.length} area{areaNames.length !== 1 ? 's' : ''} written
-              </span>
+            <span style={{ width: 84, height: 84, flexShrink: 0, borderRadius: 10, overflow: 'hidden', background: '#E8E4DF', border: mainPhotoUrl ? 'none' : '1.5px dashed #CFCAC4', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              {mainPhotoUrl
+                ? <img src={mainPhotoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                : <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8580" strokeWidth="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                    <span style={{ fontSize: 9, color: '#8A8580', letterSpacing: '.06em' }}>Add photo</span>
+                  </>
+              }
+            </span>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4 }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}>{lookName}</span>
+              <span style={{ fontSize: 12, color: isStarted ? '#4A4743' : '#6E6A64' }}>{subtext}</span>
             </span>
             <ChevronRight />
           </button>
@@ -1626,34 +1700,10 @@ function AuthoringFlow({ currentProfile, models }) {
   )
 }
 
-// ─── Lead assistant: LOOKS + MY WORK tabs ────────────────────────────────────
+// ─── Lead assistant: LOOKS only ──────────────────────────────────────────────
 function LeadAssistantStudioView({ currentProfile, models }) {
-  const [tab, setTab] = useState('LOOKS')
-
-  function TabBar() {
-    return (
-      <div className="flex border-b border-[#E0DDD8] px-4 flex-shrink-0">
-        {['LOOKS', 'MY WORK'].map(t => (
-          <button key={t} onClick={() => setTab(t)} className="flex-1 py-3 text-[10px] tracking-widest uppercase font-sans outline-none border-none bg-transparent cursor-pointer" style={{ color: tab === t ? '#111' : '#888580', borderBottom: tab === t ? '1.5px solid #111' : '1.5px solid transparent', fontWeight: tab === t ? 600 : 400 }}>
-            {t}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
-  if (tab === 'MY WORK') {
-    return (
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TabBar />
-        <AssistantStudioFlow currentProfile={currentProfile} models={models} />
-      </div>
-    )
-  }
-
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <TabBar />
       <AuthoringFlow currentProfile={currentProfile} models={models} />
     </div>
   )
