@@ -56,8 +56,8 @@ export const profiles = [
     tags: ['Runway makeup', 'Period looks', 'Airbrushing', 'Bridal', 'Avant-garde looks'] },
 
   // Lead assistants (new role)
-  { id: 'p4', name: 'Aimi K', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/aimi.jpg' },
-  { id: 'p5', name: 'Iona M', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/iona.jpg' },
+  { id: 'p4', name: 'Aimi K', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/aimi.jpg', showCount: 2 },
+  { id: 'p5', name: 'Iona M', role: 'lead_assistant', specialty: 'makeup', avatar: '/assistants/iona.jpg', showCount: 3 },
 
   // Hair assistants (9)
   { id: 'p6',  name: 'Sophia Rivera',  role: 'assistant', specialty: 'hair',   trackingState: 'active',               avatar: '/assistants/Sophia-Rivera.png', station: 'Station 1' },
@@ -73,7 +73,7 @@ export const profiles = [
   // Makeup assistants (9)
   { id: 'p15', name: 'Benji Adams',    role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 8,  avatar: '/assistants/benji.jpg',   station: 'Station 5' },
   { id: 'p16', name: 'Kenji Watanabe', role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/kenji.jpg',   station: 'Station 1' },
-  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/sofia.jpg',   station: 'Station 2' },
+  { id: 'p17', name: 'Sofia Reyes',    role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/sofia.jpg',   station: 'Station 2', showCount: 4 },
   { id: 'p18', name: 'Aisha Johnson',  role: 'assistant', specialty: 'makeup', trackingState: 'lost', lastSeenMins: 3,  avatar: '/assistants/aisha.jpg',   station: 'Station 3' },
   { id: 'p19', name: 'Lena Schmidt',   role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/lena.jpg',    station: 'Station 4' },
   { id: 'p20', name: 'Mira Patel',     role: 'assistant', specialty: 'makeup', trackingState: 'active',               avatar: '/assistants/mira.jpg',    station: 'Station 6' },
@@ -445,7 +445,7 @@ export const models = [
       nails:  _ns(),
     },
     status: 'in_progress',
-    notes: [],
+    notes: [{ id: 'note-m21-1', text: 'Latex allergy. Use non-latex sponges and gloves only.', isAllergy: true, authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: '2026-04-28T14:15:00' }],
     photos: [],
   },
   {

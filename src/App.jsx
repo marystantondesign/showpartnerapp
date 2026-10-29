@@ -388,6 +388,7 @@ function AppInner() {
               profiles={profiles}
               schedule={schedule}
               venue={venue}
+              models={models}
             />
           )}
           {tab === 'home' && currentProfile.role === 'artist' && (
@@ -429,7 +430,7 @@ function AppInner() {
           {tab === 'list' && currentProfile.role !== 'assistant' && currentProfile.role !== 'lead_assistant' && (
             <ListView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />
           )}
-          {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} onStatusChange={handleStatusChange} onNote={handleNote} />}
+          {tab === 'lineup'    && <LineupView models={models} currentProfile={currentProfile} profiles={profiles} onStatusChange={handleStatusChange} onNote={handleNote} />}
           {tab === 'dashboard' && (
             <DashboardView
               models={models}

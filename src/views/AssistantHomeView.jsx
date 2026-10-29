@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import ModelProfileOverlay from '../components/ModelProfileOverlay'
 
 const BG = '#F5F2EE', BD = '#E0DDD8', TX = '#111', MT = '#4A4743', M2 = '#6E6A64', DV = '#CFCAC4'
 
@@ -140,6 +141,8 @@ export default function AssistantHomeView({
       setElapsed(svc?.elapsedMins != null ? svc.elapsedMins : calcElapsed(startedAt))
     }
   }, [activeModel?.id])
+
+  const [profileModel, setProfileModel] = useState(null)
 
   // These must live at top level — Rules of Hooks forbids useState inside conditionals
   const [touchupCheckId, setTouchupCheckId] = useState(null)
@@ -431,6 +434,7 @@ export default function AssistantHomeView({
 
   // ── Assistant — normal (waiting or working on) ────────────────────────────────
   return (
+    <>
     <div style={{ position: 'relative', flex: 1, overflowY: 'auto', background: BG, padding: '0 16px 24px' }}>
 
       {/* Walkthrough warning overlay */}
@@ -500,7 +504,10 @@ export default function AssistantHomeView({
             })()}
 
             {/* Working on card */}
-            <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, padding: '20px 16px', marginBottom: 12 }}>
+            <div
+              onClick={() => setProfileModel(activeModel)}
+              style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 14, padding: '20px 16px', marginBottom: 12, cursor: 'pointer' }}
+            >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
                 <Avatar src={activeModel.avatar} name={activeModel.name} size={72} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -516,7 +523,7 @@ export default function AssistantHomeView({
               </div>
 
               {/* Look link */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: `1px solid ${BD}`, marginBottom: 14, cursor: 'pointer' }}>
+              <div onClick={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: `1px solid ${BD}`, marginBottom: 14, cursor: 'pointer' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 8, background: '#E8E4DF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={M2} strokeWidth="2">
                     <polygon points="5 3 19 12 5 21 5 3"/>
@@ -528,7 +535,7 @@ export default function AssistantHomeView({
 
               {/* Mark done */}
               <button
-                onClick={handleMarkDone}
+                onClick={e => { e.stopPropagation(); handleMarkDone() }}
                 style={{ width: '100%', minHeight: 56, borderRadius: 8, border: 0, background: TX, color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', cursor: 'pointer', marginBottom: 6 }}
               >
                 MARK {specialtyLabel.toUpperCase()} DONE
@@ -538,7 +545,7 @@ export default function AssistantHomeView({
               </div>
 
               {/* Pause + Lead check */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+              <div onClick={e => e.stopPropagation()} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
                 <button
                   onClick={svc?.status === 'paused' ? handleResume : handlePause}
                   style={{ minHeight: 48, borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', color: TX, cursor: 'pointer' }}
@@ -554,7 +561,7 @@ export default function AssistantHomeView({
               </div>
 
               {/* Hand off */}
-              <button style={{ width: '100%', height: 24, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.08em', color: MT, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button onClick={e => e.stopPropagation()} style={{ width: '100%', height: 24, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 10, letterSpacing: '.08em', color: MT, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 HAND OFF
               </button>
             </div>
@@ -605,5 +612,16 @@ export default function AssistantHomeView({
         )}
       </div>
     </div>
+
+    {profileModel && (
+      <ModelProfileOverlay
+        model={models.find(m => m.id === profileModel.id) || profileModel}
+        currentProfile={currentProfile}
+        profiles={profiles}
+        onClose={() => setProfileModel(null)}
+        onNote={(modelId, newNotes) => setModels(prev => prev.map(m => m.id === modelId ? { ...m, notes: newNotes } : m))}
+      />
+    )}
+    </>
   )
 }

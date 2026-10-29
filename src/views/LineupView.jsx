@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { STATUS_META, profiles as allProfiles } from '../data/mockData'
+import ModelProfileOverlay from '../components/ModelProfileOverlay'
 
 const TX = '#111', MT = '#4A4743', M2 = '#6E6A64', BD = '#E0DDD8', BG = '#F5F2EE', DV = '#CFCAC4'
 
@@ -160,8 +161,9 @@ function PhoneModelSheet({ model, onClose, onNote }) {
   )
 }
 
-export default function LineupView({ models, currentProfile, onStatusChange, onNote }) {
+export default function LineupView({ models, currentProfile, profiles, onStatusChange, onNote }) {
   const [selectedModel, setSelectedModel] = useState(null)
+  const isAssistantRole = currentProfile?.role === 'assistant' || currentProfile?.role === 'lead_assistant'
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -208,7 +210,16 @@ export default function LineupView({ models, currentProfile, onStatusChange, onN
         </div>
       </div>
 
-      {selectedModel && (
+      {selectedModel && isAssistantRole && (
+        <ModelProfileOverlay
+          model={models.find(m => m.id === selectedModel.id)}
+          currentProfile={currentProfile}
+          profiles={profiles || allProfiles}
+          onClose={() => setSelectedModel(null)}
+          onNote={onNote}
+        />
+      )}
+      {selectedModel && !isAssistantRole && (
         <PhoneModelSheet
           model={models.find(m => m.id === selectedModel.id)}
           onClose={() => setSelectedModel(null)}

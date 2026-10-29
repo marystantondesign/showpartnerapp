@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { show, timeline, profileNotifications } from '../data/mockData'
+import AssistantProfileOverlay from '../components/AssistantProfileOverlay'
 
 const SHOW_HOUR = 18
 const SHOW_MIN  = 0
@@ -100,19 +101,22 @@ function ScheduleRow({ item, isPast, isNext, minsTil }) {
   )
 }
 
-function TeamCard({ person, label, isMe, meLabel }) {
+function TeamCard({ person, label, isMe, meLabel, onClick }) {
   return (
-    <div style={{
-      background: '#fff',
-      borderRadius: 12,
-      padding: '12px 6px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 5,
-      border: isMe ? '1.5px solid #111' : '1.5px solid transparent',
-      boxSizing: 'border-box',
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        background: '#fff',
+        borderRadius: 12,
+        padding: '12px 6px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 5,
+        border: isMe ? '1.5px solid #111' : '1.5px solid transparent',
+        boxSizing: 'border-box',
+        cursor: onClick ? 'pointer' : 'default',
+      }}>
       <div style={{ position: 'relative', flexShrink: 0 }}>
         <img
           src={person.avatar}
@@ -167,9 +171,10 @@ function VenueMap({ venue }) {
   )
 }
 
-export default function AssistantTodayView({ currentProfile, profiles, schedule, venue }) {
+export default function AssistantTodayView({ currentProfile, profiles, schedule, venue, models }) {
   const [now, setNow] = useState(() => new Date())
   const [mapOpen, setMapOpen] = useState(false)
+  const [profilePerson, setProfilePerson] = useState(null)
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30000)
@@ -206,6 +211,7 @@ export default function AssistantTodayView({ currentProfile, profiles, schedule,
   const isMine = (p) => p.id === currentProfile.id
 
   return (
+    <>
     <div className="flex-1 overflow-y-auto" style={{ background: '#F5F2EE', paddingBottom: 32 }}>
       <div style={{ padding: '24px 20px 0' }}>
 
@@ -256,6 +262,7 @@ export default function AssistantTodayView({ currentProfile, profiles, schedule,
                 label={roleLabel(p)}
                 isMe={isMine(p)}
                 meLabel={`You · ${roleLabel(p)}`}
+                onClick={isLeadAssistant && !isMine(p) ? () => setProfilePerson(p) : undefined}
               />
             ))}
           </div>
@@ -270,6 +277,7 @@ export default function AssistantTodayView({ currentProfile, profiles, schedule,
                 label={p.station}
                 isMe={isMine(p) && isAssistant}
                 meLabel={`You · ${p.station}`}
+                onClick={isLeadAssistant && !isMine(p) ? () => setProfilePerson(p) : undefined}
               />
             ))}
           </div>
@@ -301,5 +309,15 @@ export default function AssistantTodayView({ currentProfile, profiles, schedule,
 
       </div>
     </div>
+    {profilePerson && (
+      <AssistantProfileOverlay
+        person={profilePerson}
+        currentProfile={currentProfile}
+        profiles={profiles}
+        models={models || []}
+        onClose={() => setProfilePerson(null)}
+      />
+    )}
+    </>
   )
 }
