@@ -181,6 +181,13 @@ export const models = [
     },
     status: 'done',
     notes: [],
+    statusLog: [
+      { time: '1:18 PM', text: 'Arrived' },
+      { time: '3:05 PM', text: 'Paired with Aisha Johnson' },
+      { time: '3:31 PM', text: 'Hair started' },
+      { time: '3:50 PM', text: 'Makeup started · Aisha J' },
+      { time: '4:12 PM', text: 'Makeup paused · Aisha J' },
+    ],
     photos: [
       { id: 'ph-1', url: '/models/Cassidy-Martin-1.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 28, 2026', label: '' },
       { id: 'ph-2', url: '/models/Cassidy-Martin-2.png', uploadedBy: 'Production', uploaderId: 'system', timestamp: 'Apr 28, 2026', label: '' },
@@ -768,3 +775,124 @@ export function modelOverallStatus(model) {
   if (statuses.some(s => s === 'paused'))        return 'paused'
   return 'not_started'
 }
+
+// ─── Model details (phone, past shows) ────────────────────────────────────────
+export const modelDetails = {
+  'm1':  { phone: '+33 6 11 22 33 44', pastShows: { count: 2, shows: 'Valentino FW25, SS25' } },
+  'm2':  { phone: '+44 7911 123 456',  pastShows: { count: 2, shows: 'Valentino FW25, FW24' } },
+  'm3':  { phone: '+7 916 123 45 67',  pastShows: { count: 1, shows: 'Valentino SS25' } },
+  'm4':  { phone: '+1 212 555 0140',   pastShows: { count: 0, shows: null } },
+  'm5':  { phone: '+1 310 555 0182',   pastShows: { count: 0, shows: null } },
+  'm6':  { phone: '+86 138 0013 8000', pastShows: { count: 1, shows: 'Valentino FW25' } },
+  'm7':  { phone: '+34 612 345 678',   pastShows: { count: 0, shows: null } },
+  'm8':  { phone: '+47 912 34 567',    pastShows: { count: 0, shows: null } },
+  'm9':  { phone: '+91 98765 43210',   pastShows: { count: 1, shows: 'Valentino SS25' } },
+  'm10': { phone: '+7 495 123 45 67',  pastShows: { count: 0, shows: null } },
+  'm11': { phone: '+221 77 123 45 67', pastShows: { count: 1, shows: 'Valentino FW25' } },
+  'm12': { phone: '+81 3 1234 5678',   pastShows: { count: 0, shows: null } },
+  'm13': { phone: '+33 6 98 76 54 32', pastShows: { count: 0, shows: null } },
+  'm14': { phone: '+47 999 00 111',    pastShows: { count: 0, shows: null } },
+  'm15': { phone: '+81 90 1234 5678',  pastShows: { count: 0, shows: null } },
+  'm16': { phone: '+20 100 123 4567',  pastShows: { count: 0, shows: null } },
+  'm17': { phone: '+39 320 123 4567',  pastShows: { count: 0, shows: null } },
+  'm18': { phone: '+82 10 1234 5678',  pastShows: { count: 0, shows: null } },
+  'm19': { phone: '+971 50 123 4567',  pastShows: { count: 0, shows: null } },
+  'm20': { phone: '+1 323 555 0167',   pastShows: { count: 0, shows: null } },
+  'm21': { phone: '+46 70 123 45 67',  pastShows: { count: 0, shows: null } },
+  'm22': { phone: '+20 100 987 6543',  pastShows: { count: 0, shows: null } },
+  'm23': { phone: '+81 80 9876 5432',  pastShows: { count: 0, shows: null } },
+  'm24': { phone: '+33 6 45 67 89 01', pastShows: { count: 0, shows: null } },
+  'm25': { phone: '+233 20 123 4567',  pastShows: { count: 0, shows: null } },
+  'm26': { phone: '+82 10 9876 5432',  pastShows: { count: 0, shows: null } },
+  'm27': { phone: '+351 912 345 678',  pastShows: { count: 0, shows: null } },
+  'm28': { phone: '+7 926 123 45 67',  pastShows: { count: 0, shows: null } },
+  'm29': { phone: '+33 6 78 90 12 34', pastShows: { count: 0, shows: null } },
+  'm30': { phone: '+216 20 123 456',   pastShows: { count: 0, shows: null } },
+}
+
+// ─── Inventory products ────────────────────────────────────────────────────────
+export const inventoryProducts = [
+  // Skin (12)
+  { id: 'p-sk-01', name: 'Luminous Silk Foundation',    brand: 'Armani Beauty',        shade: '6.5',          area: 'Skin',  color: '#C8A882', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-sk-02', name: 'Radiant Creamy Concealer',    brand: 'NARS',                 shade: 'Custard',       area: 'Skin',  color: '#D4B896', inKit: 3, today: 2, stock: 6 },
+  { id: 'p-sk-03', name: 'Flawless Filter',             brand: 'Charlotte Tilbury',    shade: '4',             area: 'Skin',  color: '#C9A87C', inKit: 1, today: 0, stock: 3 },
+  { id: 'p-sk-04', name: 'Pro Filt\'r Soft Matte',      brand: 'Fenty Beauty',         shade: '200W',          area: 'Skin',  color: '#B89070', inKit: 2, today: 1, stock: 2 },
+  { id: 'p-sk-05', name: 'Translucent Loose Powder',    brand: 'Laura Mercier',        shade: 'Translucent',   area: 'Skin',  color: '#E8DDD0', inKit: 4, today: 3, stock: 8 },
+  { id: 'p-sk-06', name: 'Ambient Lighting Powder',     brand: 'Hourglass',            shade: 'Ethereal Light',area: 'Skin',  color: '#E4D4C0', inKit: 1, today: 0, stock: 2 },
+  { id: 'p-sk-07', name: 'Skin Long-Wear Foundation',   brand: 'Bobbi Brown',          shade: 'Warm Ivory',    area: 'Skin',  color: '#D4AA80', inKit: 2, today: 1, stock: 5 },
+  { id: 'p-sk-08', name: 'Studio Fix Fluid SPF 15',     brand: 'MAC',                  shade: 'NC30',          area: 'Skin',  color: '#C4966A', inKit: 0, today: 0, stock: 1 },
+  { id: 'p-sk-09', name: 'Sensual Skin Enhancer',       brand: 'Kevyn Aucoin',         shade: 'SX08',          area: 'Skin',  color: '#B8845E', inKit: 1, today: 0, stock: 3 },
+  { id: 'p-sk-10', name: 'Sheer Glow Foundation',       brand: 'NARS',                 shade: 'Syracuse',      area: 'Skin',  color: '#C09070', inKit: 3, today: 2, stock: 7 },
+  { id: 'p-sk-11', name: 'Forever Skin Glow',           brand: 'Dior',                 shade: '2N',            area: 'Skin',  color: '#C8A882', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-sk-12', name: 'Hyaluronic Hydra-Foundation', brand: 'By Terry',             shade: '200C Natural',  area: 'Skin',  color: '#D0A880', inKit: 0, today: 0, stock: 0 },
+  // Eyes (12)
+  { id: 'p-ey-01', name: 'Rock n Kohl Liner',           brand: 'Charlotte Tilbury',    shade: 'Barbarella Brown', area: 'Eyes', color: '#6B4226', inKit: 6, today: 4, stock: 10 },
+  { id: 'p-ey-02', name: 'Scattered Light Glitter',     brand: 'Hourglass',            shade: 'Blaze',          area: 'Eyes', color: '#D4916B', inKit: 1, today: 0, stock: 2 },
+  { id: 'p-ey-03', name: 'Soft Glam Eye Shadow',        brand: 'Anastasia Beverly Hills', shade: 'Palette',    area: 'Eyes', color: '#C4845E', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-ey-04', name: 'Snap Shadows Mix & Match',    brand: 'Fenty Beauty',         shade: '4 Warm',         area: 'Eyes', color: '#A87040', inKit: 2, today: 2, stock: 5 },
+  { id: 'p-ey-05', name: '24/7 Glide-On Eye Pencil',    brand: 'Urban Decay',          shade: 'Zero',           area: 'Eyes', color: '#1A1410', inKit: 8, today: 5, stock: 14 },
+  { id: 'p-ey-06', name: 'Liquid Eye Liner',            brand: 'MAC',                  shade: 'Boot Black',     area: 'Eyes', color: '#0D0B08', inKit: 5, today: 3, stock: 9 },
+  { id: 'p-ey-07', name: 'Climax Mascara',              brand: 'NARS',                 shade: 'Explicit Black', area: 'Eyes', color: '#0A0806', inKit: 6, today: 6, stock: 12 },
+  { id: 'p-ey-08', name: 'Sky High Mascara',            brand: 'Maybelline',           shade: 'Very Black',     area: 'Eyes', color: '#0D0A07', inKit: 4, today: 3, stock: 8 },
+  { id: 'p-ey-09', name: 'Highliner Matte Gel',         brand: 'Marc Jacobs',          shade: 'Blacquer',       area: 'Eyes', color: '#121010', inKit: 3, today: 2, stock: 6 },
+  { id: 'p-ey-10', name: 'Stylo Yeux Waterproof',       brand: 'Chanel',               shade: 'Noir',           area: 'Eyes', color: '#0E0C09', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-ey-11', name: 'Diorshow Iconic Mascara',     brand: 'Dior',                 shade: 'Black',          area: 'Eyes', color: '#0B0908', inKit: 5, today: 4, stock: 10 },
+  { id: 'p-ey-12', name: 'Infallible 36H Gel Liner',    brand: 'L\'Oreal',             shade: 'Black',          area: 'Eyes', color: '#100E0B', inKit: 3, today: 2, stock: 6 },
+  // Lips (8)
+  { id: 'p-lp-01', name: 'Gloss Bomb Universal Lip',    brand: 'Fenty Beauty',         shade: 'Fu$$y',          area: 'Lips', color: '#C47060', inKit: 4, today: 3, stock: 8 },
+  { id: 'p-lp-02', name: 'Pillow Talk Lipstick',        brand: 'Charlotte Tilbury',    shade: 'Pillow Talk',    area: 'Lips', color: '#C0806A', inKit: 3, today: 2, stock: 6 },
+  { id: 'p-lp-03', name: 'Matte Lipstick',              brand: 'MAC',                  shade: 'Ruby Woo',       area: 'Lips', color: '#C03040', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-lp-04', name: 'Velvet Matte Lip Pencil',     brand: 'NARS',                 shade: 'Dragon Girl',    area: 'Lips', color: '#B82840', inKit: 1, today: 0, stock: 2 },
+  { id: 'p-lp-05', name: 'Lip Glow Oil',                brand: 'Dior',                 shade: 'Natural',        area: 'Lips', color: '#D4907A', inKit: 3, today: 2, stock: 5 },
+  { id: 'p-lp-06', name: 'Lip Color Satin',             brand: 'Tom Ford',             shade: 'Scarlet Rouge',  area: 'Lips', color: '#C83040', inKit: 1, today: 0, stock: 2 },
+  { id: 'p-lp-07', name: 'Rouge Coco Flash',            brand: 'Chanel',               shade: '54 Boy',         area: 'Lips', color: '#D06050', inKit: 2, today: 1, stock: 4 },
+  { id: 'p-lp-08', name: 'Aquaphor Healing Ointment',   brand: 'Aquaphor',             shade: 'Original',       area: 'Lips', color: '#E8DECE', inKit: 6, today: 5, stock: 12 },
+  // Brows (5)
+  { id: 'p-br-01', name: 'Brow Freeze Styling Wax',     brand: 'Anastasia Beverly Hills', shade: 'Clear',      area: 'Brows',color: '#D4C8B0', inKit: 5, today: 4, stock: 10 },
+  { id: 'p-br-02', name: 'Boy Brow',                    brand: 'Glossier',             shade: 'Clear',          area: 'Brows',color: '#C8C0A8', inKit: 4, today: 3, stock: 8 },
+  { id: 'p-br-03', name: 'Brow Wiz',                    brand: 'Anastasia Beverly Hills', shade: 'Taupe',      area: 'Brows',color: '#9A8068', inKit: 6, today: 4, stock: 12 },
+  { id: 'p-br-04', name: 'Eyebrows Fiber Gel',          brand: 'MAC',                  shade: 'Brunette',       area: 'Brows',color: '#6E5040', inKit: 3, today: 2, stock: 6 },
+  { id: 'p-br-05', name: '24-Hr Brow Setter',           brand: 'Benefit',              shade: 'Clear',          area: 'Brows',color: '#E0D8C8', inKit: 4, today: 3, stock: 8 },
+  // Tools (5)
+  { id: 'p-tl-01', name: 'Beautyblender Original',      brand: 'Beautyblender',        shade: 'Pink',           area: 'Tools',color: '#F0B0B0', inKit: 8, today: 8, stock: 16 },
+  { id: 'p-tl-02', name: 'F80 Flat Kabuki Brush',       brand: 'Sigma',                shade: 'Black',          area: 'Tools',color: '#3A3632', inKit: 6, today: 4, stock: 10 },
+  { id: 'p-tl-03', name: 'Expert Face Brush',           brand: 'Real Techniques',      shade: 'Rose Gold',      area: 'Tools',color: '#C08070', inKit: 5, today: 4, stock: 9 },
+  { id: 'p-tl-04', name: '217S Blending Brush',         brand: 'MAC',                  shade: 'Black',          area: 'Tools',color: '#2E2A26', inKit: 6, today: 5, stock: 11 },
+  { id: 'p-tl-05', name: 'Classic Lash Curler',         brand: 'Tweezerman',           shade: 'Silver',         area: 'Tools',color: '#A8A09A', inKit: 4, today: 4, stock: 8 },
+]
+
+// ─── Receipts ─────────────────────────────────────────────────────────────────
+export const receipts = [
+  {
+    id: 'rc-1',
+    when: 'Apr 28, 11:30 AM',
+    vendor: 'Sephora Paris',
+    submittedById: 'p15',
+    submittedByName: 'Benji Adams',
+    for: 'Luminous Silk · Look D',
+    amount: 78,
+    status: 'submitted',
+  },
+  {
+    id: 'rc-2',
+    when: 'Apr 28, 9:15 AM',
+    vendor: 'Marionnaud',
+    submittedById: 'p1',
+    submittedByName: 'Jen Z',
+    for: 'Setting powder + primers (30 models)',
+    amount: 240,
+    status: 'approved',
+  },
+  {
+    id: 'rc-3',
+    when: 'Apr 27, 4:00 PM',
+    vendor: 'Boots Pharmacy',
+    submittedById: 'p18',
+    submittedByName: 'Aisha Johnson',
+    for: 'Brushes + sponges',
+    amount: 123,
+    status: 'approved',
+  },
+]
+
+export const receiptSummary = { spent: 441, budget: 1500, waitingCount: 1 }

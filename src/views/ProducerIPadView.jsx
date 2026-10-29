@@ -6,6 +6,11 @@ import {
   announcements as initAnnouncements,
   show,
   showHistory,
+  modelHistory,
+  modelDetails,
+  inventoryProducts as initInventory,
+  receipts as initReceipts,
+  receiptSummary,
 } from '../data/mockData'
 import ModelModal from '../components/ModelModal'
 import StatusLinkView from './StatusLinkView'
@@ -887,9 +892,12 @@ function StarRow({ stars, max = 5 }) {
   )
 }
 
-function ShowHistoryModal({ onClose }) {
-  const [selId, setSelId] = useState(showHistory[0]?.id)
-  const sh = showHistory.find(s => s.id === selId) || showHistory[0]
+function ShowHistoryModal({ onClose, modelId }) {
+  const visibleShows = modelId
+    ? showHistory.filter(sh => (modelHistory[modelId] || []).some(mh => mh.showName === sh.name))
+    : showHistory
+  const [selId, setSelId] = useState(visibleShows[0]?.id)
+  const sh = visibleShows.find(s => s.id === selId) || visibleShows[0]
   const BD2 = BD, MT2 = MT, M22 = M2
 
   return (
@@ -901,10 +909,13 @@ function ShowHistoryModal({ onClose }) {
         <div style={{ borderRight: `1px solid ${BD2}`, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{ padding: '22px 20px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontFamily: 'Georgia, serif', fontSize: 24 }}>Show history</span>
-            <span style={{ fontSize: 12, color: MT2 }}>{showHistory.length} past shows</span>
+            <span style={{ fontSize: 12, color: MT2 }}>{visibleShows.length} past show{visibleShows.length !== 1 ? 's' : ''}</span>
           </div>
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 10px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {showHistory.map(s => {
+            {visibleShows.length === 0 && (
+              <p style={{ fontSize: 13, color: MT2, padding: '8px 14px' }}>No previous shows with Art Partner.</p>
+            )}
+            {visibleShows.map(s => {
               const isSel = s.id === selId
               return (
                 <button key={s.id} onClick={() => setSelId(s.id)} aria-current={isSel || undefined}
@@ -919,6 +930,12 @@ function ShowHistoryModal({ onClose }) {
 
         {/* Right: detail */}
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          {!sh && (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p style={{ fontSize: 14, color: MT2 }}>No shows to display.</p>
+            </div>
+          )}
+          {sh && <>
           {/* Header */}
           <div style={{ padding: '22px 24px 16px', display: 'flex', alignItems: 'flex-start', gap: 12, borderBottom: `1px solid ${BD2}`, flexShrink: 0 }}>
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -1040,6 +1057,7 @@ function ShowHistoryModal({ onClose }) {
               </div>
             </div>
           </div>
+          </>}
         </div>
       </div>
     </div>
@@ -1470,21 +1488,74 @@ const LINEUP_PANEL_DATA = {
   },
 }
 
-function IPadLineupSection({ models }) {
-  const [selModel, setSelModel] = useState(null)
+function IPadLineupSection({ models, setModels }) {
+  const [selModel, setSelModelRaw] = useState(null)
+  const [updateStatusOpen, setUpdateStatusOpen] = useState(false)
+  const [pingOpen, setPingOpen] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState(null)
+  const [pingPhrase, setPingPhrase] = useState(null)
+  const [pingCustom, setPingCustom] = useState('')
+  const [addingNote, setAddingNote] = useState(false)
+  const [noteText, setNoteText] = useState('')
+  const [localNotes, setLocalNotes] = useState([])
+  const [showHistoryModelId, setShowHistoryModelId] = useState(null)
+  const [pingToast, setPingToast] = useState(null)
   const svcs = ['hair', 'makeup', 'nails']
 
-  function getPanelData(m) {
-    return LINEUP_PANEL_DATA[m.name] || {
-      lookLabel: `Look ${String(m.lookNumber || m.look).padStart(2,'0')} · Look A`,
-      arrival: '3:00',
-      latestUpdate: null,
-      serviceWho: { hair: null, makeup: null, nails: null },
-      allergy: m.allergy || null,
-      note: m.notes || null,
-      updates: [{ time: '3:00', text: 'Arrived' }],
-      pastShowCount: 1, pastShowNames: 'Valentino FW25',
+  function setSelModel(m) {
+    setSelModelRaw(m)
+    setUpdateStatusOpen(false)
+    setPingOpen(false)
+    setAddingNote(false)
+    setNoteText('')
+    setLocalNotes(m?.notes || [])
+  }
+
+  function getProfile(id) { return id ? profiles.find(p => p.id === id) : null }
+
+  function getMakeupAssistant(m) { return getProfile(m.services?.makeup?.assistantId) }
+
+  function getLookLabel(m) {
+    const asst = getMakeupAssistant(m)
+    return `Look ${m.look} · ${asst?.name || 'Not paired'}`
+  }
+
+  function svcStatus(m, svc) { return m.services?.[svc]?.status || 'not_started' }
+  function svcChipColor(m, svc) { return STATUS_META_LINEUP[svcStatus(m, svc)]?.color || BD }
+  function svcChipLabel(m, svc) { return STATUS_META_LINEUP[svcStatus(m, svc)]?.label || 'Not started' }
+
+  function makeupSubLabel(m) {
+    const mk = m.services?.makeup
+    if (!mk) return ''
+    const asst = getProfile(mk.assistantId)
+    const name = asst ? asst.name : ''
+    const st = mk.status
+    if (st === 'done') return `${name}${name ? ' · ' : ''}Done · ${mk.elapsedMins} min`
+    if (st === 'in_progress') return `${name}${name ? ' · ' : ''}In progress`
+    if (st === 'paused') return `${name}${name ? ' · ' : ''}Paused${mk.elapsedMins ? ' · ' + mk.elapsedMins + ' min' : ''}`
+    return name || ''
+  }
+
+  function getUpdates(m) {
+    if (m.statusLog && m.statusLog.length > 0) return [...m.statusLog].reverse()
+    const entries = []
+    if (m.arrivedAt) entries.push({ time: m.arrivedAt, text: 'Arrived' })
+    const mkAid = m.services?.makeup?.assistantId
+    if (mkAid) {
+      const aname = getProfile(mkAid)?.name
+      if (aname) entries.push({ time: '', text: `Paired with ${aname}` })
+      if (m.services.makeup.startedAt) entries.push({ time: m.services.makeup.startedAt, text: `Makeup started · ${aname?.split(' ')[0] || ''}` })
+      if (m.services.makeup.status === 'done') entries.push({ time: '', text: `Makeup done · ${aname?.split(' ')[0] || ''}` })
     }
+    return entries.reverse()
+  }
+
+  function getPastShowCount(m) { return (modelHistory?.[m.id] || []).length }
+
+  function getPastShowSubLabel(m) {
+    const mh = modelHistory?.[m.id] || []
+    if (!mh.length) return 'First show with Art Partner'
+    return mh.map(s => s.showName.replace('Valentino ', '')).join(', ')
   }
 
   function getServiceCounts(m) {
@@ -1498,13 +1569,56 @@ function IPadLineupSection({ models }) {
     return c
   }
 
+  function handleSaveStatus() {
+    if (!selModel || !selectedStatus) return
+    const now = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    const asst = getMakeupAssistant(selModel)
+    const aShort = asst ? ' · ' + asst.name.split(' ')[0] : ''
+    const statusWord = { not_started: 'Not started', in_progress: 'In progress', paused: 'Paused', done: 'Done' }
+    const logText = `Makeup ${statusWord[selectedStatus].toLowerCase()}${aShort}`
+    setModels(prev => prev.map(m => {
+      if (m.id !== selModel.id) return m
+      return {
+        ...m,
+        services: { ...m.services, makeup: { ...m.services.makeup, status: selectedStatus } },
+        statusLog: [...(m.statusLog || []), { time: now, text: logText }],
+      }
+    }))
+    setSelModelRaw(prev => ({
+      ...prev,
+      services: { ...prev.services, makeup: { ...prev.services.makeup, status: selectedStatus } },
+      statusLog: [...(prev.statusLog || []), { time: now, text: logText }],
+    }))
+    setUpdateStatusOpen(false)
+    setSelectedStatus(null)
+  }
+
+  function handleSendPing() {
+    const msg = pingPhrase || pingCustom.trim()
+    if (!msg) return
+    const aname = getMakeupAssistant(selModel)?.name?.split(' ')[0] || 'assistant'
+    setPingOpen(false); setPingPhrase(null); setPingCustom('')
+    setPingToast(`Ping sent to ${aname}`)
+    setTimeout(() => setPingToast(null), 3000)
+  }
+
+  function handleAddNote() {
+    if (!noteText.trim()) return
+    const nn = { id: `note-${Date.now()}`, text: noteText.trim(), authorId: 'p1', authorName: 'Jen Z', authorRole: 'lead', createdAt: new Date().toISOString() }
+    const updated = [...localNotes, nn]
+    setLocalNotes(updated)
+    setModels(prev => prev.map(m => m.id === selModel.id ? { ...m, notes: updated } : m))
+    setNoteText(''); setAddingNote(false)
+  }
+
+  const QUICK_PHRASES = ['Status update?', 'Come to the front', 'Wrap up, rehearsal soon']
+
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
       {/* Grid area */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ flexShrink: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 16, rowGap: 8, padding: '16px 24px 12px' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, whiteSpace: 'nowrap' }}>Show order</span>
-          <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap' }}>{models.length} looks</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22, whiteSpace: 'nowrap' }}>{models.length} Models</span>
           <span style={{ flex: 1 }} />
           <span style={{ flexBasis: '100%', display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 11, color: MT }}>
             {Object.entries(STATUS_META_LINEUP).map(([key, meta]) => (
@@ -1536,23 +1650,28 @@ function IPadLineupSection({ models }) {
           </div>
         </div>
       </div>
+
       {/* Side panel */}
       {selModel && (() => {
-        const pd = getPanelData(selModel)
         const c = getServiceCounts(selModel)
+        const mkAsst = getMakeupAssistant(selModel)
+        const pastCount = getPastShowCount(selModel)
+        const updates = getUpdates(selModel)
+        const isPaired = !!selModel.services?.makeup?.assistantId
         return (
           <aside aria-label="Model details" style={{ width: 400, flexShrink: 0, borderLeft: `1px solid ${BD}`, background: BG, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+
               {/* Header */}
               <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                 <img src={selModel.avatar} alt={selModel.name} style={{ width: 90, aspectRatio: '3 / 4', borderRadius: 12, objectFit: 'cover', flexShrink: 0 }} />
                 <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 2 }}>
                   <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, lineHeight: 1.1 }}>{selModel.name}</span>
-                  <span style={{ fontSize: 13, color: MT }}>{pd.lookLabel}</span>
-                  <span style={{ fontSize: 13, color: MT }}>Arrived {pd.arrival}</span>
+                  <span style={{ fontSize: 13, color: MT }}>{getLookLabel(selModel)}</span>
+                  {selModel.arrivedAt && <span style={{ fontSize: 13, color: MT }}>Arrived {selModel.arrivedAt}</span>}
                   <span style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <span style={{ fontSize: 12 }}>{c.done} of 3 done</span>
-                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: 'var(--sp-bg-2)' }}>
+                    <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: RL }}>
                       <span style={{ width: `${c.done / 3 * 100}%`, background: '#7A9E7E' }} />
                       <span style={{ width: `${c.in_progress / 3 * 100}%`, background: '#D4A853' }} />
                       <span style={{ width: `${c.paused / 3 * 100}%`, background: '#8A9BB0' }} />
@@ -1561,78 +1680,178 @@ function IPadLineupSection({ models }) {
                 </span>
                 <button onClick={() => setSelModel(null)} style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${BD}`, background: 'transparent', fontSize: 18, color: MT, flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
               </div>
-              {/* Latest update */}
-              {pd.latestUpdate && (
-                <div style={{ background: SF, border: `1px solid ${BD}`, borderLeft: `4px solid ${pd.latestUpdate.borderColor}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Lbl>Latest · {pd.latestUpdate.time}</Lbl>
-                    <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: pd.latestUpdate.chipColor, fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX }}>{pd.latestUpdate.chipLabel}</span>
-                  </span>
-                  <span style={{ fontSize: 14, lineHeight: 1.45 }}>{pd.latestUpdate.text}</span>
-                </div>
-              )}
+
               {/* Where they're at */}
               <div>
-                <Lbl s={{ marginBottom: 2 }}>Where they're at</Lbl>
-                {svcs.map(svc => {
-                  const st = selModel.services?.[svc]?.status || 'not_started'
-                  const chipColor = STATUS_META_LINEUP[st]?.color || BD
-                  const chipLabel = STATUS_META_LINEUP[st]?.label || 'Not started'
-                  const who = pd.serviceWho[svc]
-                  return (
-                    <div key={svc} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) auto', gap: 10, alignItems: 'center', minHeight: 44, borderBottom: `1px solid ${BD}` }}>
-                      <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{svc}</span>
-                      <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{who || 'Not assigned'}</span>
-                      <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: chipColor, fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX, whiteSpace: 'nowrap' }}>{chipLabel}</span>
-                    </div>
-                  )
-                })}
-              </div>
-              {/* Notes */}
-              {(pd.allergy || pd.note) && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Lbl>Notes</Lbl>
-                  {pd.allergy && (
-                    <span style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10, background: '#F8E9E5', fontSize: 13, lineHeight: 1.4 }}>
-                      <b style={{ color: 'var(--sp-red-text)', fontSize: 11, letterSpacing: '.08em', paddingTop: 1, flexShrink: 0 }}>ALLERGY</b>
-                      <span>{pd.allergy}</span>
-                    </span>
-                  )}
-                  {pd.note && (
-                    <span style={{ padding: '10px 12px', borderRadius: 10, background: SF, border: `1px solid ${BD}`, fontSize: 13, lineHeight: 1.4 }}>{pd.note}</span>
-                  )}
+                <Lbl s={{ marginBottom: 2 }}>Where they&apos;re at</Lbl>
+                {/* Makeup first */}
+                <div style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) auto', gap: 10, alignItems: 'center', minHeight: 44, borderBottom: `1px solid ${BD}` }}>
+                  <span style={{ fontSize: 13, textTransform: 'capitalize' }}>Makeup</span>
+                  <span style={{ fontSize: 12, color: MT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{makeupSubLabel(selModel)}</span>
+                  <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: svcChipColor(selModel, 'makeup'), fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX, whiteSpace: 'nowrap' }}>{svcChipLabel(selModel, 'makeup')}</span>
                 </div>
-              )}
+                {/* Hair and Nails — chip only */}
+                {['hair', 'nails'].map(svc => (
+                  <div key={svc} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) auto', gap: 10, alignItems: 'center', minHeight: 44, borderBottom: `1px solid ${BD}` }}>
+                    <span style={{ fontSize: 13, textTransform: 'capitalize' }}>{svc}</span>
+                    <span />
+                    <span style={{ display: 'inline-block', height: 22, padding: '0 8px', borderRadius: 999, background: svcChipColor(selModel, svc), fontSize: 9, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', lineHeight: '22px', color: TX, whiteSpace: 'nowrap' }}>{svcChipLabel(selModel, svc)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Notes */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Lbl>Notes</Lbl>
+                {localNotes.map(n => (
+                  <span key={n.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 12px', borderRadius: 10, background: n.isAllergy ? '#F8E9E5' : SF, border: n.isAllergy ? 'none' : `1px solid ${BD}`, fontSize: 13, lineHeight: 1.4 }}>
+                    {n.isAllergy && <b style={{ color: '#A33D28', fontSize: 11, letterSpacing: '.08em', paddingTop: 1, flexShrink: 0 }}>ALLERGY</b>}
+                    <span>{n.text}</span>
+                  </span>
+                ))}
+                {addingNote ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <textarea
+                      autoFocus
+                      value={noteText}
+                      onChange={e => setNoteText(e.target.value)}
+                      rows={2}
+                      placeholder="Write a note..."
+                      style={{ padding: '10px 12px', border: `1px solid ${TX}`, borderRadius: 10, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, lineHeight: 1.4, resize: 'none', color: TX, background: SF, outline: 'none' }}
+                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={handleAddNote} style={{ flex: 1, height: 36, borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Save</button>
+                      <button onClick={() => { setAddingNote(false); setNoteText('') }} style={{ flex: 1, height: 36, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => setAddingNote(true)} style={{ height: 44, borderRadius: 10, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    + ADD A NOTE
+                  </button>
+                )}
+              </div>
+
               {/* Earlier updates */}
-              {pd.updates.length > 0 && (
+              {updates.length > 0 && (
                 <div>
                   <Lbl s={{ marginBottom: 2 }}>Earlier updates</Lbl>
-                  {pd.updates.map((u, i) => (
-                    <div key={i} style={{ display: 'grid', gridTemplateColumns: '52px minmax(0,1fr)', gap: 10, padding: '7px 0', fontSize: 12 }}>
+                  {updates.map((u, i) => (
+                    <div key={i} style={{ display: 'grid', gridTemplateColumns: '60px minmax(0,1fr)', gap: 10, padding: '7px 0', fontSize: 12, borderBottom: i < updates.length - 1 ? `1px solid ${BD}` : 'none' }}>
                       <span style={{ color: MT }}>{u.time}</span>
                       <span>{u.text}</span>
                     </div>
                   ))}
                 </div>
               )}
+
               {/* Past shows */}
-              <button style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${BD}`, background: SF, fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', color: TX, cursor: 'pointer' }}>
+              <button
+                onClick={() => setShowHistoryModelId(selModel.id)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${BD}`, background: SF, fontFamily: 'Inter,system-ui,sans-serif', textAlign: 'left', color: TX, cursor: 'pointer' }}>
                 <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <span style={{ fontSize: 14 }}>Past shows with you · {pd.pastShowCount}</span>
-                  <span style={{ fontSize: 12, color: MT }}>{pd.pastShowNames}</span>
+                  <span style={{ fontSize: 14 }}>Past shows with Art Partner · {pastCount}</span>
+                  <span style={{ fontSize: 12, color: MT }}>{getPastShowSubLabel(selModel)}</span>
                 </span>
                 <span aria-hidden="true" style={{ fontSize: 16, color: MT }}>›</span>
               </button>
             </div>
-            {/* Sticky footer */}
-            <div style={{ flexShrink: 0, display: 'flex', gap: 8, padding: '12px 20px 16px', borderTop: `1px solid ${BD}` }}>
-              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>PING ASSISTANT</button>
-              <span style={{ flex: 1 }} />
-              <button style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>UPDATE STATUS</button>
+
+            {/* Sticky footer with popovers */}
+            <div style={{ flexShrink: 0, borderTop: `1px solid ${BD}`, position: 'relative' }}>
+              {/* UPDATE STATUS popover (P2) */}
+              {updateStatusOpen && (
+                <div
+                  onClick={e => e.stopPropagation()}
+                  style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 16, right: 16, background: SF, border: `1px solid ${BD}`, borderRadius: 16, boxShadow: '0 -8px 32px rgba(0,0,0,.12)', padding: '18px 16px', zIndex: 10 }}>
+                  <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontSize: 18 }}>Update makeup</p>
+                  <p style={{ margin: '0 0 14px', fontSize: 12, color: MT }}>{selModel.name} · {mkAsst ? mkAsst.name + ' gets notified' : 'No assistant paired'}</p>
+                  {['not_started', 'in_progress', 'paused', 'done'].map(st => {
+                    const meta = STATUS_META_LINEUP[st]
+                    const isSel = selectedStatus === st
+                    return (
+                      <label key={st} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${BD}`, cursor: 'pointer' }}>
+                        <span style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${isSel ? TX : BD}`, background: isSel ? TX : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {isSel && <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--sp-inverse-text)' }} />}
+                        </span>
+                        <input type="radio" name="update-status" value={st} checked={isSel} onChange={() => setSelectedStatus(st)} style={{ display: 'none' }} />
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                          <span style={{ width: 10, height: 10, borderRadius: 2, background: meta?.color, flexShrink: 0 }} />
+                          <span style={{ fontSize: 14 }}>{meta?.label}</span>
+                        </span>
+                      </label>
+                    )
+                  })}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                    <button onClick={() => { setUpdateStatusOpen(false); setSelectedStatus(null) }} style={{ flex: 1, height: 40, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>CANCEL</button>
+                    <button onClick={handleSaveStatus} disabled={!selectedStatus} style={{ flex: 2, height: 40, borderRadius: 8, border: 0, background: selectedStatus ? TX : BD, color: selectedStatus ? 'var(--sp-inverse-text)' : MT, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: selectedStatus ? 'pointer' : 'default' }}>SAVE</button>
+                  </div>
+                </div>
+              )}
+              {/* PING ASSISTANT popover (P3) */}
+              {pingOpen && (
+                <div
+                  onClick={e => e.stopPropagation()}
+                  style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 16, right: 16, background: SF, border: `1px solid ${BD}`, borderRadius: 16, boxShadow: '0 -8px 32px rgba(0,0,0,.12)', padding: '18px 16px', zIndex: 10 }}>
+                  <p style={{ margin: '0 0 2px', fontFamily: 'Georgia, serif', fontSize: 18 }}>Ping {mkAsst?.name || 'assistant'}</p>
+                  <p style={{ margin: '0 0 14px', fontSize: 12, color: MT }}>About {selModel.name} · {mkAsst?.station || 'Station'}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                    {QUICK_PHRASES.map(phrase => (
+                      <button key={phrase} onClick={() => setPingPhrase(pingPhrase === phrase ? null : phrase)}
+                        style={{ height: 34, padding: '0 14px', borderRadius: 999, border: `1px solid ${pingPhrase === phrase ? TX : BD}`, background: pingPhrase === phrase ? TX : 'transparent', color: pingPhrase === phrase ? 'var(--sp-inverse-text)' : TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        {phrase}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={pingCustom}
+                    onChange={e => { setPingCustom(e.target.value); if (e.target.value) setPingPhrase(null) }}
+                    rows={2}
+                    placeholder="Or write your own..."
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', border: `1px solid ${DV}`, borderRadius: 10, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, lineHeight: 1.4, resize: 'none', color: TX, background: SF, outline: 'none', marginBottom: 12 }}
+                  />
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => { setPingOpen(false); setPingPhrase(null); setPingCustom('') }} style={{ flex: 1, height: 40, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>CANCEL</button>
+                    <button onClick={handleSendPing} disabled={!pingPhrase && !pingCustom.trim()} style={{ flex: 2, height: 40, borderRadius: 8, border: 0, background: (pingPhrase || pingCustom.trim()) ? TX : BD, color: (pingPhrase || pingCustom.trim()) ? 'var(--sp-inverse-text)' : MT, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: (pingPhrase || pingCustom.trim()) ? 'pointer' : 'default' }}>SEND PING</button>
+                  </div>
+                </div>
+              )}
+              {/* Toast */}
+              {pingToast && (
+                <div style={{ position: 'absolute', bottom: 'calc(100% + 60px)', left: 16, right: 16, padding: '10px 14px', borderRadius: 10, background: TX, color: 'var(--sp-inverse-text)', fontSize: 13, textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,.2)', zIndex: 20 }}>
+                  {pingToast}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, padding: '12px 20px 16px' }} onClick={() => { if (updateStatusOpen) setUpdateStatusOpen(false); if (pingOpen) setPingOpen(false) }}>
+                <button
+                  disabled={!isPaired}
+                  onClick={e => { e.stopPropagation(); setUpdateStatusOpen(false); setPingOpen(o => !o) }}
+                  style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: `1px solid ${isPaired ? DV : BD}`, background: 'transparent', color: isPaired ? TX : M2, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: isPaired ? 'pointer' : 'default' }}>
+                  PING ASSISTANT
+                </button>
+                <span style={{ flex: 1 }} />
+                <button
+                  onClick={e => { e.stopPropagation(); setPingOpen(false); setUpdateStatusOpen(o => !o); setSelectedStatus(selModel.services?.makeup?.status || null) }}
+                  style={{ minHeight: 40, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.1em', whiteSpace: 'nowrap', flexShrink: 0, cursor: 'pointer' }}>
+                  UPDATE STATUS
+                </button>
+              </div>
             </div>
           </aside>
         )
       })()}
+
+      {/* Backdrop to close popovers */}
+      {(updateStatusOpen || pingOpen) && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 5 }} onClick={() => { setUpdateStatusOpen(false); setPingOpen(false) }} />
+      )}
+
+      {/* Show history modal filtered by model */}
+      {showHistoryModelId && (
+        <ShowHistoryModal
+          onClose={() => setShowHistoryModelId(null)}
+          modelId={showHistoryModelId}
+        />
+      )}
     </div>
   )
 }
@@ -1680,6 +1899,179 @@ const IPAD_LOOKS_INIT = [
 ]
 
 const PRODUCT_SUGGESTIONS = ['Basic mascara~Generic~any black mascara in the kit','Maybelline Lash Sensational Sky High~Very Black','Charlotte Tilbury Rock \'n\' Kohl~Barbarella Brown','L\'Oréal Telescopic~Blackest Black','Lancôme Lash Idôle~Glossy Black']
+
+const INV_AREAS = ['All', 'Skin', 'Eyes', 'Lips', 'Brows', 'Tools']
+
+function InventoryTab() {
+  const [products, setProducts] = useState(initInventory)
+  const [areaFilter, setAreaFilter] = useState('All')
+  const [addOpen, setAddOpen] = useState(false)
+  const [newProd, setNewProd] = useState({ name: '', brand: '', shade: '', area: 'Skin', inKit: '', today: '', stock: '' })
+
+  const visible = areaFilter === 'All' ? products : products.filter(p => p.area === areaFilter)
+  const countByArea = Object.fromEntries(INV_AREAS.map(a => [a, a === 'All' ? products.length : products.filter(p => p.area === a).length]))
+
+  function handleAddProduct() {
+    if (!newProd.name.trim()) return
+    const p = {
+      id: `p-new-${Date.now()}`,
+      name: newProd.name, brand: newProd.brand, shade: newProd.shade, area: newProd.area,
+      color: '#C8B090',
+      inKit: parseInt(newProd.inKit) || 0,
+      today: parseInt(newProd.today) || 0,
+      stock: parseInt(newProd.stock) || 0,
+    }
+    setProducts(prev => [...prev, p])
+    setNewProd({ name: '', brand: '', shade: '', area: 'Skin', inKit: '', today: '', stock: '' })
+    setAddOpen(false)
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0 0 0 0' }}>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', flexWrap: 'wrap', rowGap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flex: 1 }}>
+          {INV_AREAS.map(area => (
+            <button key={area} onClick={() => setAreaFilter(area)}
+              style={{ height: 32, padding: '0 14px', borderRadius: 999, border: 0, background: areaFilter === area ? TX : RL, color: areaFilter === area ? 'var(--sp-inverse-text)' : TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              {area} {countByArea[area]}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setAddOpen(true)} style={{ height: 36, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          + ADD PRODUCT
+        </button>
+      </div>
+
+      {addOpen && (
+        <div style={{ flexShrink: 0, margin: '0 24px 12px', padding: '14px 16px', background: SF, border: `1px solid ${BD}`, borderRadius: 12, display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'flex-end' }}>
+          {[['name','Product name'], ['brand','Brand'], ['shade','Shade']].map(([k, ph]) => (
+            <input key={k} value={newProd[k]} onChange={e => setNewProd(p => ({ ...p, [k]: e.target.value }))} placeholder={ph}
+              style={{ flex: '1 1 140px', height: 36, padding: '0 10px', border: `1px solid ${BD}`, borderRadius: 8, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, background: 'transparent', outline: 'none' }} />
+          ))}
+          <select value={newProd.area} onChange={e => setNewProd(p => ({ ...p, area: e.target.value }))}
+            style={{ height: 36, padding: '0 10px', border: `1px solid ${BD}`, borderRadius: 8, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, background: 'transparent', outline: 'none', cursor: 'pointer' }}>
+            {['Skin','Eyes','Lips','Brows','Tools'].map(a => <option key={a}>{a}</option>)}
+          </select>
+          {[['inKit','In kit'], ['stock','Stock']].map(([k, ph]) => (
+            <input key={k} value={newProd[k]} onChange={e => setNewProd(p => ({ ...p, [k]: e.target.value }))} placeholder={ph} type="number"
+              style={{ width: 70, height: 36, padding: '0 10px', border: `1px solid ${BD}`, borderRadius: 8, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, color: TX, background: 'transparent', outline: 'none' }} />
+          ))}
+          <button onClick={handleAddProduct} style={{ height: 36, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Add</button>
+          <button onClick={() => setAddOpen(false)} style={{ height: 36, padding: '0 16px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+        </div>
+      )}
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 24px' }}>
+        <div style={{ background: 'white', borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px,2fr) minmax(120px,1fr) 90px 70px 52px 60px 60px', alignItems: 'center', padding: '0 16px', height: 40, borderBottom: `1px solid ${BD}`, position: 'sticky', top: 0, background: 'white', zIndex: 1 }}>
+            {['Product', 'Brand', 'Shade', 'Area', 'In kit', 'Today', 'Stock'].map(h => (
+              <span key={h} style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6E6A64' }}>{h}</span>
+            ))}
+          </div>
+          {visible.map((p, i) => {
+            const kitRed = p.inKit !== undefined && p.inKit <= 6
+            const stockLow = p.stock > 0 && p.stock <= 3
+            const stockOut = p.stock === 0
+            return (
+              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(200px,2fr) minmax(120px,1fr) 90px 70px 52px 60px 60px', alignItems: 'center', padding: '0 16px', minHeight: 44, borderBottom: i < visible.length - 1 ? `1px solid ${BD}` : 'none', background: 'white' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ width: 18, height: 18, borderRadius: 4, background: p.color, flexShrink: 0, border: '1px solid rgba(0,0,0,.08)' }} />
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
+                </span>
+                <span style={{ fontSize: 12, color: '#6E6A64', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.brand}</span>
+                <span style={{ fontSize: 12, color: '#6E6A64', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.shade}</span>
+                <span style={{ fontSize: 12, color: '#6E6A64' }}>{p.area}</span>
+                <span style={{ fontSize: 13, fontWeight: kitRed ? 700 : 400, color: kitRed ? '#C4614A' : '#111' }}>{p.inKit}</span>
+                <span style={{ fontSize: 13, color: '#111' }}>{p.today > 0 ? `${p.today} used` : ''}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  {stockOut ? <span style={{ height: 20, padding: '0 8px', borderRadius: 999, background: '#E8B7AC', fontSize: 9, fontWeight: 700, letterSpacing: '.1em', color: '#7A2018', lineHeight: '20px' }}>OUT</span>
+                  : stockLow ? <span style={{ height: 20, padding: '0 8px', borderRadius: 999, background: '#F2D9D3', fontSize: 9, fontWeight: 700, letterSpacing: '.1em', color: '#A33D28', lineHeight: '20px' }}>LOW</span>
+                  : <span style={{ fontSize: 13, color: '#111' }}>{p.stock}</span>}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ReceiptsTab() {
+  const [items, setItems] = useState(initReceipts)
+  const [chipFilter, setChipFilter] = useState('All')
+  const visible = chipFilter === 'All' ? items : items.filter(r => r.status === chipFilter.toLowerCase())
+  const totalSpent = items.reduce((s, r) => s + r.amount, 0)
+  const waitingCount = items.filter(r => r.status === 'submitted').length
+
+  function approve(id) {
+    setItems(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r))
+  }
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '12px 24px 24px' }}>
+      {/* Summary cards */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+        {[
+          { value: `€${totalSpent}`, label: 'Spent on this show' },
+          { value: `€${receiptSummary.budget.toLocaleString()}`, label: 'Kit budget' },
+          { value: waitingCount, label: 'Waiting for your approval', amber: true },
+        ].map(c => (
+          <div key={c.label} style={{ flex: 1, padding: '14px 16px', background: SF, border: `1px solid ${BD}`, borderRadius: 12 }}>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 24, color: c.amber ? '#D4A853' : TX }}>{c.value}</div>
+            <div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{c.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter chips + actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap', rowGap: 8 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {['All', 'Waiting', 'Approved'].map(f => (
+            <button key={f} onClick={() => setChipFilter(f)}
+              style={{ height: 32, padding: '0 14px', borderRadius: 999, border: 0, background: chipFilter === f ? TX : RL, color: chipFilter === f ? 'var(--sp-inverse-text)' : TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 13, cursor: 'pointer' }}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <span style={{ flex: 1 }} />
+        <button style={{ height: 36, padding: '0 16px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', color: TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          EXPORT FOR ALEXIS
+        </button>
+        <button style={{ height: 36, padding: '0 16px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          + ADD RECEIPT
+        </button>
+      </div>
+
+      {/* Table */}
+      <div style={{ background: 'white', borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '130px minmax(120px,1fr) 130px minmax(100px,1fr) 80px 100px', alignItems: 'center', padding: '0 16px', height: 40, borderBottom: `1px solid ${BD}`, background: 'white' }}>
+          {['When', 'Vendor', 'Submitted by', 'For', 'Amount', 'Status'].map(h => (
+            <span key={h} style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6E6A64' }}>{h}</span>
+          ))}
+        </div>
+        {visible.map((r, i) => {
+          const isSubmitted = r.status === 'submitted'
+          return (
+            <div key={r.id} style={{ display: 'grid', gridTemplateColumns: '130px minmax(120px,1fr) 130px minmax(100px,1fr) 80px 100px', alignItems: 'center', padding: '0 16px', minHeight: 48, borderBottom: i < visible.length - 1 ? `1px solid ${BD}` : 'none', background: 'white', cursor: isSubmitted ? 'pointer' : 'default' }}
+              onClick={() => isSubmitted && approve(r.id)}>
+              <span style={{ fontSize: 12, color: '#6E6A64' }}>{r.when}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#111' }}>{r.vendor}</span>
+              <span style={{ fontSize: 12, color: '#6E6A64' }}>{r.submittedByName}</span>
+              <span style={{ fontSize: 12, color: '#6E6A64', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.for}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>€{r.amount}</span>
+              <span>
+                {isSubmitted
+                  ? <span style={{ height: 24, padding: '0 10px', borderRadius: 999, background: '#FEF3C7', fontSize: 10, fontWeight: 700, letterSpacing: '.08em', color: '#92400E', lineHeight: '24px', display: 'inline-block', whiteSpace: 'nowrap' }}>SUBMITTED</span>
+                  : <span style={{ height: 24, padding: '0 10px', borderRadius: 999, background: '#DCE8DD', fontSize: 10, fontWeight: 700, letterSpacing: '.08em', color: '#3A5C3E', lineHeight: '24px', display: 'inline-block', whiteSpace: 'nowrap' }}>APPROVED</span>}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 function IPadStudioSection() {
   const [looks, setLooks]           = useState(IPAD_LOOKS_INIT)
@@ -2020,19 +2412,9 @@ function IPadStudioSection() {
         </div>
       )}
 
-      {studioTab === 'inventory' && (
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Inventory</span>
-          <p style={{ fontSize: 13, color: MT, marginTop: 8 }}>Product inventory is managed in the Makeup Studio on your phone.</p>
-        </div>
-      )}
+      {studioTab === 'inventory' && <InventoryTab />}
 
-      {studioTab === 'receipts' && (
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 22 }}>Receipts</span>
-          <p style={{ fontSize: 13, color: MT, marginTop: 8 }}>Receipts and expenses are tracked in the Makeup Studio on your phone.</p>
-        </div>
-      )}
+      {studioTab === 'receipts' && <ReceiptsTab />}
     </div>
   )
 }
@@ -2047,29 +2429,89 @@ const SETTINGS_ITEMS = [
   { id: 'about',         label: 'About',          group: 'prefs' },
 ]
 
-function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, venue, modelCount }) {
-  const [active, setActive]         = useState('schedule')
-  const [rows, setRows]             = useState(() => schedule || [])
-  const [localVenue, setLocalVenue] = useState(venue || '')
+function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, venue, onVenueChange, models: allModels }) {
+  const [active, setActive] = useState('schedule')
+  const [rows, setRows]     = useState(() => schedule || [])
+
+  const [venueName,         setVenueName]         = useState(venue?.area?.name || '')
+  const [venueAddress,      setVenueAddress]       = useState(venue?.pin?.address || '')
+  const [backstageLocation, setBackstageLocation]  = useState(venue?.backstageLocation || '')
+  const [teamEntrance,      setTeamEntrance]        = useState(venue?.teamEntrance || '')
+  const [venueWifi,         setVenueWifi]           = useState(venue?.wifi || '')
+  const [venueContact,      setVenueContact]        = useState(venue?.contact || '')
+  const [venueNotes,        setVenueNotes]          = useState(venue?.teamNotes || '')
 
   function changeRow(idx, field, value) {
     setRows(prev => { const n = prev.map((r, i) => i === idx ? { ...r, [field]: value } : r); onScheduleChange?.(n); return n })
   }
-  function addRow()      { setRows(prev => { const n = [...prev, { time: '', label: '' }]; onScheduleChange?.(n); return n }) }
-  function deleteRow(idx){ setRows(prev => { const n = prev.filter((_, i) => i !== idx); onScheduleChange?.(n); return n }) }
+  function addRow()       { setRows(prev => { const n = [...prev, { time: '', label: '' }]; onScheduleChange?.(n); return n }) }
+  function deleteRow(idx) { setRows(prev => { const n = prev.filter((_, i) => i !== idx); onScheduleChange?.(n); return n }) }
+
+  function handleSaveVenue() {
+    onVenueChange?.({
+      ...venue,
+      area: { ...venue?.area, name: venueName },
+      pin:  { ...venue?.pin,  address: venueAddress },
+      backstageLocation, teamEntrance, wifi: venueWifi, contact: venueContact, teamNotes: venueNotes,
+    })
+  }
+
+  const mkKeyArtist   = profiles.filter(p => p.role === 'artist' && p.specialty === SVC)
+  const mkLeads       = profiles.filter(p => p.role === 'lead_assistant' && p.specialty === SVC)
+  const mkAssistants  = profiles.filter(p => p.role === 'assistant' && p.specialty === SVC).sort((a, b) => a.name.localeCompare(b.name))
+  const looks         = [...new Set((allModels || []).map(m => m.look))].sort()
+
+  function TeamTable({ title, rows: pRows }) {
+    return (
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, margin: '0 0 8px' }}>{title}</p>
+        <div style={{ background: 'white', borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,2fr) 130px 100px 140px', alignItems: 'center', padding: '0 16px', height: 38, borderBottom: `1px solid ${BD}`, background: 'white' }}>
+            {['Name', 'Phone', 'Station', 'With Art Partner'].map(h => (
+              <span key={h} style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6E6A64' }}>{h}</span>
+            ))}
+          </div>
+          {pRows.map((p, i) => {
+            const det = modelDetails?.[p.id]
+            const pastCount = det?.pastShows?.count ?? 0
+            const withLabel = pastCount > 0 ? `${pastCount} show${pastCount > 1 ? 's' : ''}` : '1st show'
+            const roleLabel = p.role === 'artist' ? 'Key artist' : p.role === 'lead_assistant' ? 'Lead assistant' : 'Assistant'
+            return (
+              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,2fr) 130px 100px 140px', alignItems: 'center', padding: '0 16px', minHeight: 44, borderBottom: i < pRows.length - 1 ? `1px solid ${BD}` : 'none', background: 'white' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <img src={p.avatar} alt={p.name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#111' }}>{p.name}</span>
+                    <span style={{ fontSize: 11, color: '#6E6A64' }}>{roleLabel}</span>
+                  </span>
+                </span>
+                <span style={{ fontSize: 12, color: '#6E6A64' }}>{p.phone || ''}</span>
+                <span style={{ fontSize: 12, color: '#6E6A64' }}>{p.station || ''}</span>
+                <span style={{ fontSize: 12, color: '#6E6A64' }}>{withLabel}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
       <div style={{ width: 220, flexShrink: 0, borderRight: `1px solid ${BD}`, overflowY: 'auto' }}>
-        {[['show','Show Setup'],['prefs','Preferences']].map(([grp, grpLabel]) => (
-          <div key={grp} style={{ padding: '16px 0 8px' }}>
-            <Lbl s={{ padding: '0 20px', marginBottom: 4 }}>{grpLabel}</Lbl>
-            {SETTINGS_ITEMS.filter(s => s.group === grp).map(s => (
-              <button key={s.id} onClick={() => setActive(s.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: active === s.id ? 'var(--sp-bg-2)' : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, color: TX, textAlign: 'left' }}>
-                {s.label}
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke={M2} strokeWidth="1.5" strokeLinecap="round"><polyline points="3 2 7 5 3 8"/></svg>
-              </button>
-            ))}
+        {[['show', 'Show Setup'], ['prefs', 'Preferences']].map(([grp, grpLabel], gi) => (
+          <div key={grp} style={{ padding: gi === 0 ? '16px 0 8px' : '24px 0 8px' }}>
+            <Lbl s={{ padding: '0 12px', marginBottom: 4 }}>{grpLabel}</Lbl>
+            {SETTINGS_ITEMS.filter(s => s.group === grp).map(s => {
+              const isAct = active === s.id
+              return (
+                <div key={s.id} style={{ padding: '3px 8px' }}>
+                  <button onClick={() => setActive(s.id)} style={{ width: '100%', height: 44, display: 'flex', alignItems: 'center', padding: '0 14px', borderRadius: 999, border: 0, background: isAct ? TX : 'transparent', color: isAct ? 'var(--sp-inverse-text)' : TX, fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, fontWeight: isAct ? 600 : 400, cursor: 'pointer', textAlign: 'left' }}>
+                    {s.label}
+                  </button>
+                </div>
+              )
+            })}
           </div>
         ))}
       </div>
@@ -2090,26 +2532,101 @@ function IPadSettingsSection({ dark, onToggleDark, schedule, onScheduleChange, v
         {active === 'venue' && (
           <div>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Venue</p>
-            <Lbl s={{ marginBottom: 6 }}>Location</Lbl>
-            <input value={localVenue} onChange={e => setLocalVenue(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              {[
+                ['Venue name', venueName, setVenueName],
+                ['Address', venueAddress, setVenueAddress],
+                ['Backstage location', backstageLocation, setBackstageLocation],
+                ['Team entrance', teamEntrance, setTeamEntrance],
+                ['Wi-Fi', venueWifi, setVenueWifi],
+                ['Venue contact', venueContact, setVenueContact],
+              ].map(([label, val, setter]) => (
+                <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Lbl>{label}</Lbl>
+                  <input value={val} onChange={e => setter(e.target.value)}
+                    style={{ width: '100%', boxSizing: 'border-box', height: 44, borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, padding: '0 14px', color: TX, outline: 'none' }} />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+              <Lbl>Notes for the team</Lbl>
+              <textarea value={venueNotes} onChange={e => setVenueNotes(e.target.value)} rows={3}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', border: `1px solid ${BD}`, borderRadius: 8, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 14, lineHeight: 1.5, color: TX, outline: 'none', resize: 'vertical' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+              <Lbl>Floor plan</Lbl>
+              <div style={{ height: 80, borderRadius: 8, border: `1px dashed ${DV}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
+                <span style={{ fontSize: 13, color: MT }}>{venue?.floorPlanImage ? venue.floorPlanImage : 'No file uploaded'}</span>
+                <button style={{ height: 34, padding: '0 14px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, color: TX, cursor: 'pointer' }}>REPLACE FILE</button>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button style={{ height: 44, padding: '0 20px', borderRadius: 8, border: `1px solid ${BD}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, letterSpacing: '.08em', color: TX, cursor: 'pointer' }}>CANCEL</button>
+              <button onClick={handleSaveVenue} style={{ height: 44, padding: '0 24px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 12, letterSpacing: '.08em', cursor: 'pointer' }}>SAVE VENUE</button>
+            </div>
           </div>
         )}
         {active === 'models' && (
           <div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Models</p>
-            <p style={{ fontSize: 13, color: MT }}>{modelCount || 30} models loaded for this show.</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: 0 }}>Models</p>
+                <p style={{ fontSize: 12, color: MT, margin: '2px 0 0' }}>{(allModels || []).length} models · {looks.length} looks</p>
+              </div>
+              <span style={{ flex: 1 }} />
+              <button style={{ height: 36, padding: '0 14px', borderRadius: 8, border: `1px solid ${DV}`, background: 'transparent', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', color: TX, cursor: 'pointer', whiteSpace: 'nowrap' }}>IMPORT CSV</button>
+              <button style={{ height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>+ ADD MODEL</button>
+            </div>
+            <div style={{ background: 'white', borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '36px minmax(140px,2fr) 50px 110px 160px minmax(100px,1fr)', alignItems: 'center', padding: '0 16px', height: 38, borderBottom: `1px solid ${BD}`, background: 'white', position: 'sticky', top: 0 }}>
+                {['#', 'Model', 'Look', 'Phone', 'Shows with Art Partner', 'Notes'].map(h => (
+                  <span key={h} style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#6E6A64' }}>{h}</span>
+                ))}
+              </div>
+              {(allModels || []).map((m, i) => {
+                const det = modelDetails?.[m.id] || {}
+                const pastCount = det.pastShows?.count ?? 0
+                const pastLabel = pastCount > 0 ? `${pastCount} · ${det.pastShows.shows}` : 'First time'
+                const allergyNote = m.notes?.find(n => n.isAllergy)
+                const otherNote = m.notes?.find(n => !n.isAllergy)
+                return (
+                  <div key={m.id} onClick={() => {}} style={{ display: 'grid', gridTemplateColumns: '36px minmax(140px,2fr) 50px 110px 160px minmax(100px,1fr)', alignItems: 'center', padding: '0 16px', minHeight: 44, borderBottom: i < (allModels.length - 1) ? `1px solid ${BD}` : 'none', background: 'white', cursor: 'pointer' }}>
+                    <span style={{ fontSize: 12, color: '#6E6A64' }}>{String(i + 1).padStart(2, '0')}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <img src={m.avatar} alt={m.name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
+                    </span>
+                    <span style={{ fontSize: 12, color: '#6E6A64' }}>Look {m.look}</span>
+                    <span style={{ fontSize: 12, color: '#6E6A64' }}>{det.phone || ''}</span>
+                    <span style={{ fontSize: 12, color: '#6E6A64', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pastLabel}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      {allergyNote && <span style={{ height: 20, padding: '0 8px', borderRadius: 999, background: '#F8E9E5', fontSize: 9, fontWeight: 700, letterSpacing: '.08em', color: '#A33D28', lineHeight: '20px', whiteSpace: 'nowrap' }}>ALLERGY</span>}
+                      {otherNote && <span style={{ fontSize: 11, color: '#6E6A64', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{otherNote.text}</span>}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
         {active === 'team' && (
           <div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Team</p>
-            <p style={{ fontSize: 13, color: MT }}>28 assistants on the team for this show.</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: 0 }}>Team</p>
+                <p style={{ fontSize: 12, color: MT, margin: '2px 0 0' }}>Makeup · {mkKeyArtist.length} key artist · {mkLeads.length} leads · {mkAssistants.length} assistants</p>
+              </div>
+              <span style={{ flex: 1 }} />
+              <button style={{ height: 36, padding: '0 14px', borderRadius: 8, border: 0, background: TX, color: 'var(--sp-inverse-text)', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, letterSpacing: '.08em', cursor: 'pointer', whiteSpace: 'nowrap' }}>+ ADD PERSON</button>
+            </div>
+            <TeamTable title="Key artist and leads" rows={[...mkKeyArtist, ...mkLeads]} />
+            <TeamTable title={`Makeup assistants · ${mkAssistants.length}`} rows={mkAssistants} />
           </div>
         )}
         {active === 'notifications' && (
           <div>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 22, margin: '0 0 20px' }}>Notifications</p>
-            {[['Status alerts','Notify when model status changes'],['Pings','Notify when an assistant sends a ping']].map(([label, desc]) => (
+            {[['Status alerts', 'Notify when model status changes'], ['Pings', 'Notify when an assistant sends a ping']].map(([label, desc]) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: `1px solid ${BD}` }}>
                 <div><div style={{ fontSize: 14, color: TX }}>{label}</div><div style={{ fontSize: 12, color: MT, marginTop: 2 }}>{desc}</div></div>
                 <span style={{ width: 44, height: 24, borderRadius: 999, background: TX, position: 'relative', flexShrink: 0, display: 'inline-block' }}><span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: '50%', background: SF, boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} /></span>
@@ -2158,6 +2675,7 @@ export default function ProducerIPadView({
   schedule,
   onScheduleChange,
   venue,
+  onVenueChange,
 }) {
   const [panel, setPanel]           = useState('default')
   const [pairModel, setPairModel]   = useState(null)
@@ -2450,9 +2968,9 @@ export default function ProducerIPadView({
 
           {/* NON-HOME SECTIONS */}
           {ipadSection === 'assistants' && <IPadAssistantsSection models={models} profiles={profiles} />}
-          {ipadSection === 'lineup'     && <IPadLineupSection models={models} />}
+          {ipadSection === 'lineup'     && <IPadLineupSection models={models} setModels={setModels} />}
           {ipadSection === 'studio'     && <IPadStudioSection />}
-          {ipadSection === 'settings'   && <IPadSettingsSection dark={dark} onToggleDark={onToggleDark} schedule={schedule} onScheduleChange={onScheduleChange} venue={venue} modelCount={models.length} />}
+          {ipadSection === 'settings'   && <IPadSettingsSection dark={dark} onToggleDark={onToggleDark} schedule={schedule} onScheduleChange={onScheduleChange} venue={venue} models={models} />}
 
           {/* HOME */}
           {ipadSection === 'home' && (
