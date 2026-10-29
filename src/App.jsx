@@ -27,6 +27,11 @@ const DEFAULT_VENUE = {
   pin: { lat: 40.6782, lng: -73.9442, address: 'Agger Fish Building, 640 Columbia St, Brooklyn, NY' },
   area: { name: 'Agger Fish Building', geometry: null },
   floorPlanImage: null,
+  backstageLocation: '',
+  teamEntrance: '',
+  wifi: '',
+  contact: '',
+  teamNotes: '',
   zones: [
     {
       id: 'dz-runway', type: 'runway', label: 'Runway', color: '#C8C4BF',
@@ -331,6 +336,7 @@ function AppInner() {
         schedule={schedule}
         onScheduleChange={setSchedule}
         venue={venue}
+        onVenueChange={setVenue}
       />
     )
   }

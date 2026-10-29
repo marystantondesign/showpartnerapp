@@ -2970,7 +2970,7 @@ export default function ProducerIPadView({
           {ipadSection === 'assistants' && <IPadAssistantsSection models={models} profiles={profiles} />}
           {ipadSection === 'lineup'     && <IPadLineupSection models={models} setModels={setModels} />}
           {ipadSection === 'studio'     && <IPadStudioSection />}
-          {ipadSection === 'settings'   && <IPadSettingsSection dark={dark} onToggleDark={onToggleDark} schedule={schedule} onScheduleChange={onScheduleChange} venue={venue} models={models} />}
+          {ipadSection === 'settings'   && <IPadSettingsSection dark={dark} onToggleDark={onToggleDark} schedule={schedule} onScheduleChange={onScheduleChange} venue={venue} onVenueChange={onVenueChange} models={models} />}
 
           {/* HOME */}
           {ipadSection === 'home' && (
