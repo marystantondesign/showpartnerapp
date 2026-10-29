@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LS1b · Lead assistant · Set up looks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-family:Inter,system-ui,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A64;margin:0}
+.chip{font-family:Inter,system-ui,sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:4px 8px;color:#111;white-space:nowrap}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:10px;font-family:Inter,system-ui,sans-serif;font-size:9px;letter-spacing:.1em;color:#6E6A64;background:none;border:0}
+.sec{min-height:48px;border-radius:8px;border:1px solid #CFCAC4;background:transparent;font-family:Inter,system-ui,sans-serif;font-size:11px;letter-spacing:.08em;color:#111}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #F5F2EE; font-family: Inter, system-ui, sans-serif; color: #111; overflow: hidden">
+<div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid #E0DDD8"><button aria-label="Back" style="width: 44px; height: 44px; border: 0; background: none; display: flex; align-items: center; justify-content: center; margin-left: -10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button><span style="flex: 1; font-family: Georgia, serif; font-size: 24px">Set up looks</span></div><div style="flex: 1; min-height: 0; overflow-y: auto; padding: 22px 16px; display: flex; flex-direction: column; gap: 14px"><span style="font-family: Georgia, serif; font-size: 24px">How many makeup looks today?</span><div style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #E6E2DD"><button style="flex: 1; min-height: 48px; border-radius: 10px; border: 0; background: transparent; color: #111; font-family: Georgia, serif; font-size: 20px">1</button><button style="flex: 1; min-height: 48px; border-radius: 10px; border: 0; background: transparent; color: #111; font-family: Georgia, serif; font-size: 20px">2</button><button style="flex: 1; min-height: 48px; border-radius: 10px; border: 0; background: #111; color: #fff; font-family: Georgia, serif; font-size: 20px">3</button><button style="flex: 1; min-height: 48px; border-radius: 10px; border: 0; background: transparent; color: #111; font-family: Georgia, serif; font-size: 20px">4</button></div><span style="font-size: 13px; color: #4A4743">You can add or remove one later.</span><p class="lbl" style="padding-top: 10px">Name them</p><div style="display: flex; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px solid #E0DDD8"><span style="width: 24px; font-family: Georgia, serif; font-size: 20px">A</span><input value="Look A" style="flex: 1; height: 48px; padding: 0 14px; border: 1px solid #CFCAC4; border-radius: 10px; background: #fff; font-family: Inter, system-ui, sans-serif; font-size: 15px"></div><div style="display: flex; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px solid #E0DDD8"><span style="width: 24px; font-family: Georgia, serif; font-size: 20px">B</span><input value="Look B" style="flex: 1; height: 48px; padding: 0 14px; border: 1px solid #CFCAC4; border-radius: 10px; background: #fff; font-family: Inter, system-ui, sans-serif; font-size: 15px"></div><div style="display: flex; align-items: center; gap: 14px; padding: 8px 0; border-bottom: 1px solid #E0DDD8"><span style="width: 24px; font-family: Georgia, serif; font-size: 20px">C</span><input value="Look C" style="flex: 1; height: 48px; padding: 0 14px; border: 1px solid #CFCAC4; border-radius: 10px; background: #fff; font-family: Inter, system-ui, sans-serif; font-size: 15px"></div></div><div style="flex-shrink: 0; padding: 12px 16px 18px; border-top: 1px solid #E0DDD8"><button style="width: 100%; min-height: 54px; border-radius: 10px; border: 0; background: #111; color: #fff; font-family: Inter, system-ui, sans-serif; font-size: 12px; letter-spacing: .14em">NEXT: WRITE LOOK A</button></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

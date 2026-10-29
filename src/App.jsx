@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Component } from 'react'
 import { models as initModels, notifications as initNotifs, profileNotifications, profiles, schedule as initSchedule, announcements as initAnnouncements, timeline } from './data/mockData'
 import RoleSelect from './components/RoleSelect'
 import ShowHistory from './components/ShowHistory'
@@ -76,6 +76,28 @@ function profileForRole(role) {
 
 function fmtNow() {
   return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
+
+class TabBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null } }
+  static getDerivedStateFromError(err) { return { error: err } }
+  componentDidCatch(err, info) { console.error('[TabBoundary]', err, info) }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: '#111' }}>Something went wrong on this screen</p>
+          <button
+            onClick={() => this.setState({ error: null })}
+            style={{ height: 48, padding: '0 24px', borderRadius: 8, border: 0, background: '#111', color: '#fff', fontFamily: 'Inter,system-ui,sans-serif', fontSize: 11, fontWeight: 600, letterSpacing: '.1em', cursor: 'pointer' }}
+          >
+            RELOAD
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 function AppInner() {
@@ -354,6 +376,7 @@ function AppInner() {
           onShowHistory={() => setShowHistoryOpen(true)}
         />
 
+        <TabBoundary>
         <div className="flex-1 overflow-hidden flex flex-col">
           {tab === 'home' && (currentProfile.role === 'assistant' || currentProfile.role === 'lead_assistant') && (
             <AssistantTodayView
@@ -418,6 +441,7 @@ function AppInner() {
           {tab === 'studio'    && <StudioView currentProfile={currentProfile} models={models} />}
           {tab === 'settings'  && <SettingsView dark={dark} onToggleDark={toggleDark} venue={venue} onVenueChange={setVenue} onLogOut={handleLogOut} currentProfile={currentProfile} schedule={schedule} onScheduleChange={setSchedule} />}
         </div>
+        </TabBoundary>
 
         <BottomNav active={tab} onSelect={setTab} role={currentProfile.role} />
       </div>

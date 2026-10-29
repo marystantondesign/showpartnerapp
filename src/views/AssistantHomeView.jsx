@@ -141,6 +141,11 @@ export default function AssistantHomeView({
     }
   }, [activeModel?.id])
 
+  // These must live at top level — Rules of Hooks forbids useState inside conditionals
+  const [touchupCheckId, setTouchupCheckId] = useState(null)
+  const [touchupAreas, setTouchupAreas] = useState([])
+  const [touchupNote, setTouchupNote] = useState('')
+
   const latestAnn = announcements?.[0] || null
   const showWarning = !wkActive && latestAnn &&
     latestAnn.text.toLowerCase().includes('walkthrough') &&
@@ -207,11 +212,8 @@ export default function AssistantHomeView({
     )
     const pendingChecks = (toCheckQueue || []).filter(c => c.specialty === specialty)
 
-    const [touchupCheckId, setTouchupCheckId] = useState(null)
     const touchupTarget = touchupCheckId ? pendingChecks.find(c => c.id === touchupCheckId) : null
     const WHERE_OPTIONS_LA = ['Eyes', 'Brows', 'Skin', 'Lips', 'Other']
-    const [touchupAreas, setTouchupAreas] = useState([])
-    const [touchupNote, setTouchupNote] = useState('')
 
     function sendTouchupLA() {
       if (!touchupCheckId) return
